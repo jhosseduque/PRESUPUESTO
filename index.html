@@ -29,175 +29,166 @@
     }
 
     .container {
-    max-width: 960px;
-    margin: 0 auto;
-    padding: 16px;
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 16px;
     }
 
     .card {
-    background: var(--card);
-    border-radius: 18px;
-    padding: 16px;
-    margin-bottom: 16px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+      background: var(--card);
+      border-radius: 18px;
+      padding: 16px;
+      margin-bottom: 16px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
     }
 
     h1 {
-    margin: 0 0 12px;
-    font-size: 28px;
+      margin: 0 0 12px;
+      font-size: 28px;
     }
 
     h2 {
-    margin: 0 0 10px;
-    font-size: 20px;
+      margin: 0 0 10px;
+      font-size: 20px;
     }
 
     .grid-top {
-    display: grid;
-    grid-template-columns: 1fr 1fr auto;
-    gap: 10px;
-    align-items: end;
+      display: grid;
+      grid-template-columns: 44px 1fr 120px 44px;
+      gap: 10px;
+      align-items: end;
+    }
+
+    .nav-spacer {
+      height: 22px;
+      display: block;
+    }
+
+    .nav-btn {
+      width: 44px;
+      height: 42px;
+      padding: 0;
+      border-radius: 12px;
+      font-size: 22px;
+      font-weight: bold;
+      line-height: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
     }
 
     label {
-    display: block;
-    margin-bottom: 4px;
-    font-size: 14px;
-    font-weight: bold;
+      display: block;
+      margin-bottom: 4px;
+      font-size: 14px;
+      font-weight: bold;
     }
 
-    input, select, button {
-    width: 100%;
-    padding: 10px 12px;
-    border-radius: 10px;
-    border: 1px solid #d1d5db;
-    font-size: 14px;
-    background: white;
+    .col-valor input {
+      text-align: right;
     }
 
     .helper {
-    color: var(--muted);
-    font-size: 12px;
-    margin-top: 8px;
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 8px;
     }
 
     .budget-name {
-    display: inline-block;
-    margin-top: 8px;
-    padding: 7px 12px;
-    background: var(--accent);
-    border-radius: 999px;
-    font-size: 13px;
-    font-weight: bold;
+      display: inline-block;
+      margin-top: 8px;
+      padding: 7px 12px;
+      background: var(--accent);
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: bold;
     }
 
-.table-wrap {
-  overflow-x: hidden;
-}
+    .table-wrap {
+      overflow-x: hidden;
+    }
 
-table {
-  width: 100%;
-  border-collapse: collapse;
-  table-layout: fixed;
-}
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+    }
 
-th, td {
-  border-bottom: 1px solid var(--line);
-  padding: 10px 6px;
-  text-align: left;
-  vertical-align: middle;
-}
+    th, td {
+      border-bottom: 1px solid var(--line);
+      padding: 10px 6px;
+      text-align: left;
+      vertical-align: middle;
+    }
 
-th {
-  background: var(--soft);
-  font-size: 13px;
-}
+    th {
+      background: var(--soft);
+      font-size: 12px;
+    }
 
-.col-ingreso {
-  width: 38%;
-}
+      .col-ingreso,
+      .col-gasto {
+        width: 42%;
+      }
 
-.col-valor {
-  width: 24%;
-}
+      .col-valor {
+        width: 26%;
+      }
 
-.col-periodicidad {
-  width: 28%;
-}
+      .col-freq {
+        width: 14%;
+      }
 
-.col-eliminar {
-  width: 10%;
-  text-align: center;
-}
+      .col-pagado {
+        width: 9%;
+        text-align: center;
+      }
 
-.delete-mini {
-  background: #ef4444;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  width: 38px;
-  height: 38px;
-  min-width: 38px;
-  padding: 0;
-  font-size: 18px;
-  line-height: 1;
-}
+      .col-eliminar {
+        width: 9%;
+        text-align: center;
+      }
 
-@media (max-width: 720px) {
-  th, td {
-    padding: 8px 4px;
-  }
+      .delete-mini {
+        background: #ef4444;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        width: 22px;
+        height: 22px;
+        min-width: 22px;
+        padding: 0;
+        font-size: 12px;
+        line-height: 1;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
 
-  th {
-    font-size: 11px;
-  }
+    .check-wrap {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
 
-  .col-ingreso {
-    width: 38%;
-  }
+    .paid-check {
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+      accent-color: #111827;
+    }
 
-  .col-valor {
-    width: 24%;
-  }
+    .mini-legend {
+      margin-top: 8px;
+      font-size: 11px;
+      color: var(--muted);
+    }
 
-  .col-periodicidad {
-    width: 26%;
-  }
-
-  .col-eliminar {
-    width: 12%;
-  }
-
-  table input,
-  table select {
-    padding: 8px 8px;
-    font-size: 12px;
-    border-radius: 8px;
-  }
-
-  .delete-mini {
-    width: 32px;
-    height: 32px;
-    min-width: 32px;
-    font-size: 16px;
-    border-radius: 7px;
-  }
-}
-
-
-
-.income-card-grid label {
-  margin-bottom: 4px;
-  font-size: 12px;
-  color: var(--muted);
-}
-
-@media (max-width: 720px) {
-  
-}
     .summary {
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
+      grid-template-columns: 1fr;
       gap: 12px;
       margin-top: 14px;
     }
@@ -219,12 +210,6 @@ th {
       font-weight: bold;
     }
 
-    .empty-note {
-      margin-top: 10px;
-      color: var(--muted);
-      font-size: 13px;
-    }
-
     .actions-row {
       margin-top: 14px;
       display: flex;
@@ -242,58 +227,141 @@ th {
       padding: 16px 8px;
     }
 
-@media (max-width: 720px) {
-  .container {
-    padding: 12px;
-  }
+    @media (max-width: 720px) {
+      .container {
+        padding: 12px;
+      }
 
-  .card {
-    padding: 14px;
-    border-radius: 16px;
-  }
+      .card {
+        padding: 14px;
+        border-radius: 16px;
+      }
 
-  h1 {
-    font-size: 24px;
-    margin-bottom: 10px;
-  }
+      h1 {
+        font-size: 24px;
+        margin-bottom: 10px;
+      }
 
-  h2 {
-    font-size: 18px;
-    margin-bottom: 8px;
-  }
+      h2 {
+        font-size: 18px;
+        margin-bottom: 8px;
+      }
 
-  .grid-top {
-    grid-template-columns: 1fr 110px;
-    gap: 8px;
-  }
+      .grid-top {
+        grid-template-columns: 40px 1fr 96px 40px;
+        gap: 8px;
+      }
 
-  .grid-top > div:last-child {
-    grid-column: 1 / -1;
-  }
+      .nav-btn {
+        width: 40px;
+        height: 40px;
+        font-size: 20px;
+        border-radius: 10px;
+      }
 
-  input, select, button {
-    padding: 9px 10px;
-    font-size: 14px;
-  }
+      input, select, button {
+        width: 100%;
+        padding: 10px 12px;
+        border-radius: 10px;
+        border: 1px solid #d1d5db;
+        font-size: 14px;
+        background: white;
+      }
+        .table-wrap input,
+        .table-wrap select {
+          width: 100%;
+          min-width: 0;
+          max-width: 100%;
+          border: 1px solid #d1d5db !important;
+          box-shadow: none !important;
+          outline: none !important;
+          background: #fff !important;
+        }
 
-  .summary {
-    grid-template-columns: 1fr;
-    gap: 10px;
-  }
+        .col-valor input {
+          text-align: right;
+        }
 
-  .summary-box {
-    padding: 12px;
-  }
-
-  .summary-box .value {
-    font-size: 18px;
-  }
-
-  .actions-row button {
-    width: 100%;
-    min-width: 0;
-  }
+.col-freq select {
+  font-size: 11px;
+  padding-left: 8px;
+  padding-right: 18px;
+  text-align: left;
+  text-align-last: auto;
+  line-height: 1.2;
+  -webkit-appearance: menulist;
 }
+      th, td {
+        padding: 8px 4px;
+      }
+
+      th {
+        font-size: 10px;
+      }
+
+        .col-ingreso,
+        .col-gasto {
+          width: 40%;
+        }
+
+    .col-valor {
+      width: 23%;
+    }
+
+    .col-freq {
+      width: 15%;
+    }
+
+        .col-pagado {
+          width: 10%;
+        }
+
+        .col-eliminar {
+          width: 12%;
+        }
+
+        table input,
+        table select {
+          padding: 8px 5px;
+          font-size: 11px;
+          border-radius: 8px;
+        }
+
+        .delete-mini {
+          width: 18px;
+          height: 18px;
+          min-width: 18px;
+          font-size: 10px;
+          border-radius: 4px;
+        }
+
+      .paid-check {
+        width: 15px;
+        height: 15px;
+      }
+
+      .summary {
+        grid-template-columns: 1fr;
+        gap: 10px;
+      }
+
+      .summary-box {
+        padding: 12px;
+      }
+
+      .summary-box .value {
+        font-size: 18px;
+      }
+
+      .actions-row button {
+        width: 100%;
+        min-width: 0;
+      }
+
+      .mini-legend {
+        font-size: 10px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -303,6 +371,11 @@ th {
     <div class="card">
       <h2>Crear nuevo presupuesto</h2>
       <div class="grid-top">
+        <div>
+          <span class="nav-spacer" aria-hidden="true"></span>
+          <button id="presupuestoAnteriorBtn" class="nav-btn" type="button" aria-label="Ir al presupuesto anterior">‹</button>
+        </div>
+
         <div>
           <label for="mes">Mes</label>
           <select id="mes">
@@ -327,7 +400,8 @@ th {
         </div>
 
         <div>
-          <button id="crearPresupuestoBtn" type="button">Crear / Abrir</button>
+          <span class="nav-spacer" aria-hidden="true"></span>
+          <button id="presupuestoSiguienteBtn" class="nav-btn" type="button" aria-label="Ir al presupuesto siguiente">›</button>
         </div>
       </div>
 
@@ -336,21 +410,22 @@ th {
     </div>
 
     <div class="card">
-      <h2>Primer módulo: Ingresos</h2>
+      <h2>INGRESOS</h2>
       <div class="table-wrap">
         <table>
-        <thead>
-        <tr>
-            <th class="col-ingreso">Ingreso</th>
-            <th class="col-valor">Valor</th>
-            <th class="col-periodicidad">Periodicidad</th>
-            <th class="col-eliminar">X</th>
-        </tr>
-        </thead>
+          <thead>
+            <tr>
+              <th class="col-ingreso">Ingreso</th>
+              <th class="col-valor">Valor</th>
+              <th class="col-freq">Freq.</th>
+              <th class="col-eliminar">X</th>
+            </tr>
+          </thead>
           <tbody id="tablaIngresos"></tbody>
         </table>
       </div>
 
+      <div class="mini-legend">M = Mensual · A = Anual · O = Ocasional</div>
 
       <div class="actions-row">
         <button id="agregarIngresoBtn" type="button">+ Agregar ingreso</button>
@@ -361,9 +436,36 @@ th {
           <div class="label">Total ingresos registrados</div>
           <div class="value" id="totalIngresos">$0</div>
         </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>GASTOS</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th class="col-gasto">Gasto</th>
+              <th class="col-valor">Valor</th>
+              <th class="col-freq">Freq.</th>
+              <th class="col-pagado">✓</th>
+              <th class="col-eliminar">X</th>
+            </tr>
+          </thead>
+          <tbody id="tablaGastos"></tbody>
+        </table>
+      </div>
+
+      <div class="mini-legend">M = Mensual · A = Anual · O = Ocasional</div>
+
+      <div class="actions-row">
+        <button id="agregarGastoBtn" type="button">+ Agregar gasto</button>
+      </div>
+
+      <div class="summary">
         <div class="summary-box">
-          <div class="label">Cantidad de ingresos</div>
-          <div class="value" id="cantidadIngresos">0</div>
+          <div class="label">Total gastos registrados</div>
+          <div class="value" id="totalGastos">$0</div>
         </div>
       </div>
     </div>
@@ -372,12 +474,17 @@ th {
   <script>
     const mesSelect = document.getElementById('mes');
     const anioInput = document.getElementById('anio');
-    const crearPresupuestoBtn = document.getElementById('crearPresupuestoBtn');
+    const presupuestoAnteriorBtn = document.getElementById('presupuestoAnteriorBtn');
+    const presupuestoSiguienteBtn = document.getElementById('presupuestoSiguienteBtn');
     const presupuestoActivo = document.getElementById('presupuestoActivo');
+
     const tablaIngresos = document.getElementById('tablaIngresos');
     const totalIngresos = document.getElementById('totalIngresos');
-    const cantidadIngresos = document.getElementById('cantidadIngresos');
     const agregarIngresoBtn = document.getElementById('agregarIngresoBtn');
+
+    const tablaGastos = document.getElementById('tablaGastos');
+    const totalGastos = document.getElementById('totalGastos');
+    const agregarGastoBtn = document.getElementById('agregarGastoBtn');
 
     const storageKey = 'presupuestosMensualesApp';
     let presupuestos = JSON.parse(localStorage.getItem(storageKey)) || {};
@@ -392,13 +499,13 @@ th {
     }
 
     function formatoNumeroInput(valor) {
-  const limpio = String(valor || '').replace(/\D/g, '');
-  if (!limpio) return '';
-  return new Intl.NumberFormat('es-CO', {
-    maximumFractionDigits: 0
-  }).format(Number(limpio));
-}
-    
+      const limpio = String(valor || '').replace(/\D/g, '');
+      if (!limpio) return '';
+      return new Intl.NumberFormat('es-CO', {
+        maximumFractionDigits: 0
+      }).format(Number(limpio));
+    }
+
     function nombreMes(valorMes) {
       const meses = {
         '01': 'Enero',
@@ -417,64 +524,66 @@ th {
       return meses[valorMes] || '';
     }
 
-function obtenerKeyMesAnterior(mes, anio) {
-  let mesNum = Number(mes);
-  let anioNum = Number(anio);
+    function obtenerKeyMesAnterior(mes, anio) {
+      let mesNum = Number(mes);
+      let anioNum = Number(anio);
 
-  mesNum -= 1;
+      mesNum -= 1;
 
-  if (mesNum === 0) {
-    mesNum = 12;
-    anioNum -= 1;
-  }
+      if (mesNum === 0) {
+        mesNum = 12;
+        anioNum -= 1;
+      }
 
-  return `${anioNum}-${String(mesNum).padStart(2, '0')}`;
-}
+      return `${anioNum}-${String(mesNum).padStart(2, '0')}`;
+    }
 
-function obtenerIngresosInicialesDesdeMesAnterior(mes, anio) {
-  const keyAnterior = obtenerKeyMesAnterior(mes, anio);
-  const presupuestoAnterior = presupuestos[keyAnterior];
+    function obtenerIngresosInicialesDesdeMesAnterior(mes, anio) {
+      const keyAnterior = obtenerKeyMesAnterior(mes, anio);
+      const presupuestoAnterior = presupuestos[keyAnterior];
 
-  if (!presupuestoAnterior || !Array.isArray(presupuestoAnterior.ingresos)) {
-    return [];
-  }
+      if (!presupuestoAnterior || !Array.isArray(presupuestoAnterior.ingresos)) {
+        return [];
+      }
 
-  return presupuestoAnterior.ingresos
-    .filter((ingreso) => {
-      const descripcion = String(ingreso.descripcion || '').trim();
-      const valor = String(ingreso.valor || '').trim();
+      return presupuestoAnterior.ingresos
+        .filter((ingreso) =>
+          ingreso.periodicidad === 'MENSUAL' &&
+          (
+            String(ingreso.descripcion || '').trim() !== '' ||
+            String(ingreso.valor || '').trim() !== ''
+          )
+        )
+        .map((ingreso) => ({
+          descripcion: ingreso.descripcion,
+          valor: ingreso.valor,
+          periodicidad: ingreso.periodicidad
+        }));
+    }
 
-      return ingreso.periodicidad === 'MENSUAL' && (descripcion !== '' || valor !== '');
-    })
-    .map((ingreso) => ({
-      descripcion: ingreso.descripcion,
-      valor: ingreso.valor,
-      periodicidad: ingreso.periodicidad
-    }));
-}
+    function obtenerGastosInicialesDesdeMesAnterior(mes, anio) {
+      const keyAnterior = obtenerKeyMesAnterior(mes, anio);
+      const presupuestoAnterior = presupuestos[keyAnterior];
 
-function obtenerIngresosInicialesDesdeMesAnterior(mes, anio) {
-  const keyAnterior = obtenerKeyMesAnterior(mes, anio);
-  const presupuestoAnterior = presupuestos[keyAnterior];
+      if (!presupuestoAnterior || !Array.isArray(presupuestoAnterior.gastos)) {
+        return [];
+      }
 
-  if (!presupuestoAnterior || !Array.isArray(presupuestoAnterior.ingresos)) {
-    return [];
-  }
-
-  return presupuestoAnterior.ingresos
-    .filter((ingreso) =>
-      ingreso.periodicidad === 'MENSUAL' &&
-      (
-        String(ingreso.descripcion || '').trim() !== '' ||
-        String(ingreso.valor || '').trim() !== ''
-      )
-    )
-    .map((ingreso) => ({
-      descripcion: ingreso.descripcion,
-      valor: ingreso.valor,
-      periodicidad: ingreso.periodicidad
-    }));
-}
+      return presupuestoAnterior.gastos
+        .filter((gasto) =>
+          gasto.periodicidad === 'MENSUAL' &&
+          (
+            String(gasto.descripcion || '').trim() !== '' ||
+            String(gasto.valor || '').trim() !== ''
+          )
+        )
+        .map((gasto) => ({
+          descripcion: gasto.descripcion,
+          valor: gasto.valor,
+          periodicidad: gasto.periodicidad,
+          pagado: false
+        }));
+    }
 
     function guardarTodo() {
       localStorage.setItem(storageKey, JSON.stringify(presupuestos));
@@ -489,118 +598,267 @@ function obtenerIngresosInicialesDesdeMesAnterior(mes, anio) {
       };
     }
 
-    function actualizarResumen() {
+    function crearGastoVacio() {
+      return {
+        descripcion: '',
+        valor: '',
+        periodicidad: 'MENSUAL',
+        pagado: false
+      };
+    }
+
+    function asegurarEstructuraPresupuesto(key) {
+      if (!presupuestos[key]) return;
+
+      if (!Array.isArray(presupuestos[key].ingresos)) {
+        presupuestos[key].ingresos = [];
+      }
+
+      if (!Array.isArray(presupuestos[key].gastos)) {
+        presupuestos[key].gastos = [];
+      }
+    }
+
+    function actualizarResumenIngresos() {
       if (!presupuestoActualKey || !presupuestos[presupuestoActualKey]) {
         totalIngresos.textContent = formatoMoneda(0);
-        cantidadIngresos.textContent = '0';
         return;
       }
 
       const ingresos = presupuestos[presupuestoActualKey].ingresos;
       const total = ingresos.reduce((acc, fila) => acc + (Number(fila.valor) || 0), 0);
-
       totalIngresos.textContent = formatoMoneda(total);
-      cantidadIngresos.textContent = String(ingresos.length);
     }
 
- function renderIngresos() {
-  tablaIngresos.innerHTML = '';
+    function actualizarResumenGastos() {
+      if (!presupuestoActualKey || !presupuestos[presupuestoActualKey]) {
+        totalGastos.textContent = formatoMoneda(0);
+        return;
+      }
 
-  if (!presupuestoActualKey || !presupuestos[presupuestoActualKey]) {
-    totalIngresos.textContent = formatoMoneda(0);
-    cantidadIngresos.textContent = '0';
-    presupuestoActivo.textContent = 'No hay presupuesto activo';
-    return;
-  }
-
-  const ingresos = presupuestos[presupuestoActualKey].ingresos;
-
-  if (ingresos.length === 0) {
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td colspan="4" class="empty-row">Aún no has agregado ingresos para este mes.</td>
-    `;
-    tablaIngresos.appendChild(tr);
-  }
-
-  ingresos.forEach((fila, index) => {
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td class="col-ingreso">
-        <input
-          type="text"
-          value="${fila.descripcion}"
-          placeholder="Ej. Nómina"
-          data-index="${index}"
-          data-field="descripcion"
-        />
-      </td>
-      <td class="col-valor">
-        <input
-          type="text"
-          inputmode="numeric"
-          value="${formatoNumeroInput(fila.valor)}"
-          placeholder="0"
-          data-index="${index}"
-          data-field="valor"
-        />
-      </td>
-      <td class="col-periodicidad">
-        <select data-index="${index}" data-field="periodicidad">
-          <option value="MENSUAL" ${fila.periodicidad === 'MENSUAL' ? 'selected' : ''}>Mensual</option>
-          <option value="ANUAL" ${fila.periodicidad === 'ANUAL' ? 'selected' : ''}>Anual</option>
-          <option value="OCASIONAL" ${fila.periodicidad === 'OCASIONAL' ? 'selected' : ''}>Ocasional</option>
-        </select>
-      </td>
-      <td class="col-eliminar">
-        <button
-          type="button"
-          class="delete-mini"
-          data-index="${index}"
-          data-action="eliminar"
-          title="Eliminar ingreso"
-        >×</button>
-      </td>
-    `;
-
-    tablaIngresos.appendChild(tr);
-  });
-
-  actualizarResumen();
-  activarEventosFilas();
-}
-
-    function activarEventosFilas() {
-        const campos = tablaIngresos.querySelectorAll('input, select');
-
-        campos.forEach((campo) => {
-        campo.addEventListener('input', manejarCambioFila);
-        campo.addEventListener('change', manejarCambioFila);
-        });
+      const gastos = presupuestos[presupuestoActualKey].gastos;
+      const total = gastos.reduce((acc, fila) => acc + (Number(fila.valor) || 0), 0);
+      totalGastos.textContent = formatoMoneda(total);
     }
 
-    function manejarCambioFila(e) {
-  const index = Number(e.target.dataset.index);
-  const field = e.target.dataset.field;
+    function renderIngresos() {
+      tablaIngresos.innerHTML = '';
 
-  if (!presupuestoActualKey || !presupuestos[presupuestoActualKey]) return;
-  if (Number.isNaN(index)) return;
+      if (!presupuestoActualKey || !presupuestos[presupuestoActualKey]) {
+        totalIngresos.textContent = formatoMoneda(0);
+        presupuestoActivo.textContent = 'No hay presupuesto activo';
+        return;
+      }
 
-  let value = e.target.value;
+      asegurarEstructuraPresupuesto(presupuestoActualKey);
 
-  if (field === 'valor') {
-    value = value.replace(/\D/g, '');
-    presupuestos[presupuestoActualKey].ingresos[index][field] = value;
-    e.target.value = formatoNumeroInput(value);
-  } else {
-    presupuestos[presupuestoActualKey].ingresos[index][field] = value;
-  }
+      const ingresos = presupuestos[presupuestoActualKey].ingresos;
 
-  guardarTodo();
-  actualizarResumen();
-}
+      if (ingresos.length === 0) {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td colspan="4" class="empty-row">Aún no has agregado ingresos para este mes.</td>
+        `;
+        tablaIngresos.appendChild(tr);
+      }
 
-    function manejarAccionesTabla(e) {
+      ingresos.forEach((fila, index) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td class="col-ingreso">
+            <input
+              type="text"
+              value="${fila.descripcion || ''}"
+              placeholder="Ej. Nómina"
+              data-index="${index}"
+              data-field="descripcion"
+            />
+          </td>
+          <td class="col-valor">
+            <input
+              type="text"
+              inputmode="numeric"
+              value="${formatoNumeroInput(fila.valor)}"
+              placeholder="0"
+              data-index="${index}"
+              data-field="valor"
+            />
+          </td>
+          <td class="col-freq">
+            <select data-index="${index}" data-field="periodicidad">
+              <option value="MENSUAL" ${fila.periodicidad === 'MENSUAL' ? 'selected' : ''}>M</option>
+              <option value="ANUAL" ${fila.periodicidad === 'ANUAL' ? 'selected' : ''}>A</option>
+              <option value="OCASIONAL" ${fila.periodicidad === 'OCASIONAL' ? 'selected' : ''}>O</option>
+            </select>
+          </td>
+          <td class="col-eliminar">
+            <button
+              type="button"
+              class="delete-mini"
+              data-index="${index}"
+              data-action="eliminar"
+              title="Eliminar ingreso"
+            >×</button>
+          </td>
+        `;
+
+        tablaIngresos.appendChild(tr);
+      });
+
+      actualizarResumenIngresos();
+      activarEventosFilasIngresos();
+    }
+
+    function renderGastos() {
+      tablaGastos.innerHTML = '';
+
+      if (!presupuestoActualKey || !presupuestos[presupuestoActualKey]) {
+        totalGastos.textContent = formatoMoneda(0);
+        return;
+      }
+
+      asegurarEstructuraPresupuesto(presupuestoActualKey);
+
+      const gastos = presupuestos[presupuestoActualKey].gastos;
+
+      if (gastos.length === 0) {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td colspan="5" class="empty-row">Aún no has agregado gastos para este mes.</td>
+        `;
+        tablaGastos.appendChild(tr);
+      }
+
+      gastos.forEach((fila, index) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td class="col-gasto">
+            <input
+              type="text"
+              value="${fila.descripcion || ''}"
+              placeholder="Ej. Arriendo"
+              data-index="${index}"
+              data-field="descripcion"
+            />
+          </td>
+          <td class="col-valor">
+            <input
+              type="text"
+              inputmode="numeric"
+              value="${formatoNumeroInput(fila.valor)}"
+              placeholder="0"
+              data-index="${index}"
+              data-field="valor"
+            />
+          </td>
+          <td class="col-freq">
+            <select data-index="${index}" data-field="periodicidad">
+              <option value="MENSUAL" ${fila.periodicidad === 'MENSUAL' ? 'selected' : ''}>M</option>
+              <option value="ANUAL" ${fila.periodicidad === 'ANUAL' ? 'selected' : ''}>A</option>
+              <option value="OCASIONAL" ${fila.periodicidad === 'OCASIONAL' ? 'selected' : ''}>O</option>
+            </select>
+          </td>
+          <td class="col-pagado">
+            <div class="check-wrap">
+              <input
+                type="checkbox"
+                class="paid-check"
+                ${fila.pagado ? 'checked' : ''}
+                data-index="${index}"
+                data-field="pagado"
+                title="Marcar como pagado"
+              />
+            </div>
+          </td>
+          <td class="col-eliminar">
+            <button
+              type="button"
+              class="delete-mini"
+              data-index="${index}"
+              data-action="eliminar"
+              title="Eliminar gasto"
+            >×</button>
+          </td>
+        `;
+
+        tablaGastos.appendChild(tr);
+      });
+
+      actualizarResumenGastos();
+      activarEventosFilasGastos();
+    }
+
+    function activarEventosFilasIngresos() {
+      const campos = tablaIngresos.querySelectorAll('input, select');
+
+      campos.forEach((campo) => {
+        campo.addEventListener('input', manejarCambioIngreso);
+        campo.addEventListener('change', manejarCambioIngreso);
+      });
+    }
+
+    function activarEventosFilasGastos() {
+      const campos = tablaGastos.querySelectorAll('input, select');
+
+      campos.forEach((campo) => {
+        if (campo.type === 'checkbox') {
+          campo.addEventListener('change', manejarCambioGasto);
+        } else {
+          campo.addEventListener('input', manejarCambioGasto);
+          campo.addEventListener('change', manejarCambioGasto);
+        }
+      });
+    }
+
+    function manejarCambioIngreso(e) {
+      const index = Number(e.target.dataset.index);
+      const field = e.target.dataset.field;
+
+      if (!presupuestoActualKey || !presupuestos[presupuestoActualKey]) return;
+      if (Number.isNaN(index)) return;
+
+      let value = e.target.value;
+
+      if (field === 'valor') {
+        value = value.replace(/\D/g, '');
+        presupuestos[presupuestoActualKey].ingresos[index][field] = value;
+        e.target.value = formatoNumeroInput(value);
+      } else {
+        presupuestos[presupuestoActualKey].ingresos[index][field] = value;
+      }
+
+      guardarTodo();
+      actualizarResumenIngresos();
+    }
+
+    function manejarCambioGasto(e) {
+      const index = Number(e.target.dataset.index);
+      const field = e.target.dataset.field;
+
+      if (!presupuestoActualKey || !presupuestos[presupuestoActualKey]) return;
+      if (Number.isNaN(index)) return;
+
+      if (field === 'pagado') {
+        presupuestos[presupuestoActualKey].gastos[index][field] = e.target.checked;
+        guardarTodo();
+        return;
+      }
+
+      let value = e.target.value;
+
+      if (field === 'valor') {
+        value = value.replace(/\D/g, '');
+        presupuestos[presupuestoActualKey].gastos[index][field] = value;
+        e.target.value = formatoNumeroInput(value);
+      } else {
+        presupuestos[presupuestoActualKey].gastos[index][field] = value;
+      }
+
+      guardarTodo();
+      actualizarResumenGastos();
+    }
+
+    function manejarAccionesTablaIngresos(e) {
       const action = e.target.dataset.action;
       const index = Number(e.target.dataset.index);
 
@@ -613,12 +871,26 @@ function obtenerIngresosInicialesDesdeMesAnterior(mes, anio) {
       renderIngresos();
     }
 
+    function manejarAccionesTablaGastos(e) {
+      const action = e.target.dataset.action;
+      const index = Number(e.target.dataset.index);
+
+      if (action !== 'eliminar') return;
+      if (!presupuestoActualKey || !presupuestos[presupuestoActualKey]) return;
+      if (Number.isNaN(index)) return;
+
+      presupuestos[presupuestoActualKey].gastos.splice(index, 1);
+      guardarTodo();
+      renderGastos();
+    }
+
     function agregarIngreso() {
       if (!presupuestoActualKey || !presupuestos[presupuestoActualKey]) {
         alert('Primero crea o abre un presupuesto.');
         return;
       }
 
+      asegurarEstructuraPresupuesto(presupuestoActualKey);
       presupuestos[presupuestoActualKey].ingresos.push(crearFilaVacia());
       guardarTodo();
       renderIngresos();
@@ -628,46 +900,102 @@ function obtenerIngresosInicialesDesdeMesAnterior(mes, anio) {
       if (nuevoCampo) nuevoCampo.focus();
     }
 
+    function agregarGasto() {
+      if (!presupuestoActualKey || !presupuestos[presupuestoActualKey]) {
+        alert('Primero crea o abre un presupuesto.');
+        return;
+      }
+
+      asegurarEstructuraPresupuesto(presupuestoActualKey);
+      presupuestos[presupuestoActualKey].gastos.push(crearGastoVacio());
+      guardarTodo();
+      renderGastos();
+
+      const nuevoIndex = presupuestos[presupuestoActualKey].gastos.length - 1;
+      const nuevoCampo = tablaGastos.querySelector(`[data-index="${nuevoIndex}"][data-field="descripcion"]`);
+      if (nuevoCampo) nuevoCampo.focus();
+    }
+
+    function actualizarSeleccionPresupuesto(mes, anio) {
+      mesSelect.value = mes;
+      anioInput.value = anio;
+      crearOAbrirPresupuesto();
+    }
+
+    function navegarPresupuesto(direccion) {
+      guardarTodo();
+
+      const mesActual = Number(mesSelect.value || '1');
+      const anioActual = Number(anioInput.value || new Date().getFullYear());
+
+      let nuevoMes = mesActual + direccion;
+      let nuevoAnio = anioActual;
+
+      if (nuevoMes < 1) {
+        nuevoMes = 12;
+        nuevoAnio -= 1;
+      }
+
+      if (nuevoMes > 12) {
+        nuevoMes = 1;
+        nuevoAnio += 1;
+      }
+
+      actualizarSeleccionPresupuesto(String(nuevoMes).padStart(2, '0'), String(nuevoAnio));
+    }
+
     function crearOAbrirPresupuesto() {
-        const mes = mesSelect.value;
-        const anio = anioInput.value.trim();
+      const mes = mesSelect.value;
+      const anio = anioInput.value.trim();
 
-        if (!anio) {
-            alert('Escribe el año para crear el presupuesto.');
-            return;
+      if (!anio) {
+        alert('Escribe el año para crear el presupuesto.');
+        return;
+      }
+
+      const key = `${anio}-${mes}`;
+      const ingresosArrastrados = obtenerIngresosInicialesDesdeMesAnterior(mes, anio);
+      const gastosArrastrados = obtenerGastosInicialesDesdeMesAnterior(mes, anio);
+
+      if (!presupuestos[key]) {
+        presupuestos[key] = {
+          mes,
+          anio,
+          ingresos: ingresosArrastrados,
+          gastos: gastosArrastrados
+        };
+      } else {
+        if (!Array.isArray(presupuestos[key].ingresos)) {
+          presupuestos[key].ingresos = [];
         }
 
-        const key = `${anio}-${mes}`;
-        const ingresosArrastrados = obtenerIngresosInicialesDesdeMesAnterior(mes, anio);
-
-        if (!presupuestos[key]) {
-            presupuestos[key] = {
-            mes,
-            anio,
-            ingresos: ingresosArrastrados
-            };
-        } else {
-            if (!Array.isArray(presupuestos[key].ingresos)) {
-            presupuestos[key].ingresos = [];
-            }
-
-            const estaVacio = presupuestos[key].ingresos.length === 0;
-
-            if (estaVacio && ingresosArrastrados.length > 0) {
-            presupuestos[key].ingresos = ingresosArrastrados;
-            }
+        if (!Array.isArray(presupuestos[key].gastos)) {
+          presupuestos[key].gastos = [];
         }
 
-        presupuestoActualKey = key;
-        presupuestoActivo.textContent = `Presupuesto activo: ${nombreMes(mes)} ${anio}`;
-        guardarTodo();
-        renderIngresos();
+        const ingresosVacios = presupuestos[key].ingresos.length === 0;
+        const gastosVacios = presupuestos[key].gastos.length === 0;
+
+        if (ingresosVacios && ingresosArrastrados.length > 0) {
+          presupuestos[key].ingresos = ingresosArrastrados;
+        }
+
+        if (gastosVacios && gastosArrastrados.length > 0) {
+          presupuestos[key].gastos = gastosArrastrados;
+        }
+      }
+
+      presupuestoActualKey = key;
+      presupuestoActivo.textContent = `Presupuesto activo: ${nombreMes(mes)} ${anio}`;
+      guardarTodo();
+      renderIngresos();
+      renderGastos();
     }
 
     function intentarAbrirPresupuestoAutomatico() {
-        const anio = anioInput.value.trim();
-        if (!/^\d{4}$/.test(anio)) return;
-        crearOAbrirPresupuesto();
+      const anio = anioInput.value.trim();
+      if (!/^\d{4}$/.test(anio)) return;
+      crearOAbrirPresupuesto();
     }
 
     function cargarInicial() {
@@ -682,14 +1010,24 @@ function obtenerIngresosInicialesDesdeMesAnterior(mes, anio) {
         const [anioGuardado, mesGuardado] = presupuestoActualKey.split('-');
         mesSelect.value = mesGuardado;
         anioInput.value = anioGuardado;
+        asegurarEstructuraPresupuesto(presupuestoActualKey);
         presupuestoActivo.textContent = `Presupuesto activo: ${nombreMes(mesGuardado)} ${anioGuardado}`;
         renderIngresos();
+        renderGastos();
+      } else {
+        totalIngresos.textContent = formatoMoneda(0);
+        totalGastos.textContent = formatoMoneda(0);
       }
     }
 
-    crearPresupuestoBtn.addEventListener('click', crearOAbrirPresupuesto);
+    presupuestoAnteriorBtn.addEventListener('click', () => navegarPresupuesto(-1));
+    presupuestoSiguienteBtn.addEventListener('click', () => navegarPresupuesto(1));
+
     agregarIngresoBtn.addEventListener('click', agregarIngreso);
-    tablaIngresos.addEventListener('click', manejarAccionesTabla);
+    agregarGastoBtn.addEventListener('click', agregarGasto);
+
+    tablaIngresos.addEventListener('click', manejarAccionesTablaIngresos);
+    tablaGastos.addEventListener('click', manejarAccionesTablaGastos);
 
     mesSelect.addEventListener('change', intentarAbrirPresupuestoAutomatico);
     anioInput.addEventListener('change', intentarAbrirPresupuestoAutomatico);
