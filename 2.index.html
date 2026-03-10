@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MI PRESUPUESTO</title>
+  <style>
+    :root {
+      --bg: #f6f7fb;
+      --card: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --line: #e5e7eb;
+      --dark: #111827;
+      --soft: #f9fafb;
+      --accent: #e9eefc;
+      --danger: #ef4444;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .container {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    h1 {
+      margin: 0 0 16px;
+      font-size: 28px;
+    }
+
+    h2 {
+      margin: 0 0 12px;
+      font-size: 20px;
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: 18px;
+      padding: 18px;
+      margin-bottom: 18px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    }
+
+    .grid-top {
+      display: grid;
+      grid-template-columns: 1fr 1fr auto;
+      gap: 12px;
+      align-items: end;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 14px;
+      font-weight: bold;
+    }
+
+    input, select, button {
+      width: 100%;
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid #d1d5db;
+      font-size: 14px;
+      background: white;
+    }
+
+    button {
+      background: var(--dark);
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .btn-danger {
+      background: var(--danger);
+    }
+
+    .helper {
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 10px;
+    }
+
+    .budget-name {
+      display: inline-block;
+      margin-top: 10px;
+      padding: 8px 12px;
+      background: var(--accent);
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: bold;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 820px;
+    }
+
+    th, td {
+      border-bottom: 1px solid var(--line);
+      padding: 10px 8px;
+      text-align: left;
+      vertical-align: middle;
+    }
+
+    th {
+      background: var(--soft);
+      font-size: 13px;
+    }
+
+    .row-number {
+      width: 60px;
+      font-weight: bold;
+    }
+
+    .value-cell {
+      min-width: 140px;
+    }
+
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .summary-box {
+      background: var(--soft);
+      border-radius: 14px;
+      padding: 14px;
+    }
+
+    .summary-box .label {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    .summary-box .value {
+      font-size: 22px;
+      font-weight: bold;
+    }
+
+    .empty-note {
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .actions-row {
+      margin-top: 14px;
+      display: flex;
+      justify-content: flex-start;
+    }
+
+    .actions-row button {
+      width: auto;
+      min-width: 180px;
+      padding: 12px 18px;
+    }
+
+    .empty-row {
+      color: var(--muted);
+      padding: 16px 8px;
+    }
+
+    @media (max-width: 720px) {
+      .grid-top {
+        grid-template-columns: 1fr;
+      }
+
+      .summary {
+        grid-template-columns: 1fr;
+      }
+
+      h1 {
+        font-size: 24px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Mi Presupuesto</h1>
+
+    <div class="card">
+      <h2>Crear nuevo presupuesto</h2>
+      <div class="grid-top">
+        <div>
+          <label for="mes">Mes</label>
+          <select id="mes">
+            <option value="01">Enero</option>
+            <option value="02">Febrero</option>
+            <option value="03">Marzo</option>
+            <option value="04">Abril</option>
+            <option value="05">Mayo</option>
+            <option value="06">Junio</option>
+            <option value="07">Julio</option>
+            <option value="08">Agosto</option>
+            <option value="09">Septiembre</option>
+            <option value="10">Octubre</option>
+            <option value="11">Noviembre</option>
+            <option value="12">Diciembre</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="anio">Año</label>
+          <input id="anio" type="number" placeholder="2026" min="2024" max="2100" />
+        </div>
+
+        <div>
+          <button id="crearPresupuestoBtn" type="button">Crear / Abrir</button>
+        </div>
+      </div>
+
+      <div class="helper">Cada mes y año crea una planilla nueva. Si ya existe, se vuelve a abrir.</div>
+      <div id="presupuestoActivo" class="budget-name">No hay presupuesto activo</div>
+    </div>
+
+    <div class="card">
+      <h2>Primer módulo: Ingresos</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>No.</th>
+              <th>Descripción</th>
+              <th>Valor</th>
+              <th>Periodicidad</th>
+              <th>Acción</th>
+            </tr>
+          </thead>
+          <tbody id="tablaIngresos"></tbody>
+        </table>
+      </div>
+
+      
+      <div class="actions-row">
+        <button id="agregarIngresoBtn" type="button">+ Agregar ingreso</button>
+      </div>
+
+      <div class="summary">
+        <div class="summary-box">
+          <div class="label">Total ingresos registrados</div>
+          <div class="value" id="totalIngresos">$0</div>
+        </div>
+        <div class="summary-box">
+          <div class="label">Cantidad de ingresos</div>
+          <div class="value" id="cantidadIngresos">0</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const mesSelect = document.getElementById('mes');
+    const anioInput = document.getElementById('anio');
+    const crearPresupuestoBtn = document.getElementById('crearPresupuestoBtn');
+    const presupuestoActivo = document.getElementById('presupuestoActivo');
+    const tablaIngresos = document.getElementById('tablaIngresos');
+    const totalIngresos = document.getElementById('totalIngresos');
+    const cantidadIngresos = document.getElementById('cantidadIngresos');
+    const agregarIngresoBtn = document.getElementById('agregarIngresoBtn');
+
+    const storageKey = 'presupuestosMensualesApp';
+    let presupuestos = JSON.parse(localStorage.getItem(storageKey)) || {};
+    let presupuestoActualKey = localStorage.getItem('presupuestoActualKey') || '';
+
+    function formatoMoneda(numero) {
+      return new Intl.NumberFormat('es-CO', {
+        style: 'currency',
+        currency: 'COP',
+        maximumFractionDigits: 0
+      }).format(Number(numero) || 0);
+    }
+
+    function formatoNumeroInput(valor) {
+  const limpio = String(valor || '').replace(/\D/g, '');
+  if (!limpio) return '';
+  return new Intl.NumberFormat('es-CO', {
+    maximumFractionDigits: 0
+  }).format(Number(limpio));
+}
+    
+    function nombreMes(valorMes) {
+      const meses = {
+        '01': 'Enero',
+        '02': 'Febrero',
+        '03': 'Marzo',
+        '04': 'Abril',
+        '05': 'Mayo',
+        '06': 'Junio',
+        '07': 'Julio',
+        '08': 'Agosto',
+        '09': 'Septiembre',
+        '10': 'Octubre',
+        '11': 'Noviembre',
+        '12': 'Diciembre'
+      };
+      return meses[valorMes] || '';
+    }
+
+function obtenerKeyMesAnterior(mes, anio) {
+  let mesNum = Number(mes);
+  let anioNum = Number(anio);
+
+  mesNum -= 1;
+
+  if (mesNum === 0) {
+    mesNum = 12;
+    anioNum -= 1;
+  }
+
+  return `${anioNum}-${String(mesNum).padStart(2, '0')}`;
+}
+
+function obtenerIngresosInicialesDesdeMesAnterior(mes, anio) {
+  const keyAnterior = obtenerKeyMesAnterior(mes, anio);
+  const presupuestoAnterior = presupuestos[keyAnterior];
+
+  if (!presupuestoAnterior || !Array.isArray(presupuestoAnterior.ingresos)) {
+    return [];
+  }
+
+  return presupuestoAnterior.ingresos
+    .filter((ingreso) => {
+      const descripcion = String(ingreso.descripcion || '').trim();
+      const valor = String(ingreso.valor || '').trim();
+
+      return ingreso.periodicidad === 'MENSUAL' && (descripcion !== '' || valor !== '');
+    })
+    .map((ingreso) => ({
+      descripcion: ingreso.descripcion,
+      valor: ingreso.valor,
+      periodicidad: ingreso.periodicidad
+    }));
+}
+
+function obtenerIngresosInicialesDesdeMesAnterior(mes, anio) {
+  const keyAnterior = obtenerKeyMesAnterior(mes, anio);
+  const presupuestoAnterior = presupuestos[keyAnterior];
+
+  if (!presupuestoAnterior || !Array.isArray(presupuestoAnterior.ingresos)) {
+    return [];
+  }
+
+  return presupuestoAnterior.ingresos
+    .filter((ingreso) =>
+      ingreso.periodicidad === 'MENSUAL' &&
+      (
+        String(ingreso.descripcion || '').trim() !== '' ||
+        String(ingreso.valor || '').trim() !== ''
+      )
+    )
+    .map((ingreso) => ({
+      descripcion: ingreso.descripcion,
+      valor: ingreso.valor,
+      periodicidad: ingreso.periodicidad
+    }));
+}
+
+    function guardarTodo() {
+      localStorage.setItem(storageKey, JSON.stringify(presupuestos));
+      localStorage.setItem('presupuestoActualKey', presupuestoActualKey);
+    }
+
+    function crearFilaVacia() {
+      return {
+        descripcion: '',
+        valor: '',
+        periodicidad: 'MENSUAL'
+      };
+    }
+
+    function actualizarResumen() {
+      if (!presupuestoActualKey || !presupuestos[presupuestoActualKey]) {
+        totalIngresos.textContent = formatoMoneda(0);
+        cantidadIngresos.textContent = '0';
+        return;
+      }
+
+      const ingresos = presupuestos[presupuestoActualKey].ingresos;
+      const total = ingresos.reduce((acc, fila) => acc + (Number(fila.valor) || 0), 0);
+
+      totalIngresos.textContent = formatoMoneda(total);
+      cantidadIngresos.textContent = String(ingresos.length);
+    }
+
+    function renderIngresos() {
+      tablaIngresos.innerHTML = '';
+
+      if (!presupuestoActualKey || !presupuestos[presupuestoActualKey]) {
+        totalIngresos.textContent = formatoMoneda(0);
+        cantidadIngresos.textContent = '0';
+        presupuestoActivo.textContent = 'No hay presupuesto activo';
+        return;
+      }
+
+      const ingresos = presupuestos[presupuestoActualKey].ingresos;
+
+      if (ingresos.length === 0) {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td colspan="5" class="empty-row">Aún no has agregado ingresos para este mes.</td>
+        `;
+        tablaIngresos.appendChild(tr);
+      }
+
+      ingresos.forEach((fila, index) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td class="row-number">${index + 1}</td>
+          <td>
+            <input
+              type="text"
+              value="${fila.descripcion}"
+              placeholder="Ej. Salario, ventas, arriendo"
+              data-index="${index}"
+              data-field="descripcion"
+            />
+          </td>
+          <td class="value-cell">
+            <input
+              type="text"
+              inputmode="numeric"
+              value="${formatoNumeroInput(fila.valor)}"
+              placeholder="Ej. 2500000"
+              data-index="${index}"
+              data-field="valor"
+            />
+          </td>
+          <td>
+            <select data-index="${index}" data-field="periodicidad">
+              <option value="MENSUAL" ${fila.periodicidad === 'MENSUAL' ? 'selected' : ''}>MENSUAL</option>
+              <option value="ANUAL" ${fila.periodicidad === 'ANUAL' ? 'selected' : ''}>ANUAL</option>
+              <option value="OCASIONAL" ${fila.periodicidad === 'OCASIONAL' ? 'selected' : ''}>OCASIONAL</option>
+            </select>
+          </td>
+          <td>
+            <button type="button" class="btn-danger" data-index="${index}" data-action="eliminar">Eliminar</button>
+          </td>
+        `;
+
+        tablaIngresos.appendChild(tr);
+      });
+
+      actualizarResumen();
+      activarEventosFilas();
+    }
+
+    function activarEventosFilas() {
+      const campos = tablaIngresos.querySelectorAll('input, select');
+
+      campos.forEach((campo) => {
+        campo.addEventListener('input', manejarCambioFila);
+        campo.addEventListener('change', manejarCambioFila);
+      });
+    }
+
+    function manejarCambioFila(e) {
+  const index = Number(e.target.dataset.index);
+  const field = e.target.dataset.field;
+
+  if (!presupuestoActualKey || !presupuestos[presupuestoActualKey]) return;
+  if (Number.isNaN(index)) return;
+
+  let value = e.target.value;
+
+  if (field === 'valor') {
+    value = value.replace(/\D/g, '');
+    presupuestos[presupuestoActualKey].ingresos[index][field] = value;
+    e.target.value = formatoNumeroInput(value);
+  } else {
+    presupuestos[presupuestoActualKey].ingresos[index][field] = value;
+  }
+
+  guardarTodo();
+  actualizarResumen();
+}
+
+    function manejarAccionesTabla(e) {
+      const action = e.target.dataset.action;
+      const index = Number(e.target.dataset.index);
+
+      if (action !== 'eliminar') return;
+      if (!presupuestoActualKey || !presupuestos[presupuestoActualKey]) return;
+      if (Number.isNaN(index)) return;
+
+      presupuestos[presupuestoActualKey].ingresos.splice(index, 1);
+      guardarTodo();
+      renderIngresos();
+    }
+
+    function agregarIngreso() {
+      if (!presupuestoActualKey || !presupuestos[presupuestoActualKey]) {
+        alert('Primero crea o abre un presupuesto.');
+        return;
+      }
+
+      presupuestos[presupuestoActualKey].ingresos.push(crearFilaVacia());
+      guardarTodo();
+      renderIngresos();
+
+      const nuevoIndex = presupuestos[presupuestoActualKey].ingresos.length - 1;
+      const nuevoCampo = tablaIngresos.querySelector(`[data-index="${nuevoIndex}"][data-field="descripcion"]`);
+      if (nuevoCampo) nuevoCampo.focus();
+    }
+
+    function crearOAbrirPresupuesto() {
+        const mes = mesSelect.value;
+        const anio = anioInput.value.trim();
+
+        if (!anio) {
+            alert('Escribe el año para crear el presupuesto.');
+            return;
+        }
+
+        const key = `${anio}-${mes}`;
+        const ingresosArrastrados = obtenerIngresosInicialesDesdeMesAnterior(mes, anio);
+
+        if (!presupuestos[key]) {
+            presupuestos[key] = {
+            mes,
+            anio,
+            ingresos: ingresosArrastrados
+            };
+        } else {
+            if (!Array.isArray(presupuestos[key].ingresos)) {
+            presupuestos[key].ingresos = [];
+            }
+
+            const estaVacio = presupuestos[key].ingresos.length === 0;
+
+            if (estaVacio && ingresosArrastrados.length > 0) {
+            presupuestos[key].ingresos = ingresosArrastrados;
+            }
+        }
+
+        presupuestoActualKey = key;
+        presupuestoActivo.textContent = `Presupuesto activo: ${nombreMes(mes)} ${anio}`;
+        guardarTodo();
+        renderIngresos();
+    }
+
+    function intentarAbrirPresupuestoAutomatico() {
+        const anio = anioInput.value.trim();
+        if (!/^\d{4}$/.test(anio)) return;
+        crearOAbrirPresupuesto();
+    }
+
+    function cargarInicial() {
+      const hoy = new Date();
+      const mesActual = String(hoy.getMonth() + 1).padStart(2, '0');
+      const anioActual = hoy.getFullYear();
+
+      mesSelect.value = mesActual;
+      anioInput.value = anioActual;
+
+      if (presupuestoActualKey && presupuestos[presupuestoActualKey]) {
+        const [anioGuardado, mesGuardado] = presupuestoActualKey.split('-');
+        mesSelect.value = mesGuardado;
+        anioInput.value = anioGuardado;
+        presupuestoActivo.textContent = `Presupuesto activo: ${nombreMes(mesGuardado)} ${anioGuardado}`;
+        renderIngresos();
+      }
+    }
+
+    crearPresupuestoBtn.addEventListener('click', crearOAbrirPresupuesto);
+    agregarIngresoBtn.addEventListener('click', agregarIngreso);
+    tablaIngresos.addEventListener('click', manejarAccionesTabla);
+
+    mesSelect.addEventListener('change', intentarAbrirPresupuestoAutomatico);
+    anioInput.addEventListener('change', intentarAbrirPresupuestoAutomatico);
+    anioInput.addEventListener('blur', intentarAbrirPresupuestoAutomatico);
+
+    cargarInicial();
+  </script>
+</body>
+</html>
