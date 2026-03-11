@@ -780,6 +780,23 @@
       return `${anio}-${mes}`;
     }
 
+    function abrirPresupuestoExistente(key) {
+      if (!presupuestos[key]) return;
+
+      presupuestoActualKey = key;
+      asegurarEstructuraPresupuesto(key);
+
+      const [anioGuardado, mesGuardado] = key.split('-');
+      presupuestoActivo.textContent = `Presupuesto activo: ${nombreMes(mesGuardado)} ${anioGuardado}`;
+
+      guardarTodo();
+      renderIngresos();
+      renderGastos();
+      renderAhorros();
+      actualizarDisponibleActual();
+      mostrarPresupuestoActivo();
+    }
+
     function evaluarVistaSegunSeleccion() {
       const key = obtenerKeySeleccionActual();
 
@@ -788,9 +805,8 @@
         return;
       }
 
-      if (presupuestoActualKey === key && presupuestos[key]) {
-        mostrarPresupuestoActivo();
-        presupuestoActivo.textContent = `Presupuesto activo: ${nombreMes(mesSelect.value)} ${anioInput.value.trim()}`;
+      if (presupuestos[key]) {
+        abrirPresupuestoExistente(key);
         return;
       }
 
@@ -1291,15 +1307,7 @@
         }
       }
 
-      presupuestoActualKey = key;
-      presupuestoActivo.textContent = `Presupuesto activo: ${nombreMes(mes)} ${anio}`;
-      guardarTodo();
-
-      renderIngresos();
-      renderGastos();
-      renderAhorros();
-      actualizarDisponibleActual();
-      mostrarPresupuestoActivo();
+      abrirPresupuestoExistente(key);
     }
 
     function intentarAbrirPresupuestoAutomatico() {
@@ -1318,15 +1326,7 @@
         const [anioGuardado, mesGuardado] = presupuestoActualKey.split('-');
         mesSelect.value = mesGuardado;
         anioInput.value = anioGuardado;
-
-        asegurarEstructuraPresupuesto(presupuestoActualKey);
-        presupuestoActivo.textContent = `Presupuesto activo: ${nombreMes(mesGuardado)} ${anioGuardado}`;
-
-        renderIngresos();
-        renderGastos();
-        renderAhorros();
-        actualizarDisponibleActual();
-        mostrarPresupuestoActivo();
+        abrirPresupuestoExistente(presupuestoActualKey);
       } else {
         totalIngresos.textContent = formatoMoneda(0);
         totalGastos.textContent = formatoMoneda(0);
