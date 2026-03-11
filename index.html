@@ -11,10 +11,10 @@
       --text: #1f2937;
       --muted: #6b7280;
       --line: #e5e7eb;
-      --dark: #111827;
       --soft: #f9fafb;
       --accent: #e9eefc;
       --danger: #ef4444;
+      --success: #16a34a;
     }
 
     * {
@@ -85,8 +85,13 @@
       font-weight: bold;
     }
 
-    .col-valor input {
-      text-align: right;
+    input, select, button {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid #d1d5db;
+      font-size: 14px;
+      background: white;
     }
 
     .helper {
@@ -127,45 +132,70 @@
       font-size: 12px;
     }
 
-      .col-ingreso,
-      .col-gasto {
-        width: 42%;
-      }
+    .col-ingreso,
+    .col-gasto,
+    .col-ahorro {
+      width: 42%;
+    }
 
-      .col-valor {
-        width: 26%;
-      }
+    .col-valor {
+      width: 26%;
+    }
 
-      .col-freq {
-        width: 14%;
-      }
+    .col-freq {
+      width: 14%;
+    }
 
-      .col-pagado {
-        width: 9%;
-        text-align: center;
-      }
+    .col-pagado {
+      width: 9%;
+      text-align: center;
+    }
 
-      .col-eliminar {
-        width: 9%;
-        text-align: center;
-      }
+    .col-eliminar {
+      width: 9%;
+      text-align: center;
+    }
 
-      .delete-mini {
-        background: #ef4444;
-        color: white;
-        border: none;
-        border-radius: 5px;
-        width: 22px;
-        height: 22px;
-        min-width: 22px;
-        padding: 0;
-        font-size: 12px;
-        line-height: 1;
-        cursor: pointer;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-      }
+    .table-wrap input,
+    .table-wrap select {
+      width: 100%;
+      min-width: 0;
+      max-width: 100%;
+      border: 1px solid #d1d5db !important;
+      box-shadow: none !important;
+      outline: none !important;
+      background: #fff !important;
+    }
+
+    .col-valor input {
+      text-align: right;
+    }
+
+    .col-freq select {
+      font-size: 14px;
+      padding-left: 8px;
+      padding-right: 8px;
+      text-align: center;
+      text-align-last: center;
+      line-height: 1.2;
+    }
+
+    .delete-mini {
+      background: #ef4444;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      width: 22px;
+      height: 22px;
+      min-width: 22px;
+      padding: 0;
+      font-size: 12px;
+      line-height: 1;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
 
     .check-wrap {
       display: flex;
@@ -173,12 +203,12 @@
       align-items: center;
     }
 
-.paid-check {
-  width: 14px;
-  height: 14px;
-  cursor: pointer;
-  accent-color: #111827;
-}
+    .paid-check {
+      width: 14px;
+      height: 14px;
+      cursor: pointer;
+      accent-color: #111827;
+    }
 
     .mini-legend {
       margin-top: 8px;
@@ -208,6 +238,15 @@
     .summary-box .value {
       font-size: 22px;
       font-weight: bold;
+    }
+
+    .summary-box input {
+      width: 100%;
+      margin-top: 6px;
+    }
+
+    .summary-box.value-success .value {
+      color: var(--success);
     }
 
     .actions-row {
@@ -259,33 +298,6 @@
         border-radius: 10px;
       }
 
-      input, select, button {
-        width: 100%;
-        padding: 10px 12px;
-        border-radius: 10px;
-        border: 1px solid #d1d5db;
-        font-size: 14px;
-        background: white;
-      }
-        .table-wrap input,
-        .table-wrap select {
-          width: 100%;
-          min-width: 0;
-          max-width: 100%;
-          border: 1px solid #d1d5db !important;
-          box-shadow: none !important;
-          outline: none !important;
-          background: #fff !important;
-        }
-
-        .col-valor input {
-          text-align: right;
-        }
-
-.col-valor input {
-  text-align: right;
-  font-size: 16px;
-}
       th, td {
         padding: 8px 4px;
       }
@@ -294,46 +306,61 @@
         font-size: 10px;
       }
 
-.col-ingreso,
-.col-gasto {
-  width: 39%;
-}
+      .col-ingreso,
+      .col-gasto,
+      .col-ahorro {
+        width: 39%;
+      }
 
-.col-valor {
-  width: 24%;
-}
+      .col-valor {
+        width: 24%;
+      }
 
-.col-freq {
-  width: 15%;
-}
+      .col-freq {
+        width: 15%;
+      }
 
-.col-pagado {
-  width: 7%;
-}
+      .col-pagado {
+        width: 7%;
+      }
 
-.col-eliminar {
-  width: 7%;
-}
+      .col-eliminar {
+        width: 7%;
+      }
 
-        table input,
-        table select {
-          padding: 8px 6px;
-          font-size: 16px;
-          border-radius: 8px;
-        }
+      table input,
+      table select {
+        padding: 8px 6px;
+        font-size: 16px;
+        border-radius: 8px;
+      }
 
-.delete-mini {
-  width: 16px;
-  height: 16px;
-  min-width: 16px;
-  font-size: 9px;
-  border-radius: 4px;
-}
+      .col-valor input {
+        font-size: 16px;
+        text-align: right;
+      }
 
-.paid-check {
-  width: 13px;
-  height: 13px;
-}
+      .col-freq select {
+        font-size: 16px;
+        padding-left: 4px;
+        padding-right: 10px;
+        text-align: left;
+        text-align-last: auto;
+        line-height: 1.2;
+      }
+
+      .delete-mini {
+        width: 16px;
+        height: 16px;
+        min-width: 16px;
+        font-size: 9px;
+        border-radius: 4px;
+      }
+
+      .paid-check {
+        width: 13px;
+        height: 13px;
+      }
 
       .summary {
         grid-template-columns: 1fr;
@@ -464,6 +491,62 @@
         </div>
       </div>
     </div>
+
+    <div class="card">
+      <h2>AHORRO</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th class="col-ahorro">Ahorro</th>
+              <th class="col-valor">Valor</th>
+              <th class="col-freq">Freq.</th>
+              <th class="col-pagado">✓</th>
+              <th class="col-eliminar">X</th>
+            </tr>
+          </thead>
+          <tbody id="tablaAhorros"></tbody>
+        </table>
+      </div>
+
+      <div class="mini-legend">M = Mensual · A = Anual · O = Ocasional</div>
+
+      <div class="actions-row">
+        <button id="agregarAhorroBtn" type="button">+ Agregar ahorro</button>
+      </div>
+
+      <div class="summary">
+        <div class="summary-box">
+          <div class="label">Total ahorros registrados</div>
+          <div class="value" id="totalAhorros">$0</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>DISPONIBLE ACTUAL</h2>
+      <div class="summary" style="margin-top: 0;">
+        <div class="summary-box">
+          <div class="label">Cuentas bancarias</div>
+          <input id="cuentasBancarias" type="text" inputmode="numeric" placeholder="0" />
+        </div>
+
+        <div class="summary-box">
+          <div class="label">Efectivo</div>
+          <input id="efectivoDisponible" type="text" inputmode="numeric" placeholder="0" />
+        </div>
+
+        <div class="summary-box">
+          <div class="label">Pendiente por pagar / apartar</div>
+          <div class="value" id="pendientePorPagar">$0</div>
+        </div>
+
+        <div class="summary-box value-success">
+          <div class="label">Disponible real</div>
+          <div class="value" id="disponibleReal">$0</div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <script>
@@ -480,6 +563,15 @@
     const tablaGastos = document.getElementById('tablaGastos');
     const totalGastos = document.getElementById('totalGastos');
     const agregarGastoBtn = document.getElementById('agregarGastoBtn');
+
+    const tablaAhorros = document.getElementById('tablaAhorros');
+    const totalAhorros = document.getElementById('totalAhorros');
+    const agregarAhorroBtn = document.getElementById('agregarAhorroBtn');
+
+    const cuentasBancariasInput = document.getElementById('cuentasBancarias');
+    const efectivoDisponibleInput = document.getElementById('efectivoDisponible');
+    const pendientePorPagar = document.getElementById('pendientePorPagar');
+    const disponibleReal = document.getElementById('disponibleReal');
 
     const storageKey = 'presupuestosMensualesApp';
     let presupuestos = JSON.parse(localStorage.getItem(storageKey)) || {};
@@ -580,6 +672,30 @@
         }));
     }
 
+    function obtenerAhorrosInicialesDesdeMesAnterior(mes, anio) {
+      const keyAnterior = obtenerKeyMesAnterior(mes, anio);
+      const presupuestoAnterior = presupuestos[keyAnterior];
+
+      if (!presupuestoAnterior || !Array.isArray(presupuestoAnterior.ahorros)) {
+        return [];
+      }
+
+      return presupuestoAnterior.ahorros
+        .filter((ahorro) =>
+          ahorro.periodicidad === 'MENSUAL' &&
+          (
+            String(ahorro.descripcion || '').trim() !== '' ||
+            String(ahorro.valor || '').trim() !== ''
+          )
+        )
+        .map((ahorro) => ({
+          descripcion: ahorro.descripcion,
+          valor: ahorro.valor,
+          periodicidad: ahorro.periodicidad,
+          pagado: false
+        }));
+    }
+
     function guardarTodo() {
       localStorage.setItem(storageKey, JSON.stringify(presupuestos));
       localStorage.setItem('presupuestoActualKey', presupuestoActualKey);
@@ -602,6 +718,15 @@
       };
     }
 
+    function crearAhorroVacio() {
+      return {
+        descripcion: '',
+        valor: '',
+        periodicidad: 'MENSUAL',
+        pagado: false
+      };
+    }
+
     function asegurarEstructuraPresupuesto(key) {
       if (!presupuestos[key]) return;
 
@@ -611,6 +736,17 @@
 
       if (!Array.isArray(presupuestos[key].gastos)) {
         presupuestos[key].gastos = [];
+      }
+
+      if (!Array.isArray(presupuestos[key].ahorros)) {
+        presupuestos[key].ahorros = [];
+      }
+
+      if (!presupuestos[key].disponibleActual) {
+        presupuestos[key].disponibleActual = {
+          cuentasBancarias: '',
+          efectivo: ''
+        };
       }
     }
 
@@ -636,6 +772,49 @@
       totalGastos.textContent = formatoMoneda(total);
     }
 
+    function actualizarResumenAhorros() {
+      if (!presupuestoActualKey || !presupuestos[presupuestoActualKey]) {
+        totalAhorros.textContent = formatoMoneda(0);
+        return;
+      }
+
+      const ahorros = presupuestos[presupuestoActualKey].ahorros;
+      const total = ahorros.reduce((acc, fila) => acc + (Number(fila.valor) || 0), 0);
+      totalAhorros.textContent = formatoMoneda(total);
+    }
+
+    function actualizarDisponibleActual() {
+      if (!presupuestoActualKey || !presupuestos[presupuestoActualKey]) {
+        pendientePorPagar.textContent = formatoMoneda(0);
+        disponibleReal.textContent = formatoMoneda(0);
+        cuentasBancariasInput.value = '';
+        efectivoDisponibleInput.value = '';
+        return;
+      }
+
+      asegurarEstructuraPresupuesto(presupuestoActualKey);
+
+      const presupuesto = presupuestos[presupuestoActualKey];
+      const cuentas = Number(presupuesto.disponibleActual?.cuentasBancarias || 0);
+      const efectivo = Number(presupuesto.disponibleActual?.efectivo || 0);
+
+      const gastosPendientes = presupuesto.gastos
+        .filter((item) => !item.pagado)
+        .reduce((acc, item) => acc + (Number(item.valor) || 0), 0);
+
+      const ahorrosPendientes = presupuesto.ahorros
+        .filter((item) => !item.pagado)
+        .reduce((acc, item) => acc + (Number(item.valor) || 0), 0);
+
+      const pendiente = gastosPendientes + ahorrosPendientes;
+      const disponible = (cuentas + efectivo) - pendiente;
+
+      pendientePorPagar.textContent = formatoMoneda(pendiente);
+      disponibleReal.textContent = formatoMoneda(disponible);
+      cuentasBancariasInput.value = formatoNumeroInput(presupuesto.disponibleActual?.cuentasBancarias || '');
+      efectivoDisponibleInput.value = formatoNumeroInput(presupuesto.disponibleActual?.efectivo || '');
+    }
+
     function renderIngresos() {
       tablaIngresos.innerHTML = '';
 
@@ -651,9 +830,7 @@
 
       if (ingresos.length === 0) {
         const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td colspan="4" class="empty-row">Aún no has agregado ingresos para este mes.</td>
-        `;
+        tr.innerHTML = `<td colspan="4" class="empty-row">Aún no has agregado ingresos para este mes.</td>`;
         tablaIngresos.appendChild(tr);
       }
 
@@ -661,23 +838,10 @@
         const tr = document.createElement('tr');
         tr.innerHTML = `
           <td class="col-ingreso">
-            <input
-              type="text"
-              value="${fila.descripcion || ''}"
-              placeholder="Ej. Nómina"
-              data-index="${index}"
-              data-field="descripcion"
-            />
+            <input type="text" value="${fila.descripcion || ''}" placeholder="Ej. Nómina" data-index="${index}" data-field="descripcion" />
           </td>
           <td class="col-valor">
-            <input
-              type="text"
-              inputmode="numeric"
-              value="${formatoNumeroInput(fila.valor)}"
-              placeholder="0"
-              data-index="${index}"
-              data-field="valor"
-            />
+            <input type="text" inputmode="numeric" value="${formatoNumeroInput(fila.valor)}" placeholder="0" data-index="${index}" data-field="valor" />
           </td>
           <td class="col-freq">
             <select data-index="${index}" data-field="periodicidad">
@@ -687,16 +851,9 @@
             </select>
           </td>
           <td class="col-eliminar">
-            <button
-              type="button"
-              class="delete-mini"
-              data-index="${index}"
-              data-action="eliminar"
-              title="Eliminar ingreso"
-            >×</button>
+            <button type="button" class="delete-mini" data-index="${index}" data-action="eliminar" title="Eliminar ingreso">×</button>
           </td>
         `;
-
         tablaIngresos.appendChild(tr);
       });
 
@@ -713,14 +870,11 @@
       }
 
       asegurarEstructuraPresupuesto(presupuestoActualKey);
-
       const gastos = presupuestos[presupuestoActualKey].gastos;
 
       if (gastos.length === 0) {
         const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td colspan="5" class="empty-row">Aún no has agregado gastos para este mes.</td>
-        `;
+        tr.innerHTML = `<td colspan="5" class="empty-row">Aún no has agregado gastos para este mes.</td>`;
         tablaGastos.appendChild(tr);
       }
 
@@ -728,23 +882,10 @@
         const tr = document.createElement('tr');
         tr.innerHTML = `
           <td class="col-gasto">
-            <input
-              type="text"
-              value="${fila.descripcion || ''}"
-              placeholder="Ej. Arriendo"
-              data-index="${index}"
-              data-field="descripcion"
-            />
+            <input type="text" value="${fila.descripcion || ''}" placeholder="Ej. Arriendo" data-index="${index}" data-field="descripcion" />
           </td>
           <td class="col-valor">
-            <input
-              type="text"
-              inputmode="numeric"
-              value="${formatoNumeroInput(fila.valor)}"
-              placeholder="0"
-              data-index="${index}"
-              data-field="valor"
-            />
+            <input type="text" inputmode="numeric" value="${formatoNumeroInput(fila.valor)}" placeholder="0" data-index="${index}" data-field="valor" />
           </td>
           <td class="col-freq">
             <select data-index="${index}" data-field="periodicidad">
@@ -755,27 +896,13 @@
           </td>
           <td class="col-pagado">
             <div class="check-wrap">
-              <input
-                type="checkbox"
-                class="paid-check"
-                ${fila.pagado ? 'checked' : ''}
-                data-index="${index}"
-                data-field="pagado"
-                title="Marcar como pagado"
-              />
+              <input type="checkbox" class="paid-check" ${fila.pagado ? 'checked' : ''} data-index="${index}" data-field="pagado" title="Marcar como pagado" />
             </div>
           </td>
           <td class="col-eliminar">
-            <button
-              type="button"
-              class="delete-mini"
-              data-index="${index}"
-              data-action="eliminar"
-              title="Eliminar gasto"
-            >×</button>
+            <button type="button" class="delete-mini" data-index="${index}" data-action="eliminar" title="Eliminar gasto">×</button>
           </td>
         `;
-
         tablaGastos.appendChild(tr);
       });
 
@@ -783,9 +910,57 @@
       activarEventosFilasGastos();
     }
 
+    function renderAhorros() {
+      tablaAhorros.innerHTML = '';
+
+      if (!presupuestoActualKey || !presupuestos[presupuestoActualKey]) {
+        totalAhorros.textContent = formatoMoneda(0);
+        return;
+      }
+
+      asegurarEstructuraPresupuesto(presupuestoActualKey);
+      const ahorros = presupuestos[presupuestoActualKey].ahorros;
+
+      if (ahorros.length === 0) {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td colspan="5" class="empty-row">Aún no has agregado ahorros para este mes.</td>`;
+        tablaAhorros.appendChild(tr);
+      }
+
+      ahorros.forEach((fila, index) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td class="col-ahorro">
+            <input type="text" value="${fila.descripcion || ''}" placeholder="Ej. Fondo viaje" data-index="${index}" data-field="descripcion" />
+          </td>
+          <td class="col-valor">
+            <input type="text" inputmode="numeric" value="${formatoNumeroInput(fila.valor)}" placeholder="0" data-index="${index}" data-field="valor" />
+          </td>
+          <td class="col-freq">
+            <select data-index="${index}" data-field="periodicidad">
+              <option value="MENSUAL" ${fila.periodicidad === 'MENSUAL' ? 'selected' : ''}>M</option>
+              <option value="ANUAL" ${fila.periodicidad === 'ANUAL' ? 'selected' : ''}>A</option>
+              <option value="OCASIONAL" ${fila.periodicidad === 'OCASIONAL' ? 'selected' : ''}>O</option>
+            </select>
+          </td>
+          <td class="col-pagado">
+            <div class="check-wrap">
+              <input type="checkbox" class="paid-check" ${fila.pagado ? 'checked' : ''} data-index="${index}" data-field="pagado" title="Marcar como realizado" />
+            </div>
+          </td>
+          <td class="col-eliminar">
+            <button type="button" class="delete-mini" data-index="${index}" data-action="eliminar" title="Eliminar ahorro">×</button>
+          </td>
+        `;
+        tablaAhorros.appendChild(tr);
+      });
+
+      actualizarResumenAhorros();
+      activarEventosFilasAhorros();
+    }
+
     function activarEventosFilasIngresos() {
       const campos = tablaIngresos.querySelectorAll('input, select');
-
       campos.forEach((campo) => {
         campo.addEventListener('input', manejarCambioIngreso);
         campo.addEventListener('change', manejarCambioIngreso);
@@ -794,7 +969,6 @@
 
     function activarEventosFilasGastos() {
       const campos = tablaGastos.querySelectorAll('input, select');
-
       campos.forEach((campo) => {
         if (campo.type === 'checkbox') {
           campo.addEventListener('change', manejarCambioGasto);
@@ -805,15 +979,25 @@
       });
     }
 
+    function activarEventosFilasAhorros() {
+      const campos = tablaAhorros.querySelectorAll('input, select');
+      campos.forEach((campo) => {
+        if (campo.type === 'checkbox') {
+          campo.addEventListener('change', manejarCambioAhorro);
+        } else {
+          campo.addEventListener('input', manejarCambioAhorro);
+          campo.addEventListener('change', manejarCambioAhorro);
+        }
+      });
+    }
+
     function manejarCambioIngreso(e) {
       const index = Number(e.target.dataset.index);
       const field = e.target.dataset.field;
 
-      if (!presupuestoActualKey || !presupuestos[presupuestoActualKey]) return;
-      if (Number.isNaN(index)) return;
+      if (!presupuestoActualKey || !presupuestos[presupuestoActualKey] || Number.isNaN(index)) return;
 
       let value = e.target.value;
-
       if (field === 'valor') {
         value = value.replace(/\D/g, '');
         presupuestos[presupuestoActualKey].ingresos[index][field] = value;
@@ -830,17 +1014,17 @@
       const index = Number(e.target.dataset.index);
       const field = e.target.dataset.field;
 
-      if (!presupuestoActualKey || !presupuestos[presupuestoActualKey]) return;
-      if (Number.isNaN(index)) return;
+      if (!presupuestoActualKey || !presupuestos[presupuestoActualKey] || Number.isNaN(index)) return;
 
       if (field === 'pagado') {
         presupuestos[presupuestoActualKey].gastos[index][field] = e.target.checked;
         guardarTodo();
+        actualizarResumenGastos();
+        actualizarDisponibleActual();
         return;
       }
 
       let value = e.target.value;
-
       if (field === 'valor') {
         value = value.replace(/\D/g, '');
         presupuestos[presupuestoActualKey].gastos[index][field] = value;
@@ -851,15 +1035,62 @@
 
       guardarTodo();
       actualizarResumenGastos();
+      actualizarDisponibleActual();
+    }
+
+    function manejarCambioAhorro(e) {
+      const index = Number(e.target.dataset.index);
+      const field = e.target.dataset.field;
+
+      if (!presupuestoActualKey || !presupuestos[presupuestoActualKey] || Number.isNaN(index)) return;
+
+      if (field === 'pagado') {
+        presupuestos[presupuestoActualKey].ahorros[index][field] = e.target.checked;
+        guardarTodo();
+        actualizarResumenAhorros();
+        actualizarDisponibleActual();
+        return;
+      }
+
+      let value = e.target.value;
+      if (field === 'valor') {
+        value = value.replace(/\D/g, '');
+        presupuestos[presupuestoActualKey].ahorros[index][field] = value;
+        e.target.value = formatoNumeroInput(value);
+      } else {
+        presupuestos[presupuestoActualKey].ahorros[index][field] = value;
+      }
+
+      guardarTodo();
+      actualizarResumenAhorros();
+      actualizarDisponibleActual();
+    }
+
+    function manejarCambioDisponibleInput(e) {
+      if (!presupuestoActualKey || !presupuestos[presupuestoActualKey]) return;
+
+      asegurarEstructuraPresupuesto(presupuestoActualKey);
+
+      const value = e.target.value.replace(/\D/g, '');
+      e.target.value = formatoNumeroInput(value);
+
+      if (e.target.id === 'cuentasBancarias') {
+        presupuestos[presupuestoActualKey].disponibleActual.cuentasBancarias = value;
+      }
+
+      if (e.target.id === 'efectivoDisponible') {
+        presupuestos[presupuestoActualKey].disponibleActual.efectivo = value;
+      }
+
+      guardarTodo();
+      actualizarDisponibleActual();
     }
 
     function manejarAccionesTablaIngresos(e) {
       const action = e.target.dataset.action;
       const index = Number(e.target.dataset.index);
 
-      if (action !== 'eliminar') return;
-      if (!presupuestoActualKey || !presupuestos[presupuestoActualKey]) return;
-      if (Number.isNaN(index)) return;
+      if (action !== 'eliminar' || !presupuestoActualKey || !presupuestos[presupuestoActualKey] || Number.isNaN(index)) return;
 
       presupuestos[presupuestoActualKey].ingresos.splice(index, 1);
       guardarTodo();
@@ -870,13 +1101,24 @@
       const action = e.target.dataset.action;
       const index = Number(e.target.dataset.index);
 
-      if (action !== 'eliminar') return;
-      if (!presupuestoActualKey || !presupuestos[presupuestoActualKey]) return;
-      if (Number.isNaN(index)) return;
+      if (action !== 'eliminar' || !presupuestoActualKey || !presupuestos[presupuestoActualKey] || Number.isNaN(index)) return;
 
       presupuestos[presupuestoActualKey].gastos.splice(index, 1);
       guardarTodo();
       renderGastos();
+      actualizarDisponibleActual();
+    }
+
+    function manejarAccionesTablaAhorros(e) {
+      const action = e.target.dataset.action;
+      const index = Number(e.target.dataset.index);
+
+      if (action !== 'eliminar' || !presupuestoActualKey || !presupuestos[presupuestoActualKey] || Number.isNaN(index)) return;
+
+      presupuestos[presupuestoActualKey].ahorros.splice(index, 1);
+      guardarTodo();
+      renderAhorros();
+      actualizarDisponibleActual();
     }
 
     function agregarIngreso() {
@@ -905,9 +1147,27 @@
       presupuestos[presupuestoActualKey].gastos.push(crearGastoVacio());
       guardarTodo();
       renderGastos();
+      actualizarDisponibleActual();
 
       const nuevoIndex = presupuestos[presupuestoActualKey].gastos.length - 1;
       const nuevoCampo = tablaGastos.querySelector(`[data-index="${nuevoIndex}"][data-field="descripcion"]`);
+      if (nuevoCampo) nuevoCampo.focus();
+    }
+
+    function agregarAhorro() {
+      if (!presupuestoActualKey || !presupuestos[presupuestoActualKey]) {
+        alert('Primero crea o abre un presupuesto.');
+        return;
+      }
+
+      asegurarEstructuraPresupuesto(presupuestoActualKey);
+      presupuestos[presupuestoActualKey].ahorros.push(crearAhorroVacio());
+      guardarTodo();
+      renderAhorros();
+      actualizarDisponibleActual();
+
+      const nuevoIndex = presupuestos[presupuestoActualKey].ahorros.length - 1;
+      const nuevoCampo = tablaAhorros.querySelector(`[data-index="${nuevoIndex}"][data-field="descripcion"]`);
       if (nuevoCampo) nuevoCampo.focus();
     }
 
@@ -951,25 +1211,26 @@
       const key = `${anio}-${mes}`;
       const ingresosArrastrados = obtenerIngresosInicialesDesdeMesAnterior(mes, anio);
       const gastosArrastrados = obtenerGastosInicialesDesdeMesAnterior(mes, anio);
+      const ahorrosArrastrados = obtenerAhorrosInicialesDesdeMesAnterior(mes, anio);
 
       if (!presupuestos[key]) {
         presupuestos[key] = {
           mes,
           anio,
           ingresos: ingresosArrastrados,
-          gastos: gastosArrastrados
+          gastos: gastosArrastrados,
+          ahorros: ahorrosArrastrados,
+          disponibleActual: {
+            cuentasBancarias: '',
+            efectivo: ''
+          }
         };
       } else {
-        if (!Array.isArray(presupuestos[key].ingresos)) {
-          presupuestos[key].ingresos = [];
-        }
-
-        if (!Array.isArray(presupuestos[key].gastos)) {
-          presupuestos[key].gastos = [];
-        }
+        asegurarEstructuraPresupuesto(key);
 
         const ingresosVacios = presupuestos[key].ingresos.length === 0;
         const gastosVacios = presupuestos[key].gastos.length === 0;
+        const ahorrosVacios = presupuestos[key].ahorros.length === 0;
 
         if (ingresosVacios && ingresosArrastrados.length > 0) {
           presupuestos[key].ingresos = ingresosArrastrados;
@@ -978,6 +1239,10 @@
         if (gastosVacios && gastosArrastrados.length > 0) {
           presupuestos[key].gastos = gastosArrastrados;
         }
+
+        if (ahorrosVacios && ahorrosArrastrados.length > 0) {
+          presupuestos[key].ahorros = ahorrosArrastrados;
+        }
       }
 
       presupuestoActualKey = key;
@@ -985,6 +1250,8 @@
       guardarTodo();
       renderIngresos();
       renderGastos();
+      renderAhorros();
+      actualizarDisponibleActual();
     }
 
     function intentarAbrirPresupuestoAutomatico() {
@@ -1009,9 +1276,14 @@
         presupuestoActivo.textContent = `Presupuesto activo: ${nombreMes(mesGuardado)} ${anioGuardado}`;
         renderIngresos();
         renderGastos();
+        renderAhorros();
+        actualizarDisponibleActual();
       } else {
         totalIngresos.textContent = formatoMoneda(0);
         totalGastos.textContent = formatoMoneda(0);
+        totalAhorros.textContent = formatoMoneda(0);
+        pendientePorPagar.textContent = formatoMoneda(0);
+        disponibleReal.textContent = formatoMoneda(0);
       }
     }
 
@@ -1020,9 +1292,14 @@
 
     agregarIngresoBtn.addEventListener('click', agregarIngreso);
     agregarGastoBtn.addEventListener('click', agregarGasto);
+    agregarAhorroBtn.addEventListener('click', agregarAhorro);
 
     tablaIngresos.addEventListener('click', manejarAccionesTablaIngresos);
     tablaGastos.addEventListener('click', manejarAccionesTablaGastos);
+    tablaAhorros.addEventListener('click', manejarAccionesTablaAhorros);
+
+    cuentasBancariasInput.addEventListener('input', manejarCambioDisponibleInput);
+    efectivoDisponibleInput.addEventListener('input', manejarCambioDisponibleInput);
 
     mesSelect.addEventListener('change', intentarAbrirPresupuestoAutomatico);
     anioInput.addEventListener('change', intentarAbrirPresupuestoAutomatico);
