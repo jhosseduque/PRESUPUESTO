@@ -94,22 +94,6 @@
       background: white;
     }
 
-    .helper {
-      color: var(--muted);
-      font-size: 12px;
-      margin-top: 8px;
-    }
-
-    .budget-name {
-      display: inline-block;
-      margin-top: 8px;
-      padding: 7px 12px;
-      background: var(--accent);
-      border-radius: 999px;
-      font-size: 13px;
-      font-weight: bold;
-    }
-
     .table-wrap {
       overflow-x: hidden;
     }
@@ -427,13 +411,11 @@
         </div>
       </div>
 
-      <div class="helper">Cada mes y año crea una planilla nueva. Si ya existe, se vuelve a abrir.</div>
+<div class="actions-row" id="crearPresupuestoWrap" style="margin-top: 10px;">
+  <button id="crearPresupuestoBtn" type="button">Crear</button>
+</div>
 
-      <div class="actions-row" id="crearPresupuestoWrap" style="margin-top: 10px;">
-        <button id="crearPresupuestoBtn" type="button">Crear</button>
-      </div>
-
-      <div id="presupuestoActivo" class="budget-name" style="display: none;">No hay presupuesto activo</div>
+<div id="presupuestoActivo" class="budget-name" style="display: none;"></div>
     </div>
 
     <div id="modulosPresupuesto" style="display: none;">
@@ -769,7 +751,7 @@
     function mostrarPresupuestoActivo() {
       modulosPresupuesto.style.display = 'block';
       crearPresupuestoWrap.style.display = 'none';
-      presupuestoActivo.style.display = 'inline-block';
+      presupuestoActivo.style.display = 'none';
     }
 
     function obtenerKeySeleccionActual() {
