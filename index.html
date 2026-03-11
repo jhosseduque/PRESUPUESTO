@@ -428,122 +428,129 @@
       </div>
 
       <div class="helper">Cada mes y año crea una planilla nueva. Si ya existe, se vuelve a abrir.</div>
-      <div id="presupuestoActivo" class="budget-name">No hay presupuesto activo</div>
+
+      <div class="actions-row" id="crearPresupuestoWrap" style="margin-top: 10px;">
+        <button id="crearPresupuestoBtn" type="button">Crear</button>
+      </div>
+
+      <div id="presupuestoActivo" class="budget-name" style="display: none;">No hay presupuesto activo</div>
     </div>
 
-    <div class="card">
-      <h2>INGRESOS</h2>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th class="col-ingreso">Ingreso</th>
-              <th class="col-valor">Valor</th>
-              <th class="col-freq">Freq.</th>
-              <th class="col-eliminar">X</th>
-            </tr>
-          </thead>
-          <tbody id="tablaIngresos"></tbody>
-        </table>
-      </div>
-
-      <div class="mini-legend">M = Mensual · A = Anual · O = Ocasional</div>
-
-      <div class="actions-row">
-        <button id="agregarIngresoBtn" type="button">+ Agregar ingreso</button>
-      </div>
-
-      <div class="summary">
-        <div class="summary-box">
-          <div class="label">Total ingresos registrados</div>
-          <div class="value" id="totalIngresos">$0</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="card">
-      <h2>GASTOS</h2>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th class="col-gasto">Gasto</th>
-              <th class="col-valor">Valor</th>
-              <th class="col-freq">Freq.</th>
-              <th class="col-pagado">✓</th>
-              <th class="col-eliminar">X</th>
-            </tr>
-          </thead>
-          <tbody id="tablaGastos"></tbody>
-        </table>
-      </div>
-
-      <div class="mini-legend">M = Mensual · A = Anual · O = Ocasional</div>
-
-      <div class="actions-row">
-        <button id="agregarGastoBtn" type="button">+ Agregar gasto</button>
-      </div>
-
-      <div class="summary">
-        <div class="summary-box">
-          <div class="label">Total gastos registrados</div>
-          <div class="value" id="totalGastos">$0</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="card">
-      <h2>AHORRO</h2>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th class="col-ahorro">Ahorro</th>
-              <th class="col-valor">Valor</th>
-              <th class="col-freq">Freq.</th>
-              <th class="col-pagado">✓</th>
-              <th class="col-eliminar">X</th>
-            </tr>
-          </thead>
-          <tbody id="tablaAhorros"></tbody>
-        </table>
-      </div>
-
-      <div class="mini-legend">M = Mensual · A = Anual · O = Ocasional</div>
-
-      <div class="actions-row">
-        <button id="agregarAhorroBtn" type="button">+ Agregar ahorro</button>
-      </div>
-
-      <div class="summary">
-        <div class="summary-box">
-          <div class="label">Total ahorros registrados</div>
-          <div class="value" id="totalAhorros">$0</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="card">
-      <h2>DISPONIBLE ACTUAL</h2>
-      <div class="summary" style="margin-top: 0;">
-        <div class="summary-box">
-          <div class="label">Cuentas bancarias</div>
-          <input id="cuentasBancarias" type="text" inputmode="numeric" placeholder="0" />
+    <div id="modulosPresupuesto" style="display: none;">
+      <div class="card">
+        <h2>INGRESOS</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th class="col-ingreso">Ingreso</th>
+                <th class="col-valor">Valor</th>
+                <th class="col-freq">Freq.</th>
+                <th class="col-eliminar">X</th>
+              </tr>
+            </thead>
+            <tbody id="tablaIngresos"></tbody>
+          </table>
         </div>
 
-        <div class="summary-box">
-          <div class="label">Efectivo</div>
-          <input id="efectivoDisponible" type="text" inputmode="numeric" placeholder="0" />
+        <div class="mini-legend">M = Mensual · A = Anual · O = Ocasional</div>
+
+        <div class="actions-row">
+          <button id="agregarIngresoBtn" type="button">+ Agregar ingreso</button>
         </div>
 
-        <div class="summary-box">
-          <div class="label">Pendiente por pagar / apartar</div>
-          <div class="value" id="pendientePorPagar">$0</div>
+        <div class="summary">
+          <div class="summary-box">
+            <div class="label">Total ingresos registrados</div>
+            <div class="value" id="totalIngresos">$0</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>GASTOS</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th class="col-gasto">Gasto</th>
+                <th class="col-valor">Valor</th>
+                <th class="col-freq">Freq.</th>
+                <th class="col-pagado">✓</th>
+                <th class="col-eliminar">X</th>
+              </tr>
+            </thead>
+            <tbody id="tablaGastos"></tbody>
+          </table>
         </div>
 
-        <div class="summary-box value-success">
-          <div class="label">Disponible real</div>
-          <div class="value" id="disponibleReal">$0</div>
+        <div class="mini-legend">M = Mensual · A = Anual · O = Ocasional</div>
+
+        <div class="actions-row">
+          <button id="agregarGastoBtn" type="button">+ Agregar gasto</button>
+        </div>
+
+        <div class="summary">
+          <div class="summary-box">
+            <div class="label">Total gastos registrados</div>
+            <div class="value" id="totalGastos">$0</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>AHORRO</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th class="col-ahorro">Ahorro</th>
+                <th class="col-valor">Valor</th>
+                <th class="col-freq">Freq.</th>
+                <th class="col-pagado">✓</th>
+                <th class="col-eliminar">X</th>
+              </tr>
+            </thead>
+            <tbody id="tablaAhorros"></tbody>
+          </table>
+        </div>
+
+        <div class="mini-legend">M = Mensual · A = Anual · O = Ocasional</div>
+
+        <div class="actions-row">
+          <button id="agregarAhorroBtn" type="button">+ Agregar ahorro</button>
+        </div>
+
+        <div class="summary">
+          <div class="summary-box">
+            <div class="label">Total ahorros registrados</div>
+            <div class="value" id="totalAhorros">$0</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>DISPONIBLE ACTUAL</h2>
+        <div class="summary" style="margin-top: 0;">
+          <div class="summary-box">
+            <div class="label">Cuentas bancarias</div>
+            <input id="cuentasBancarias" type="text" inputmode="numeric" placeholder="0" />
+          </div>
+
+          <div class="summary-box">
+            <div class="label">Efectivo</div>
+            <input id="efectivoDisponible" type="text" inputmode="numeric" placeholder="0" />
+          </div>
+
+          <div class="summary-box">
+            <div class="label">Pendiente por pagar / apartar</div>
+            <div class="value" id="pendientePorPagar">$0</div>
+          </div>
+
+          <div class="summary-box value-success">
+            <div class="label">Disponible real</div>
+            <div class="value" id="disponibleReal">$0</div>
+          </div>
         </div>
       </div>
     </div>
@@ -555,6 +562,9 @@
     const presupuestoAnteriorBtn = document.getElementById('presupuestoAnteriorBtn');
     const presupuestoSiguienteBtn = document.getElementById('presupuestoSiguienteBtn');
     const presupuestoActivo = document.getElementById('presupuestoActivo');
+    const crearPresupuestoWrap = document.getElementById('crearPresupuestoWrap');
+    const crearPresupuestoBtn = document.getElementById('crearPresupuestoBtn');
+    const modulosPresupuesto = document.getElementById('modulosPresupuesto');
 
     const tablaIngresos = document.getElementById('tablaIngresos');
     const totalIngresos = document.getElementById('totalIngresos');
@@ -750,6 +760,43 @@
       }
     }
 
+    function mostrarSoloEncabezado() {
+      modulosPresupuesto.style.display = 'none';
+      crearPresupuestoWrap.style.display = 'flex';
+      presupuestoActivo.style.display = 'none';
+    }
+
+    function mostrarPresupuestoActivo() {
+      modulosPresupuesto.style.display = 'block';
+      crearPresupuestoWrap.style.display = 'none';
+      presupuestoActivo.style.display = 'inline-block';
+    }
+
+    function obtenerKeySeleccionActual() {
+      const mes = mesSelect.value;
+      const anio = anioInput.value.trim();
+
+      if (!/^\d{4}$/.test(anio)) return '';
+      return `${anio}-${mes}`;
+    }
+
+    function evaluarVistaSegunSeleccion() {
+      const key = obtenerKeySeleccionActual();
+
+      if (!key) {
+        mostrarSoloEncabezado();
+        return;
+      }
+
+      if (presupuestoActualKey === key && presupuestos[key]) {
+        mostrarPresupuestoActivo();
+        presupuestoActivo.textContent = `Presupuesto activo: ${nombreMes(mesSelect.value)} ${anioInput.value.trim()}`;
+        return;
+      }
+
+      mostrarSoloEncabezado();
+    }
+
     function actualizarResumenIngresos() {
       if (!presupuestoActualKey || !presupuestos[presupuestoActualKey]) {
         totalIngresos.textContent = formatoMoneda(0);
@@ -825,7 +872,6 @@
       }
 
       asegurarEstructuraPresupuesto(presupuestoActualKey);
-
       const ingresos = presupuestos[presupuestoActualKey].ingresos;
 
       if (ingresos.length === 0) {
@@ -1174,7 +1220,7 @@
     function actualizarSeleccionPresupuesto(mes, anio) {
       mesSelect.value = mes;
       anioInput.value = anio;
-      crearOAbrirPresupuesto();
+      evaluarVistaSegunSeleccion();
     }
 
     function navegarPresupuesto(direccion) {
@@ -1248,16 +1294,16 @@
       presupuestoActualKey = key;
       presupuestoActivo.textContent = `Presupuesto activo: ${nombreMes(mes)} ${anio}`;
       guardarTodo();
+
       renderIngresos();
       renderGastos();
       renderAhorros();
       actualizarDisponibleActual();
+      mostrarPresupuestoActivo();
     }
 
     function intentarAbrirPresupuestoAutomatico() {
-      const anio = anioInput.value.trim();
-      if (!/^\d{4}$/.test(anio)) return;
-      crearOAbrirPresupuesto();
+      evaluarVistaSegunSeleccion();
     }
 
     function cargarInicial() {
@@ -1272,18 +1318,22 @@
         const [anioGuardado, mesGuardado] = presupuestoActualKey.split('-');
         mesSelect.value = mesGuardado;
         anioInput.value = anioGuardado;
+
         asegurarEstructuraPresupuesto(presupuestoActualKey);
         presupuestoActivo.textContent = `Presupuesto activo: ${nombreMes(mesGuardado)} ${anioGuardado}`;
+
         renderIngresos();
         renderGastos();
         renderAhorros();
         actualizarDisponibleActual();
+        mostrarPresupuestoActivo();
       } else {
         totalIngresos.textContent = formatoMoneda(0);
         totalGastos.textContent = formatoMoneda(0);
         totalAhorros.textContent = formatoMoneda(0);
         pendientePorPagar.textContent = formatoMoneda(0);
         disponibleReal.textContent = formatoMoneda(0);
+        mostrarSoloEncabezado();
       }
     }
 
@@ -1293,6 +1343,7 @@
     agregarIngresoBtn.addEventListener('click', agregarIngreso);
     agregarGastoBtn.addEventListener('click', agregarGasto);
     agregarAhorroBtn.addEventListener('click', agregarAhorro);
+    crearPresupuestoBtn.addEventListener('click', crearOAbrirPresupuesto);
 
     tablaIngresos.addEventListener('click', manejarAccionesTablaIngresos);
     tablaGastos.addEventListener('click', manejarAccionesTablaGastos);
