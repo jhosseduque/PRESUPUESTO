@@ -19,6 +19,8 @@
       --income-soft: #eef7ee;
       --income-border: #d8ead8;
       --income-title: #49634d;
+      --income-pending: #dff2df;
+      --income-pending-border: #b9ddb9;
 
       --expense-soft: #fff1ee;
       --expense-border: #f3d3cb;
@@ -204,11 +206,11 @@
     .col-ingreso,
     .col-gasto,
     .col-ahorro {
-      width: 42%;
+      width: 40%;
     }
 
     .col-valor {
-      width: 26%;
+      width: 24%;
     }
 
     .col-freq {
@@ -216,12 +218,12 @@
     }
 
     .col-pagado {
-      width: 9%;
+      width: 11%;
       text-align: center;
     }
 
     .col-eliminar {
-      width: 9%;
+      width: 11%;
       text-align: center;
     }
 
@@ -373,6 +375,17 @@
       font-size: 14px;
     }
 
+    .fila-ingreso-pendiente td {
+      background: var(--income-pending);
+      border-bottom: 1px solid var(--income-pending-border);
+    }
+
+    .fila-ingreso-pendiente input,
+    .fila-ingreso-pendiente select {
+      background: #f8fff8 !important;
+      border-color: #b7dcb7 !important;
+    }
+
     .fila-gasto-pendiente td {
       background: var(--expense-unpaid);
       border-bottom: 1px solid var(--expense-unpaid-border);
@@ -437,11 +450,11 @@
       .col-ingreso,
       .col-gasto,
       .col-ahorro {
-        width: 39%;
+        width: 38%;
       }
 
       .col-valor {
-        width: 24%;
+        width: 23%;
       }
 
       .col-freq {
@@ -449,11 +462,11 @@
       }
 
       .col-pagado {
-        width: 7%;
+        width: 12%;
       }
 
       .col-eliminar {
-        width: 7%;
+        width: 12%;
       }
 
       table input,
@@ -572,6 +585,7 @@
                 <th class="col-ingreso">Ingreso</th>
                 <th class="col-valor">Valor</th>
                 <th class="col-freq">Freq.</th>
+                <th class="col-pagado">✓</th>
                 <th class="col-eliminar">X</th>
               </tr>
             </thead>
@@ -780,7 +794,8 @@
         .map((ingreso) => ({
           descripcion: ingreso.descripcion,
           valor: ingreso.valor,
-          periodicidad: ingreso.periodicidad
+          periodicidad: ingreso.periodicidad,
+          recibido: false
         }));
     }
 
@@ -841,7 +856,8 @@
       return {
         descripcion: '',
         valor: '',
-        periodicidad: 'MENSUAL'
+        periodicidad: 'MENSUAL',
+        recibido: false
       };
     }
 
@@ -869,6 +885,13 @@
       if (!Array.isArray(presupuestos[key].ingresos)) {
         presupuestos[key].ingresos = [];
       }
+
+      presupuestos[key].ingresos = presupuestos[key].ingresos.map((ingreso) => ({
+        descripcion: ingreso.descripcion || '',
+        valor: ingreso.valor || '',
+        periodicidad: ingreso.periodicidad || 'MENSUAL',
+        recibido: Boolean(ingreso.recibido)
+      }));
 
       if (!Array.isArray(presupuestos[key].gastos)) {
         presupuestos[key].gastos = [];
@@ -1014,12 +1037,15 @@
 
       if (ingresos.length === 0) {
         const tr = document.createElement('tr');
-        tr.innerHTML = `<td colspan="4" class="empty-row">Aún no has agregado ingresos para este mes.</td>`;
+        tr.innerHTML = `<td colspan="5" class="empty-row">Aún no has agregado ingresos para este mes.</td>`;
         tablaIngresos.appendChild(tr);
       }
 
       ingresos.forEach((fila, index) => {
+        const clasePendiente = fila.recibido ? '' : 'fila-ingreso-pendiente';
+
         const tr = document.createElement('tr');
+        tr.className = clasePendiente;
         tr.innerHTML = `
           <td class="col-ingreso">
             <input type="text" value="${fila.descripcion || ''}" placeholder="Ej. Nómina" data-index="${index}" data-field="descripcion" />
@@ -1033,6 +1059,11 @@
               <option value="ANUAL" ${fila.periodicidad === 'ANUAL' ? 'selected' : ''}>A</option>
               <option value="OCASIONAL" ${fila.periodicidad === 'OCASIONAL' ? 'selected' : ''}>O</option>
             </select>
+          </td>
+          <td class="col-pagado">
+            <div class="check-wrap">
+              <input type="checkbox" class="paid-check" ${fila.recibido ? 'checked' : ''} data-index="${index}" data-field="recibido" title="Marcar como recibido" />
+            </div>
           </td>
           <td class="col-eliminar">
             <button type="button" class="delete-mini" data-index="${index}" data-action="eliminar" title="Eliminar ingreso">×</button>
@@ -1151,9 +1182,14 @@
 
     function activarEventosFilasIngresos() {
       const campos = tablaIngresos.querySelectorAll('input, select');
+
       campos.forEach((campo) => {
-        campo.addEventListener('input', manejarCambioIngreso);
-        campo.addEventListener('change', manejarCambioIngreso);
+        if (campo.type === 'checkbox') {
+          campo.addEventListener('change', manejarCambioIngreso);
+        } else {
+          campo.addEventListener('input', manejarCambioIngreso);
+          campo.addEventListener('change', manejarCambioIngreso);
+        }
       });
     }
 
@@ -1186,6 +1222,14 @@
       const field = e.target.dataset.field;
 
       if (!presupuestoActualKey || !presupuestos[presupuestoActualKey] || Number.isNaN(index)) return;
+
+      if (field === 'recibido') {
+        presupuestos[presupuestoActualKey].ingresos[index][field] = e.target.checked;
+        guardarTodo();
+        actualizarResumenIngresos();
+        renderIngresos();
+        return;
+      }
 
       let value = e.target.value;
       if (field === 'valor') {
