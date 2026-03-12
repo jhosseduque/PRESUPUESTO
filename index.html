@@ -6,15 +6,37 @@
   <title>MI PRESUPUESTO</title>
   <style>
     :root {
-      --bg: #f6f7fb;
-      --card: #ffffff;
-      --text: #1f2937;
-      --muted: #6b7280;
-      --line: #e5e7eb;
-      --soft: #f9fafb;
+      --bg: #f7f3f3;
+      --card: #fffdfb;
+      --text: #243041;
+      --muted: #6c7486;
+      --line: #e6e0dc;
+      --soft: #f7f4f1;
       --accent: #e9eefc;
       --danger: #ef4444;
       --success: #16a34a;
+
+      --income-soft: #eef7ee;
+      --income-border: #d8ead8;
+      --income-title: #49634d;
+
+      --expense-soft: #fff1ee;
+      --expense-border: #f3d3cb;
+      --expense-title: #c56a58;
+      --expense-unpaid: #ffe2dc;
+      --expense-unpaid-border: #f0b9ab;
+
+      --saving-soft: #f1f5fb;
+      --saving-border: #d6e0f0;
+      --saving-title: #5b7a97;
+      --saving-unpaid: #e7eef9;
+
+      --available-soft: #f9f2ea;
+      --available-border: #eadbc9;
+      --available-title: #7c6a57;
+
+      --input-bg: #ffffff;
+      --shadow: 0 10px 30px rgba(84, 64, 44, 0.08);
     }
 
     * {
@@ -36,20 +58,63 @@
 
     .card {
       background: var(--card);
-      border-radius: 18px;
+      border-radius: 22px;
       padding: 16px;
-      margin-bottom: 16px;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+      margin-bottom: 18px;
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(0,0,0,0.03);
     }
 
     h1 {
-      margin: 0 0 12px;
+      margin: 0 0 14px;
       font-size: 28px;
+      color: var(--text);
     }
 
     h2 {
-      margin: 0 0 10px;
+      margin: 0 0 12px;
       font-size: 20px;
+      color: var(--text);
+    }
+
+    .card-presupuesto {
+      background: #fffaf8;
+    }
+
+    .card-ingresos {
+      background: var(--card);
+      border: 1px solid var(--income-border);
+    }
+
+    .card-gastos {
+      background: var(--card);
+      border: 1px solid var(--expense-border);
+    }
+
+    .card-ahorro {
+      background: var(--card);
+      border: 1px solid var(--saving-border);
+    }
+
+    .card-disponible {
+      background: var(--card);
+      border: 1px solid var(--available-border);
+    }
+
+    .card-ingresos h2 {
+      color: var(--income-title);
+    }
+
+    .card-gastos h2 {
+      color: var(--expense-title);
+    }
+
+    .card-ahorro h2 {
+      color: var(--saving-title);
+    }
+
+    .card-disponible h2 {
+      color: var(--available-title);
     }
 
     .grid-top {
@@ -68,7 +133,7 @@
       width: 44px;
       height: 42px;
       padding: 0;
-      border-radius: 12px;
+      border-radius: 14px;
       font-size: 22px;
       font-weight: bold;
       line-height: 1;
@@ -76,22 +141,30 @@
       align-items: center;
       justify-content: center;
       cursor: pointer;
+      background: #fff;
+      border: 1px solid #d8dbe2;
     }
 
     label {
       display: block;
-      margin-bottom: 4px;
+      margin-bottom: 6px;
       font-size: 14px;
       font-weight: bold;
+      color: var(--text);
     }
 
     input, select, button {
       width: 100%;
       padding: 10px 12px;
-      border-radius: 10px;
-      border: 1px solid #d1d5db;
+      border-radius: 14px;
+      border: 1px solid #d8dbe2;
       font-size: 14px;
-      background: white;
+      background: var(--input-bg);
+      color: var(--text);
+    }
+
+    button {
+      cursor: pointer;
     }
 
     .table-wrap {
@@ -112,8 +185,20 @@
     }
 
     th {
-      background: var(--soft);
       font-size: 12px;
+      color: var(--text);
+    }
+
+    .card-ingresos th {
+      background: var(--income-soft);
+    }
+
+    .card-gastos th {
+      background: var(--expense-soft);
+    }
+
+    .card-ahorro th {
+      background: var(--saving-soft);
     }
 
     .col-ingreso,
@@ -145,7 +230,7 @@
       width: 100%;
       min-width: 0;
       max-width: 100%;
-      border: 1px solid #d1d5db !important;
+      border: 1px solid #cfd5df !important;
       box-shadow: none !important;
       outline: none !important;
       background: #fff !important;
@@ -165,17 +250,16 @@
     }
 
     .delete-mini {
-      background: #ef4444;
+      background: #f25a55;
       color: white;
       border: none;
-      border-radius: 5px;
+      border-radius: 6px;
       width: 22px;
       height: 22px;
       min-width: 22px;
       padding: 0;
       font-size: 12px;
       line-height: 1;
-      cursor: pointer;
       display: inline-flex;
       align-items: center;
       justify-content: center;
@@ -191,7 +275,7 @@
       width: 14px;
       height: 14px;
       cursor: pointer;
-      accent-color: #111827;
+      accent-color: #243041;
     }
 
     .mini-legend {
@@ -209,8 +293,24 @@
 
     .summary-box {
       background: var(--soft);
-      border-radius: 14px;
+      border-radius: 18px;
       padding: 14px;
+    }
+
+    .card-ingresos .summary-box {
+      background: var(--income-soft);
+    }
+
+    .card-gastos .summary-box {
+      background: #fff6f3;
+    }
+
+    .card-ahorro .summary-box {
+      background: var(--saving-soft);
+    }
+
+    .card-disponible .summary-box {
+      background: var(--available-soft);
     }
 
     .summary-box .label {
@@ -222,11 +322,13 @@
     .summary-box .value {
       font-size: 22px;
       font-weight: bold;
+      color: var(--text);
     }
 
     .summary-box input {
       width: 100%;
       margin-top: 6px;
+      background: rgba(255,255,255,0.78);
     }
 
     .summary-box.value-success .value {
@@ -243,11 +345,53 @@
       width: auto;
       min-width: 180px;
       padding: 12px 18px;
+      font-weight: 500;
+      background: #fff;
+    }
+
+    .card-ingresos .actions-row button {
+      border-color: #bfd8bf;
+      color: var(--income-title);
+      background: #fcfffc;
+    }
+
+    .card-gastos .actions-row button {
+      border-color: #f0c2b8;
+      color: var(--expense-title);
+      background: #fff9f8;
+    }
+
+    .card-ahorro .actions-row button {
+      border-color: #c6d5e8;
+      color: var(--saving-title);
+      background: #fbfdff;
     }
 
     .empty-row {
       color: var(--muted);
       padding: 16px 8px;
+      font-size: 14px;
+    }
+
+    .fila-gasto-pendiente td {
+      background: var(--expense-unpaid);
+      border-bottom: 1px solid var(--expense-unpaid-border);
+    }
+
+    .fila-gasto-pendiente input,
+    .fila-gasto-pendiente select {
+      background: #fff8f6 !important;
+      border-color: #eab4a6 !important;
+    }
+
+    .fila-ahorro-pendiente td {
+      background: var(--saving-unpaid);
+    }
+
+    .fila-ahorro-pendiente input,
+    .fila-ahorro-pendiente select {
+      background: #f8fbff !important;
+      border-color: #c6d5e8 !important;
     }
 
     @media (max-width: 720px) {
@@ -257,7 +401,7 @@
 
       .card {
         padding: 14px;
-        border-radius: 16px;
+        border-radius: 18px;
       }
 
       h1 {
@@ -279,7 +423,7 @@
         width: 40px;
         height: 40px;
         font-size: 20px;
-        border-radius: 10px;
+        border-radius: 12px;
       }
 
       th, td {
@@ -316,7 +460,7 @@
       table select {
         padding: 8px 6px;
         font-size: 16px;
-        border-radius: 8px;
+        border-radius: 10px;
       }
 
       .col-valor input {
@@ -374,7 +518,7 @@
   <div class="container">
     <h1>Mi Presupuesto</h1>
 
-    <div class="card">
+    <div class="card card-presupuesto">
       <h2>Crear nuevo presupuesto</h2>
       <div class="grid-top">
         <div>
@@ -411,15 +555,15 @@
         </div>
       </div>
 
-<div class="actions-row" id="crearPresupuestoWrap" style="margin-top: 10px;">
-  <button id="crearPresupuestoBtn" type="button">Crear</button>
-</div>
+      <div class="actions-row" id="crearPresupuestoWrap" style="margin-top: 10px;">
+        <button id="crearPresupuestoBtn" type="button">Crear</button>
+      </div>
 
-<div id="presupuestoActivo" class="budget-name" style="display: none;"></div>
+      <div id="presupuestoActivo" style="display: none;"></div>
     </div>
 
     <div id="modulosPresupuesto" style="display: none;">
-      <div class="card">
+      <div class="card card-ingresos">
         <h2>INGRESOS</h2>
         <div class="table-wrap">
           <table>
@@ -449,7 +593,7 @@
         </div>
       </div>
 
-      <div class="card">
+      <div class="card card-gastos">
         <h2>GASTOS</h2>
         <div class="table-wrap">
           <table>
@@ -480,7 +624,7 @@
         </div>
       </div>
 
-      <div class="card">
+      <div class="card card-ahorro">
         <h2>AHORRO</h2>
         <div class="table-wrap">
           <table>
@@ -511,7 +655,7 @@
         </div>
       </div>
 
-      <div class="card">
+      <div class="card card-disponible">
         <h2>DISPONIBLE ACTUAL</h2>
         <div class="summary" style="margin-top: 0;">
           <div class="summary-box">
@@ -768,9 +912,6 @@
       presupuestoActualKey = key;
       asegurarEstructuraPresupuesto(key);
 
-      const [anioGuardado, mesGuardado] = key.split('-');
-      presupuestoActivo.textContent = `Presupuesto activo: ${nombreMes(mesGuardado)} ${anioGuardado}`;
-
       guardarTodo();
       renderIngresos();
       renderGastos();
@@ -865,7 +1006,6 @@
 
       if (!presupuestoActualKey || !presupuestos[presupuestoActualKey]) {
         totalIngresos.textContent = formatoMoneda(0);
-        presupuestoActivo.textContent = 'No hay presupuesto activo';
         return;
       }
 
@@ -923,7 +1063,10 @@
       }
 
       gastos.forEach((fila, index) => {
+        const clasePendiente = fila.pagado ? '' : 'fila-gasto-pendiente';
+
         const tr = document.createElement('tr');
+        tr.className = clasePendiente;
         tr.innerHTML = `
           <td class="col-gasto">
             <input type="text" value="${fila.descripcion || ''}" placeholder="Ej. Arriendo" data-index="${index}" data-field="descripcion" />
@@ -972,7 +1115,10 @@
       }
 
       ahorros.forEach((fila, index) => {
+        const clasePendiente = fila.pagado ? '' : 'fila-ahorro-pendiente';
+
         const tr = document.createElement('tr');
+        tr.className = clasePendiente;
         tr.innerHTML = `
           <td class="col-ahorro">
             <input type="text" value="${fila.descripcion || ''}" placeholder="Ej. Fondo viaje" data-index="${index}" data-field="descripcion" />
@@ -1065,6 +1211,7 @@
         guardarTodo();
         actualizarResumenGastos();
         actualizarDisponibleActual();
+        renderGastos();
         return;
       }
 
@@ -1093,6 +1240,7 @@
         guardarTodo();
         actualizarResumenAhorros();
         actualizarDisponibleActual();
+        renderAhorros();
         return;
       }
 
