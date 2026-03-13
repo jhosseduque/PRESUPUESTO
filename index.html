@@ -13,7 +13,7 @@
       --line: #e6e0dc;
       --soft: #f7f4f1;
       --accent: #e9eefc;
-      --danger: #d84b43;
+      --danger: #ef4444;
       --success: #16a34a;
 
       --income-soft: #eef7ee;
@@ -203,27 +203,29 @@
       background: var(--saving-soft);
     }
 
-    .col-concepto {
-      width: 41%;
-    }
+.col-ingreso,
+.col-gasto,
+.col-ahorro {
+  width: 41%;
+}
 
-    .col-valor {
-      width: 26%;
-    }
+.col-valor {
+  width: 26%;
+}
 
-    .col-freq {
-      width: 15%;
-    }
+.col-freq {
+  width: 15%;
+}
 
-    .col-pagado {
-      width: 8%;
-      text-align: center;
-    }
+.col-pagado {
+  width: 8%;
+  text-align: center;
+}
 
-    .col-eliminar {
-      width: 9%;
-      text-align: center;
-    }
+.col-eliminar {
+  width: 9%;
+  text-align: center;
+}
 
     .table-wrap input,
     .table-wrap select {
@@ -249,21 +251,21 @@
       line-height: 1.2;
     }
 
-    .delete-mini {
-      background: #f25a55;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      width: 15px;
-      height: 15px;
-      min-width: 15px;
-      padding: 0;
-      font-size: 8px;
-      line-height: 1;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-    }
+.delete-mini {
+  background: #f25a55;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  width: 15px;
+  height: 15px;
+  min-width: 15px;
+  padding: 0;
+  font-size: 8px;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
 
     .check-wrap {
       display: flex;
@@ -271,12 +273,12 @@
       align-items: center;
     }
 
-    .paid-check {
-      width: 10px;
-      height: 10px;
-      cursor: pointer;
-      accent-color: #243041;
-    }
+.paid-check {
+  width: 10px;
+  height: 10px;
+  cursor: pointer;
+  accent-color: #243041;
+}
 
     .mini-legend {
       margin-top: 8px;
@@ -328,32 +330,11 @@
     .summary-box input {
       width: 100%;
       margin-top: 6px;
-      background: rgba(255,255,255,0.85);
+      background: rgba(255,255,255,0.78);
     }
 
     .summary-box.value-success .value {
       color: var(--success);
-    }
-
-    .summary-box.value-danger .label,
-    .summary-box.value-danger .value {
-      color: var(--danger);
-    }
-
-    .manual-toggle {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-top: 10px;
-      font-size: 12px;
-      color: var(--muted);
-      font-weight: normal;
-    }
-
-    .manual-toggle input {
-      width: auto;
-      margin: 0;
-      transform: translateY(0);
     }
 
     .actions-row {
@@ -466,25 +447,27 @@
         font-size: 10px;
       }
 
-      .col-concepto {
-        width: 39%;
-      }
+.col-ingreso,
+.col-gasto,
+.col-ahorro {
+  width: 39%;
+}
 
-      .col-valor {
-        width: 27%;
-      }
+.col-valor {
+  width: 27%;
+}
 
-      .col-freq {
-        width: 15%;
-      }
+.col-freq {
+  width: 15%;
+}
 
-      .col-pagado {
-        width: 9%;
-      }
+.col-pagado {
+  width: 9%;
+}
 
-      .col-eliminar {
-        width: 9%;
-      }
+.col-eliminar {
+  width: 9%;
+}
 
       table input,
       table select {
@@ -507,18 +490,18 @@
         line-height: 1.2;
       }
 
-      .delete-mini {
-        width: 14px;
-        height: 14px;
-        min-width: 14px;
-        font-size: 8px;
-        border-radius: 4px;
-      }
+.delete-mini {
+  width: 14px;
+  height: 14px;
+  min-width: 14px;
+  font-size: 8px;
+  border-radius: 4px;
+}
 
-      .paid-check {
-        width: 9px;
-        height: 9px;
-      }
+.paid-check {
+  width: 9px;
+  height: 9px;
+}
 
       .summary {
         grid-template-columns: 1fr;
@@ -546,7 +529,12 @@
 </head>
 <body>
   <div class="container">
-    <h1>Mi Presupuesto</h1>
+<div style="display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:14px;">
+  <h1 style="margin:0;">Mi Presupuesto</h1>
+  <button id="logoutBtn" type="button" style="width:auto; min-width:auto; padding:10px 14px; background:#fff; border:1px solid #d8dbe2; border-radius:12px; font-size:13px;">
+    Cerrar sesión
+  </button>
+</div>
 
     <div class="card card-presupuesto">
       <h2>Crear nuevo presupuesto</h2>
@@ -599,7 +587,7 @@
           <table>
             <thead>
               <tr>
-                <th class="col-concepto">Concepto</th>
+                <th class="col-ingreso">Ingreso</th>
                 <th class="col-valor">Valor</th>
                 <th class="col-freq">Freq.</th>
                 <th class="col-pagado">✓</th>
@@ -630,7 +618,7 @@
           <table>
             <thead>
               <tr>
-                <th class="col-concepto">Concepto</th>
+                <th class="col-gasto">Gasto</th>
                 <th class="col-valor">Valor</th>
                 <th class="col-freq">Freq.</th>
                 <th class="col-pagado">✓</th>
@@ -661,7 +649,7 @@
           <table>
             <thead>
               <tr>
-                <th class="col-concepto">Concepto</th>
+                <th class="col-ahorro">Ahorro</th>
                 <th class="col-valor">Valor</th>
                 <th class="col-freq">Freq.</th>
                 <th class="col-pagado">✓</th>
@@ -690,15 +678,16 @@
         <h2>DISPONIBLE ACTUAL</h2>
         <div class="summary" style="margin-top: 0;">
           <div class="summary-box">
-            <div class="label">Disponible</div>
-            <input id="disponibleBaseInput" type="text" inputmode="numeric" placeholder="0" />
-            <label class="manual-toggle">
-              <input id="disponibleManualToggle" type="checkbox" />
-              Editar manualmente
-            </label>
+            <div class="label">Cuentas bancarias</div>
+            <input id="cuentasBancarias" type="text" inputmode="numeric" placeholder="0" />
           </div>
 
-          <div class="summary-box value-danger">
+          <div class="summary-box">
+            <div class="label">Efectivo</div>
+            <input id="efectivoDisponible" type="text" inputmode="numeric" placeholder="0" />
+          </div>
+
+          <div class="summary-box">
             <div class="label">Pendiente por pagar / apartar</div>
             <div class="value" id="pendientePorPagar">$0</div>
           </div>
@@ -734,14 +723,32 @@
     const totalAhorros = document.getElementById('totalAhorros');
     const agregarAhorroBtn = document.getElementById('agregarAhorroBtn');
 
-    const disponibleBaseInput = document.getElementById('disponibleBaseInput');
-    const disponibleManualToggle = document.getElementById('disponibleManualToggle');
+    const cuentasBancariasInput = document.getElementById('cuentasBancarias');
+    const efectivoDisponibleInput = document.getElementById('efectivoDisponible');
     const pendientePorPagar = document.getElementById('pendientePorPagar');
     const disponibleReal = document.getElementById('disponibleReal');
+
+    const loginScreen = document.getElementById('loginScreen');
+    const appShell = document.getElementById('appShell');
+    const loginEmail = document.getElementById('loginEmail');
+    const loginPassword = document.getElementById('loginPassword');
+    const loginBtn = document.getElementById('loginBtn');
+    const loginError = document.getElementById('loginError');
+    const logoutBtn = document.getElementById('logoutBtn');
+
 
     const storageKey = 'presupuestosMensualesApp';
     let presupuestos = JSON.parse(localStorage.getItem(storageKey)) || {};
     let presupuestoActualKey = localStorage.getItem('presupuestoActualKey') || '';
+
+    const SUPABASE_URL = 'https://vpaqslncpewdszwtraat.supabase.co';
+    const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_iiw7qQDDAVI9WY0TILlO5A_x1bAN-M_';
+
+    const supabaseClient = window.supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_PUBLISHABLE_KEY
+);
+
 
     function formatoMoneda(numero) {
       return new Intl.NumberFormat('es-CO', {
@@ -791,63 +798,76 @@
       return `${anioNum}-${String(mesNum).padStart(2, '0')}`;
     }
 
-    function obtenerKeyMismoMesAnioAnterior(mes, anio) {
-      return `${Number(anio) - 1}-${mes}`;
-    }
+    function obtenerIngresosInicialesDesdeMesAnterior(mes, anio) {
+      const keyAnterior = obtenerKeyMesAnterior(mes, anio);
+      const presupuestoAnterior = presupuestos[keyAnterior];
 
-    function itemTieneContenido(item) {
-      return (
-        String(item.descripcion || '').trim() !== '' ||
-        String(item.valor || '').trim() !== ''
-      );
-    }
-
-    function obtenerItemsArrastrados(tipo, mes, anio, estadoField) {
-      const arrastrados = [];
-      const keyMesAnterior = obtenerKeyMesAnterior(mes, anio);
-      const keyAnioAnterior = obtenerKeyMismoMesAnioAnterior(mes, anio);
-
-      const presupuestoMesAnterior = presupuestos[keyMesAnterior];
-      if (presupuestoMesAnterior && Array.isArray(presupuestoMesAnterior[tipo])) {
-        presupuestoMesAnterior[tipo]
-          .filter((item) => item.periodicidad === 'MENSUAL' && itemTieneContenido(item))
-          .forEach((item) => {
-            arrastrados.push({
-              descripcion: item.descripcion,
-              valor: item.valor,
-              periodicidad: item.periodicidad,
-              [estadoField]: false
-            });
-          });
+      if (!presupuestoAnterior || !Array.isArray(presupuestoAnterior.ingresos)) {
+        return [];
       }
 
-      const presupuestoAnioAnterior = presupuestos[keyAnioAnterior];
-      if (presupuestoAnioAnterior && Array.isArray(presupuestoAnioAnterior[tipo])) {
-        presupuestoAnioAnterior[tipo]
-          .filter((item) => item.periodicidad === 'ANUAL' && itemTieneContenido(item))
-          .forEach((item) => {
-            arrastrados.push({
-              descripcion: item.descripcion,
-              valor: item.valor,
-              periodicidad: item.periodicidad,
-              [estadoField]: false
-            });
-          });
+      return presupuestoAnterior.ingresos
+        .filter((ingreso) =>
+          ingreso.periodicidad === 'MENSUAL' &&
+          (
+            String(ingreso.descripcion || '').trim() !== '' ||
+            String(ingreso.valor || '').trim() !== ''
+          )
+        )
+        .map((ingreso) => ({
+          descripcion: ingreso.descripcion,
+          valor: ingreso.valor,
+          periodicidad: ingreso.periodicidad,
+          recibido: false
+        }));
+    }
+
+    function obtenerGastosInicialesDesdeMesAnterior(mes, anio) {
+      const keyAnterior = obtenerKeyMesAnterior(mes, anio);
+      const presupuestoAnterior = presupuestos[keyAnterior];
+
+      if (!presupuestoAnterior || !Array.isArray(presupuestoAnterior.gastos)) {
+        return [];
       }
 
-      return arrastrados;
+      return presupuestoAnterior.gastos
+        .filter((gasto) =>
+          gasto.periodicidad === 'MENSUAL' &&
+          (
+            String(gasto.descripcion || '').trim() !== '' ||
+            String(gasto.valor || '').trim() !== ''
+          )
+        )
+        .map((gasto) => ({
+          descripcion: gasto.descripcion,
+          valor: gasto.valor,
+          periodicidad: gasto.periodicidad,
+          pagado: false
+        }));
     }
 
-    function obtenerIngresosIniciales(mes, anio) {
-      return obtenerItemsArrastrados('ingresos', mes, anio, 'recibido');
-    }
+    function obtenerAhorrosInicialesDesdeMesAnterior(mes, anio) {
+      const keyAnterior = obtenerKeyMesAnterior(mes, anio);
+      const presupuestoAnterior = presupuestos[keyAnterior];
 
-    function obtenerGastosIniciales(mes, anio) {
-      return obtenerItemsArrastrados('gastos', mes, anio, 'pagado');
-    }
+      if (!presupuestoAnterior || !Array.isArray(presupuestoAnterior.ahorros)) {
+        return [];
+      }
 
-    function obtenerAhorrosIniciales(mes, anio) {
-      return obtenerItemsArrastrados('ahorros', mes, anio, 'pagado');
+      return presupuestoAnterior.ahorros
+        .filter((ahorro) =>
+          ahorro.periodicidad === 'MENSUAL' &&
+          (
+            String(ahorro.descripcion || '').trim() !== '' ||
+            String(ahorro.valor || '').trim() !== ''
+          )
+        )
+        .map((ahorro) => ({
+          descripcion: ahorro.descripcion,
+          valor: ahorro.valor,
+          periodicidad: ahorro.periodicidad,
+          pagado: false
+        }));
     }
 
     function guardarTodo() {
@@ -855,7 +875,7 @@
       localStorage.setItem('presupuestoActualKey', presupuestoActualKey);
     }
 
-    function crearIngresoVacio() {
+    function crearFilaVacia() {
       return {
         descripcion: '',
         valor: '',
@@ -900,33 +920,16 @@
         presupuestos[key].gastos = [];
       }
 
-      presupuestos[key].gastos = presupuestos[key].gastos.map((gasto) => ({
-        descripcion: gasto.descripcion || '',
-        valor: gasto.valor || '',
-        periodicidad: gasto.periodicidad || 'MENSUAL',
-        pagado: Boolean(gasto.pagado)
-      }));
-
       if (!Array.isArray(presupuestos[key].ahorros)) {
         presupuestos[key].ahorros = [];
       }
 
-      presupuestos[key].ahorros = presupuestos[key].ahorros.map((ahorro) => ({
-        descripcion: ahorro.descripcion || '',
-        valor: ahorro.valor || '',
-        periodicidad: ahorro.periodicidad || 'MENSUAL',
-        pagado: Boolean(ahorro.pagado)
-      }));
-
-      const disponibleAnterior = presupuestos[key].disponibleActual || {};
-      const sumaAnterior =
-        Number(disponibleAnterior.cuentasBancarias || 0) +
-        Number(disponibleAnterior.efectivo || 0);
-
-      presupuestos[key].disponibleActual = {
-        valorManual: String(disponibleAnterior.valorManual ?? (sumaAnterior || '')),
-        usarManual: Boolean(disponibleAnterior.usarManual)
-      };
+      if (!presupuestos[key].disponibleActual) {
+        presupuestos[key].disponibleActual = {
+          cuentasBancarias: '',
+          efectivo: ''
+        };
+      }
     }
 
     function mostrarSoloEncabezado() {
@@ -947,41 +950,6 @@
 
       if (!/^\d{4}$/.test(anio)) return '';
       return `${anio}-${mes}`;
-    }
-
-    function calcularDisponibleAutomatico(presupuesto) {
-      const ingresosRecibidos = presupuesto.ingresos
-        .filter((item) => item.recibido)
-        .reduce((acc, item) => acc + (Number(item.valor) || 0), 0);
-
-      const gastosPagados = presupuesto.gastos
-        .filter((item) => item.pagado)
-        .reduce((acc, item) => acc + (Number(item.valor) || 0), 0);
-
-      const ahorrosPagados = presupuesto.ahorros
-        .filter((item) => item.pagado)
-        .reduce((acc, item) => acc + (Number(item.valor) || 0), 0);
-
-      return ingresosRecibidos - gastosPagados - ahorrosPagados;
-    }
-
-    function calcularPendiente(presupuesto) {
-      const gastosPendientes = presupuesto.gastos
-        .filter((item) => !item.pagado)
-        .reduce((acc, item) => acc + (Number(item.valor) || 0), 0);
-
-      const ahorrosPendientes = presupuesto.ahorros
-        .filter((item) => !item.pagado)
-        .reduce((acc, item) => acc + (Number(item.valor) || 0), 0);
-
-      return gastosPendientes + ahorrosPendientes;
-    }
-
-    function obtenerDisponibleBase(presupuesto) {
-      if (presupuesto.disponibleActual?.usarManual) {
-        return Number(presupuesto.disponibleActual?.valorManual || 0);
-      }
-      return calcularDisponibleAutomatico(presupuesto);
     }
 
     function abrirPresupuestoExistente(key) {
@@ -1051,29 +1019,32 @@
       if (!presupuestoActualKey || !presupuestos[presupuestoActualKey]) {
         pendientePorPagar.textContent = formatoMoneda(0);
         disponibleReal.textContent = formatoMoneda(0);
-        disponibleBaseInput.value = '';
-        disponibleBaseInput.readOnly = true;
-        disponibleManualToggle.checked = false;
+        cuentasBancariasInput.value = '';
+        efectivoDisponibleInput.value = '';
         return;
       }
 
       asegurarEstructuraPresupuesto(presupuestoActualKey);
 
       const presupuesto = presupuestos[presupuestoActualKey];
-      const disponibleBase = obtenerDisponibleBase(presupuesto);
-      const pendiente = calcularPendiente(presupuesto);
-      const disponible = disponibleBase - pendiente;
+      const cuentas = Number(presupuesto.disponibleActual?.cuentasBancarias || 0);
+      const efectivo = Number(presupuesto.disponibleActual?.efectivo || 0);
+
+      const gastosPendientes = presupuesto.gastos
+        .filter((item) => !item.pagado)
+        .reduce((acc, item) => acc + (Number(item.valor) || 0), 0);
+
+      const ahorrosPendientes = presupuesto.ahorros
+        .filter((item) => !item.pagado)
+        .reduce((acc, item) => acc + (Number(item.valor) || 0), 0);
+
+      const pendiente = gastosPendientes + ahorrosPendientes;
+      const disponible = (cuentas + efectivo) - pendiente;
 
       pendientePorPagar.textContent = formatoMoneda(pendiente);
       disponibleReal.textContent = formatoMoneda(disponible);
-
-      disponibleManualToggle.checked = Boolean(presupuesto.disponibleActual.usarManual);
-      disponibleBaseInput.readOnly = !presupuesto.disponibleActual.usarManual;
-      disponibleBaseInput.value = formatoNumeroInput(
-        presupuesto.disponibleActual.usarManual
-          ? presupuesto.disponibleActual.valorManual
-          : String(disponibleBase)
-      );
+      cuentasBancariasInput.value = formatoNumeroInput(presupuesto.disponibleActual?.cuentasBancarias || '');
+      efectivoDisponibleInput.value = formatoNumeroInput(presupuesto.disponibleActual?.efectivo || '');
     }
 
     function renderIngresos() {
@@ -1099,7 +1070,7 @@
         const tr = document.createElement('tr');
         tr.className = clasePendiente;
         tr.innerHTML = `
-          <td class="col-concepto">
+          <td class="col-ingreso">
             <input type="text" value="${fila.descripcion || ''}" placeholder="Ej. Nómina" data-index="${index}" data-field="descripcion" />
           </td>
           <td class="col-valor">
@@ -1151,7 +1122,7 @@
         const tr = document.createElement('tr');
         tr.className = clasePendiente;
         tr.innerHTML = `
-          <td class="col-concepto">
+          <td class="col-gasto">
             <input type="text" value="${fila.descripcion || ''}" placeholder="Ej. Arriendo" data-index="${index}" data-field="descripcion" />
           </td>
           <td class="col-valor">
@@ -1203,7 +1174,7 @@
         const tr = document.createElement('tr');
         tr.className = clasePendiente;
         tr.innerHTML = `
-          <td class="col-concepto">
+          <td class="col-ahorro">
             <input type="text" value="${fila.descripcion || ''}" placeholder="Ej. Fondo viaje" data-index="${index}" data-field="descripcion" />
           </td>
           <td class="col-valor">
@@ -1279,7 +1250,6 @@
         presupuestos[presupuestoActualKey].ingresos[index][field] = e.target.checked;
         guardarTodo();
         actualizarResumenIngresos();
-        actualizarDisponibleActual();
         renderIngresos();
         return;
       }
@@ -1295,7 +1265,6 @@
 
       guardarTodo();
       actualizarResumenIngresos();
-      actualizarDisponibleActual();
     }
 
     function manejarCambioGasto(e) {
@@ -1356,34 +1325,20 @@
       actualizarDisponibleActual();
     }
 
-    function manejarCambioDisponibleBase(e) {
+    function manejarCambioDisponibleInput(e) {
       if (!presupuestoActualKey || !presupuestos[presupuestoActualKey]) return;
-      const presupuesto = presupuestos[presupuestoActualKey];
 
-      if (!presupuesto.disponibleActual.usarManual) {
-        actualizarDisponibleActual();
-        return;
-      }
+      asegurarEstructuraPresupuesto(presupuestoActualKey);
 
       const value = e.target.value.replace(/\D/g, '');
-      presupuesto.disponibleActual.valorManual = value;
       e.target.value = formatoNumeroInput(value);
 
-      guardarTodo();
-      actualizarDisponibleActual();
-    }
+      if (e.target.id === 'cuentasBancarias') {
+        presupuestos[presupuestoActualKey].disponibleActual.cuentasBancarias = value;
+      }
 
-    function manejarCambioModoManual(e) {
-      if (!presupuestoActualKey || !presupuestos[presupuestoActualKey]) return;
-      const presupuesto = presupuestos[presupuestoActualKey];
-
-      presupuesto.disponibleActual.usarManual = e.target.checked;
-
-      if (e.target.checked) {
-        const disponibleAuto = calcularDisponibleAutomatico(presupuesto);
-        if (!presupuesto.disponibleActual.valorManual) {
-          presupuesto.disponibleActual.valorManual = String(disponibleAuto);
-        }
+      if (e.target.id === 'efectivoDisponible') {
+        presupuestos[presupuestoActualKey].disponibleActual.efectivo = value;
       }
 
       guardarTodo();
@@ -1399,7 +1354,6 @@
       presupuestos[presupuestoActualKey].ingresos.splice(index, 1);
       guardarTodo();
       renderIngresos();
-      actualizarDisponibleActual();
     }
 
     function manejarAccionesTablaGastos(e) {
@@ -1433,7 +1387,7 @@
       }
 
       asegurarEstructuraPresupuesto(presupuestoActualKey);
-      presupuestos[presupuestoActualKey].ingresos.push(crearIngresoVacio());
+      presupuestos[presupuestoActualKey].ingresos.push(crearFilaVacia());
       guardarTodo();
       renderIngresos();
 
@@ -1514,9 +1468,9 @@
       }
 
       const key = `${anio}-${mes}`;
-      const ingresosArrastrados = obtenerIngresosIniciales(mes, anio);
-      const gastosArrastrados = obtenerGastosIniciales(mes, anio);
-      const ahorrosArrastrados = obtenerAhorrosIniciales(mes, anio);
+      const ingresosArrastrados = obtenerIngresosInicialesDesdeMesAnterior(mes, anio);
+      const gastosArrastrados = obtenerGastosInicialesDesdeMesAnterior(mes, anio);
+      const ahorrosArrastrados = obtenerAhorrosInicialesDesdeMesAnterior(mes, anio);
 
       if (!presupuestos[key]) {
         presupuestos[key] = {
@@ -1526,8 +1480,8 @@
           gastos: gastosArrastrados,
           ahorros: ahorrosArrastrados,
           disponibleActual: {
-            valorManual: '',
-            usarManual: false
+            cuentasBancarias: '',
+            efectivo: ''
           }
         };
       } else {
@@ -1592,14 +1546,122 @@
     tablaGastos.addEventListener('click', manejarAccionesTablaGastos);
     tablaAhorros.addEventListener('click', manejarAccionesTablaAhorros);
 
-    disponibleBaseInput.addEventListener('input', manejarCambioDisponibleBase);
-    disponibleManualToggle.addEventListener('change', manejarCambioModoManual);
+    cuentasBancariasInput.addEventListener('input', manejarCambioDisponibleInput);
+    efectivoDisponibleInput.addEventListener('input', manejarCambioDisponibleInput);
 
     mesSelect.addEventListener('change', intentarAbrirPresupuestoAutomatico);
     anioInput.addEventListener('change', intentarAbrirPresupuestoAutomatico);
     anioInput.addEventListener('blur', intentarAbrirPresupuestoAutomatico);
 
+function mostrarLogin() {
+  loginScreen.style.display = 'block';
+  appShell.style.display = 'none';
+}
+
+function mostrarApp() {
+  loginScreen.style.display = 'none';
+  appShell.style.display = 'block';
+}
+
+async function verificarSesionInicial() {
+  const { data, error } = await supabaseClient.auth.getSession();
+
+  if (error) {
+    console.error('Error obteniendo sesión:', error.message);
+    mostrarLogin();
+    return;
+  }
+
+  if (data.session) {
+    mostrarApp();
     cargarInicial();
+  } else {
+    mostrarLogin();
+  }
+}
+
+async function iniciarSesion() {
+  loginError.style.display = 'none';
+  loginError.textContent = '';
+
+  const email = loginEmail.value.trim();
+  const password = loginPassword.value;
+
+  if (!email || !password) {
+    loginError.textContent = 'Completa correo y contraseña.';
+    loginError.style.display = 'block';
+    return;
+  }
+
+  const { error } = await supabaseClient.auth.signInWithPassword({
+    email,
+    password
+  });
+
+  if (error) {
+    loginError.textContent = 'No pudimos iniciar sesión. Revisa correo y contraseña.';
+    loginError.style.display = 'block';
+    return;
+  }
+
+  loginPassword.value = '';
+  mostrarApp();
+  cargarInicial();
+}
+
+async function cerrarSesion() {
+  await supabaseClient.auth.signOut();
+  mostrarLogin();
+}
+
+supabaseClient.auth.onAuthStateChange((event, session) => {
+  if (session) {
+    mostrarApp();
+  } else {
+    mostrarLogin();
+  }
+});
+
+verificarSesionInicial();
+
+loginBtn.addEventListener('click', iniciarSesion);
+
+loginPassword.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') {
+    iniciarSesion();
+  }
+});
+
+logoutBtn.addEventListener('click', cerrarSesion);
+
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   </script>
 </body>
+
+<div id="loginScreen" style="display:none; min-height:100vh; padding:24px; background:#f7f3f3;">
+  <div style="max-width:420px; margin:48px auto; background:#fffdfb; border-radius:22px; padding:24px; box-shadow:0 10px 30px rgba(84,64,44,0.08); border:1px solid rgba(0,0,0,0.04);">
+    <h1 style="margin:0 0 10px; font-size:30px; color:#243041;">Mi Presupuesto</h1>
+    <p style="margin:0 0 20px; color:#6c7486; font-size:14px;">Ingresa con tu correo y contraseña.</p>
+
+    <div style="margin-bottom:14px;">
+      <label for="loginEmail" style="display:block; margin-bottom:6px; font-weight:bold; color:#243041;">Correo</label>
+      <input id="loginEmail" type="email" placeholder="tucorreo@ejemplo.com" />
+    </div>
+
+    <div style="margin-bottom:14px;">
+      <label for="loginPassword" style="display:block; margin-bottom:6px; font-weight:bold; color:#243041;">Contraseña</label>
+      <input id="loginPassword" type="password" placeholder="********" />
+    </div>
+
+    <button id="loginBtn" type="button" style="width:100%; background:#243041; color:white; border:none; padding:12px 16px; border-radius:14px; font-weight:bold;">
+      Ingresar
+    </button>
+
+    <p id="loginError" style="display:none; margin-top:12px; color:#d84b43; font-size:13px;"></p>
+  </div>
+</div>
+
+<div id="appShell" style="display:none;">
+  </div>
 </html>
