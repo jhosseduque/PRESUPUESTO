@@ -526,7 +526,7 @@
       }
 
       th {
-        font-size: 10px;
+        font-size: 10px;a
       }
 
       .col-concepto {
@@ -853,8 +853,21 @@
     const disponibleReal = document.getElementById('disponibleReal');
 
     const storageKey = 'presupuestosMensualesApp';
-    let presupuestos = JSON.parse(localStorage.getItem(storageKey)) || {};
+    const storageOwnerKey = 'presupuestosMensualesAppOwner';
+
+    function leerPresupuestosLocales() {
+      try {
+        return JSON.parse(localStorage.getItem(storageKey)) || {};
+      } catch (error) {
+        console.error('Error leyendo presupuestos locales:', error);
+        return {};
+      }
+    }
+
+    let presupuestos = leerPresupuestosLocales();
     let presupuestoActualKey = localStorage.getItem('presupuestoActualKey') || '';
+    let guardadoSupabaseTimeout = null;
+    const presupuestosPendientesSync = new Set();
 
     function formatoMoneda(numero) {
       return new Intl.NumberFormat('es-CO', {
@@ -963,9 +976,196 @@
       return obtenerItemsArrastrados('ahorros', mes, anio, 'pagado');
     }
 
-    function guardarTodo() {
+    function guardarTodoLocal() {
       localStorage.setItem(storageKey, JSON.stringify(presupuestos));
       localStorage.setItem('presupuestoActualKey', presupuestoActualKey);
+    }
+
+    function guardarOwnerLocal(userId) {
+      if (userId) {
+        localStorage.setItem(storageOwnerKey, userId);
+      }
+    }
+
+    async function obtenerUsuarioActual() {
+      const { data, error } = await supabaseClient.auth.getUser();
+
+      if (error) {
+        console.error('Error obteniendo usuario actual:', error.message);
+        return null;
+      }
+
+      return data.user || null;
+    }
+
+    function construirDataPresupuesto(presupuesto) {
+      return {
+        ingresos: Array.isArray(presupuesto.ingresos) ? presupuesto.ingresos : [],
+        gastos: Array.isArray(presupuesto.gastos) ? presupuesto.gastos : [],
+        ahorros: Array.isArray(presupuesto.ahorros) ? presupuesto.ahorros : [],
+        disponibleActual: presupuesto.disponibleActual || {
+          valorManual: '',
+          usarManual: false
+        }
+      };
+    }
+
+    function normalizarPresupuestoDesdeFila(row) {
+      const data = row.data || {};
+
+      return {
+        mes: String(row.mes).padStart(2, '0'),
+        anio: String(row.anio),
+        ingresos: Array.isArray(data.ingresos) ? data.ingresos : [],
+        gastos: Array.isArray(data.gastos) ? data.gastos : [],
+        ahorros: Array.isArray(data.ahorros) ? data.ahorros : [],
+        disponibleActual: data.disponibleActual || {
+          valorManual: '',
+          usarManual: false
+        }
+      };
+    }
+
+    async function cargarPresupuestosDesdeSupabase() {
+      const user = await obtenerUsuarioActual();
+      if (!user) return false;
+
+      const { data, error } = await supabaseClient
+        .from('presupuestos')
+        .select('user_id, presupuesto_key, mes, anio, data')
+        .eq('user_id', user.id)
+        .order('anio', { ascending: true })
+        .order('mes', { ascending: true });
+
+      if (error) {
+        console.error('Error cargando presupuestos desde Supabase:', error.message);
+        return false;
+      }
+
+      const presupuestosRemotos = {};
+
+      (data || []).forEach((row) => {
+        const key = row.presupuesto_key || `${row.anio}-${String(row.mes).padStart(2, '0')}`;
+        presupuestosRemotos[key] = normalizarPresupuestoDesdeFila(row);
+      });
+
+      presupuestos = presupuestosRemotos;
+      Object.keys(presupuestos).forEach(asegurarEstructuraPresupuesto);
+      guardarOwnerLocal(user.id);
+
+      if (presupuestoActualKey && !presupuestos[presupuestoActualKey]) {
+        presupuestoActualKey = '';
+      }
+
+      guardarTodoLocal();
+      return true;
+    }
+
+    async function guardarPresupuestoEnSupabase(key) {
+      if (!key || !presupuestos[key]) return;
+
+      const user = await obtenerUsuarioActual();
+      if (!user) return;
+
+      asegurarEstructuraPresupuesto(key);
+      const presupuesto = presupuestos[key];
+
+      const payload = {
+        user_id: user.id,
+        presupuesto_key: key,
+        mes: presupuesto.mes,
+        anio: Number(presupuesto.anio),
+        data: construirDataPresupuesto(presupuesto)
+      };
+
+      const { error } = await supabaseClient
+        .from('presupuestos')
+        .upsert(payload, { onConflict: 'user_id,presupuesto_key' });
+
+      if (error) {
+        console.error(`Error guardando presupuesto ${key} en Supabase:`, error.message);
+      }
+    }
+
+    async function guardarTodosLosPresupuestosEnSupabase() {
+      const keys = Object.keys(presupuestos);
+      if (!keys.length) return;
+
+      const user = await obtenerUsuarioActual();
+      if (!user) return;
+
+      const payload = keys.map((key) => {
+        asegurarEstructuraPresupuesto(key);
+        const presupuesto = presupuestos[key];
+
+        return {
+          user_id: user.id,
+          presupuesto_key: key,
+          mes: presupuesto.mes,
+          anio: Number(presupuesto.anio),
+          data: construirDataPresupuesto(presupuesto)
+        };
+      });
+
+      const { error } = await supabaseClient
+        .from('presupuestos')
+        .upsert(payload, { onConflict: 'user_id,presupuesto_key' });
+
+      if (error) {
+        console.error('Error migrando presupuestos a Supabase:', error.message);
+      }
+    }
+
+    function programarGuardadoSupabase(key) {
+      if (!key || !presupuestos[key]) return;
+
+      presupuestosPendientesSync.add(key);
+
+      if (guardadoSupabaseTimeout) {
+        clearTimeout(guardadoSupabaseTimeout);
+      }
+
+      guardadoSupabaseTimeout = setTimeout(async () => {
+        const keysPendientes = Array.from(presupuestosPendientesSync);
+        presupuestosPendientesSync.clear();
+
+        for (const keyPendiente of keysPendientes) {
+          await guardarPresupuestoEnSupabase(keyPendiente);
+        }
+      }, 500);
+    }
+
+    async function sincronizarPresupuestosIniciales() {
+      const presupuestosLocales = leerPresupuestosLocales();
+      const ownerLocal = localStorage.getItem(storageOwnerKey) || '';
+      const user = await obtenerUsuarioActual();
+      const cargoRemotos = await cargarPresupuestosDesdeSupabase();
+
+      if (!cargoRemotos) {
+        presupuestos = presupuestosLocales;
+        Object.keys(presupuestos).forEach(asegurarEstructuraPresupuesto);
+        if (user) guardarOwnerLocal(user.id);
+        guardarTodoLocal();
+        return;
+      }
+
+      const hayRemotos = Object.keys(presupuestos).length > 0;
+      const hayLocales = Object.keys(presupuestosLocales).length > 0;
+      const localPerteneceAlUsuario = !ownerLocal || (user && ownerLocal === user.id);
+
+      if (!hayRemotos && hayLocales && localPerteneceAlUsuario) {
+        presupuestos = presupuestosLocales;
+        Object.keys(presupuestos).forEach(asegurarEstructuraPresupuesto);
+        if (user) guardarOwnerLocal(user.id);
+        guardarTodoLocal();
+        await guardarTodosLosPresupuestosEnSupabase();
+        await cargarPresupuestosDesdeSupabase();
+      }
+    }
+
+    function guardarTodo() {
+      guardarTodoLocal();
+      programarGuardadoSupabase(presupuestoActualKey);
     }
 
     function crearIngresoVacio() {
@@ -1715,6 +1915,7 @@
 
         if (data.session) {
           mostrarApp();
+          await sincronizarPresupuestosIniciales();
           cargarInicial();
         } else {
           mostrarLogin();
@@ -1751,10 +1952,17 @@
 
       loginPassword.value = '';
       mostrarApp();
+      await sincronizarPresupuestosIniciales();
       cargarInicial();
     }
 
     async function cerrarSesion() {
+      if (guardadoSupabaseTimeout) {
+        clearTimeout(guardadoSupabaseTimeout);
+        guardadoSupabaseTimeout = null;
+      }
+
+      await guardarTodosLosPresupuestosEnSupabase();
       await supabaseClient.auth.signOut();
       mostrarLogin();
     }
@@ -1762,9 +1970,12 @@
     supabaseClient.auth.onAuthStateChange((event, session) => {
       if (session) {
         mostrarApp();
-      } else {
-        mostrarLogin();
+        return;
       }
+
+      presupuestoActualKey = '';
+      localStorage.removeItem('presupuestoActualKey');
+      mostrarLogin();
     });
 
     presupuestoAnteriorBtn.addEventListener('click', () => navegarPresupuesto(-1));
