@@ -370,6 +370,36 @@
       background: #fff;
     }
 
+
+    .presupuesto-activo {
+      margin-top: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 14px;
+      border: 1px solid #eadfce;
+      border-radius: 16px;
+      background: #fffaf4;
+    }
+
+    .presupuesto-activo-texto {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .danger-outline-btn {
+      width: auto;
+      min-width: auto;
+      padding: 10px 14px;
+      border: 1px solid #e5b8b0;
+      border-radius: 12px;
+      background: #fff7f6;
+      color: #9d3f33;
+      font-weight: 600;
+    }
+
     .card-ingresos .actions-row button {
       border-color: #bfd8bf;
       color: var(--income-title);
@@ -629,6 +659,16 @@
         min-width: 0;
       }
 
+
+      .presupuesto-activo {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .danger-outline-btn {
+        width: 100%;
+      }
+
       .mini-legend {
         font-size: 10px;
       }
@@ -735,7 +775,10 @@
           <button id="crearPresupuestoBtn" type="button">Crear</button>
         </div>
 
-        <div id="presupuestoActivo" style="display: none;"></div>
+        <div id="presupuestoActivo" class="presupuesto-activo" style="display: none;">
+          <div id="presupuestoActivoTexto" class="presupuesto-activo-texto"></div>
+          <button id="eliminarPresupuestoBtn" type="button" class="danger-outline-btn">Eliminar este presupuesto</button>
+        </div>
       </div>
 
       <div id="modulosPresupuesto" style="display: none;">
@@ -892,6 +935,8 @@
     const presupuestoAnteriorBtn = document.getElementById('presupuestoAnteriorBtn');
     const presupuestoSiguienteBtn = document.getElementById('presupuestoSiguienteBtn');
     const presupuestoActivo = document.getElementById('presupuestoActivo');
+    const presupuestoActivoTexto = document.getElementById('presupuestoActivoTexto');
+    const eliminarPresupuestoBtn = document.getElementById('eliminarPresupuestoBtn');
     const crearPresupuestoWrap = document.getElementById('crearPresupuestoWrap');
     const crearPresupuestoBtn = document.getElementById('crearPresupuestoBtn');
     const modulosPresupuesto = document.getElementById('modulosPresupuesto');
@@ -937,6 +982,22 @@
         currency: 'COP',
         maximumFractionDigits: 0
       }).format(Number(numero) || 0);
+    }
+
+
+    function obtenerNombreMes(mes) {
+      const option = mesSelect.querySelector(`option[value="${String(mes).padStart(2, '0')}"]`);
+      return option ? option.textContent : String(mes);
+    }
+
+    function actualizarEtiquetaPresupuestoActivo() {
+      if (!presupuestoActualKey || !presupuestos[presupuestoActualKey]) {
+        presupuestoActivoTexto.textContent = '';
+        return;
+      }
+
+      const presupuesto = presupuestos[presupuestoActualKey];
+      presupuestoActivoTexto.textContent = `Presupuesto activo: ${obtenerNombreMes(presupuesto.mes)} ${presupuesto.anio}`;
     }
 
     function formatoNumeroInput(valor) {
@@ -1314,6 +1375,27 @@
       }
     }
 
+
+    async function eliminarPresupuestoDeSupabase(key) {
+      if (!key) return false;
+
+      const user = await obtenerUsuarioActual();
+      if (!user) return false;
+
+      const { error } = await supabaseClient
+        .from('presupuestos')
+        .delete()
+        .eq('user_id', user.id)
+        .eq('presupuesto_key', key);
+
+      if (error) {
+        console.error(`Error eliminando presupuesto ${key} en Supabase:`, error.message);
+        return false;
+      }
+
+      return true;
+    }
+
     async function guardarTodosLosPresupuestosEnSupabase() {
       const keys = Object.keys(presupuestos);
       if (!keys.length) return;
@@ -1473,12 +1555,14 @@
       modulosPresupuesto.style.display = 'none';
       crearPresupuestoWrap.style.display = 'flex';
       presupuestoActivo.style.display = 'none';
+      presupuestoActivoTexto.textContent = '';
     }
 
     function mostrarPresupuestoActivo() {
       modulosPresupuesto.style.display = 'block';
       crearPresupuestoWrap.style.display = 'none';
-      presupuestoActivo.style.display = 'none';
+      actualizarEtiquetaPresupuestoActivo();
+      presupuestoActivo.style.display = 'flex';
     }
 
     function obtenerKeySeleccionActual() {
@@ -2093,6 +2177,39 @@
       abrirPresupuestoExistente(key);
     }
 
+
+    async function eliminarPresupuestoActual() {
+      if (!presupuestoActualKey || !presupuestos[presupuestoActualKey]) {
+        alert('No hay un presupuesto activo para eliminar.');
+        return;
+      }
+
+      const keyAEliminar = presupuestoActualKey;
+      const presupuestoRespaldo = JSON.parse(JSON.stringify(presupuestos[keyAEliminar]));
+      const etiqueta = `${obtenerNombreMes(presupuestoRespaldo.mes)} ${presupuestoRespaldo.anio}`;
+      const confirmado = confirm(`¿Seguro que quieres eliminar el presupuesto de ${etiqueta}? Esta acción no se puede deshacer.`);
+
+      if (!confirmado) return;
+
+      delete presupuestos[keyAEliminar];
+      presupuestosPendientesSync.delete(keyAEliminar);
+      presupuestoActualKey = '';
+      guardarTodoLocal();
+      mostrarSoloEncabezado();
+      evaluarVistaSegunSeleccion();
+
+      const eliminado = await eliminarPresupuestoDeSupabase(keyAEliminar);
+
+      if (!eliminado) {
+        presupuestos[keyAEliminar] = presupuestoRespaldo;
+        presupuestoActualKey = keyAEliminar;
+        guardarTodoLocal();
+        abrirPresupuestoExistente(keyAEliminar);
+        alert('No se pudo eliminar el presupuesto en la base de datos. Inténtalo otra vez.');
+        return;
+      }
+    }
+
     function intentarAbrirPresupuestoAutomatico() {
       evaluarVistaSegunSeleccion();
     }
@@ -2240,6 +2357,7 @@
     agregarGastoBtn.addEventListener('click', agregarGasto);
     agregarAhorroBtn.addEventListener('click', agregarAhorro);
     crearPresupuestoBtn.addEventListener('click', crearOAbrirPresupuesto);
+    eliminarPresupuestoBtn.addEventListener('click', eliminarPresupuestoActual);
 
     tablaIngresos.addEventListener('click', manejarAccionesTablaIngresos);
     tablaGastos.addEventListener('click', manejarAccionesTablaGastos);
