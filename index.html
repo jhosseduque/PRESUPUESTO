@@ -959,13 +959,63 @@
     }
 
     function obtenerRecoveryRedirectUrl() {
-      return `${window.location.origin}${window.location.pathname}`;
+      const url = new URL(`${window.location.origin}${window.location.pathname}`);
+      url.searchParams.set('recovery', '1');
+      return url.toString();
     }
 
     function limpiarUrlRecuperacion() {
       if (window.location.hash || window.location.search) {
         window.history.replaceState({}, document.title, window.location.pathname);
       }
+    }
+
+    function obtenerHashParams() {
+      const hash = (window.location.hash || '').replace(/^#/, '');
+      return new URLSearchParams(hash);
+    }
+
+    function obtenerSearchParams() {
+      return new URLSearchParams(window.location.search || '');
+    }
+
+    function urlIndicaRecuperacion() {
+      const hashParams = obtenerHashParams();
+      const searchParams = obtenerSearchParams();
+      return (
+        hashParams.get('type') === 'recovery' ||
+        searchParams.get('type') === 'recovery' ||
+        searchParams.get('recovery') === '1' ||
+        searchParams.has('code')
+      );
+    }
+
+    async function procesarRecuperacionDesdeUrl() {
+      const searchParams = obtenerSearchParams();
+      const hashParams = obtenerHashParams();
+      const code = searchParams.get('code');
+      const esRecuperacion =
+        searchParams.get('recovery') === '1' ||
+        searchParams.get('type') === 'recovery' ||
+        hashParams.get('type') === 'recovery';
+
+      if (code && esRecuperacion) {
+        const { error } = await supabaseClient.auth.exchangeCodeForSession(code);
+        if (error) {
+          console.error('Error intercambiando código de recuperación:', error.message);
+          loginError.textContent = 'El enlace de recuperación no es válido o ya expiró. Solicita uno nuevo.';
+          loginError.style.display = 'block';
+          mostrarFormularioAcceso();
+          return false;
+        }
+      }
+
+      if (esRecuperacion || hashParams.get('type') === 'recovery') {
+        mostrarFormularioRecuperacion();
+        return true;
+      }
+
+      return false;
     }
 
     function mostrarFormularioAcceso() {
@@ -984,12 +1034,6 @@
       loginScreen.style.display = 'block';
       appShell.style.display = 'none';
       setTimeout(() => recoveryPassword.focus(), 50);
-    }
-
-    function urlIndicaRecuperacion() {
-      const hash = window.location.hash || '';
-      const search = window.location.search || '';
-      return hash.includes('type=recovery') || search.includes('type=recovery');
     }
 
     async function solicitarRestablecimientoClave() {
@@ -1053,6 +1097,7 @@
 
       recoverySuccess.textContent = 'Contraseña actualizada. Ya puedes entrar de nuevo.';
       recoverySuccess.style.display = 'block';
+      await supabaseClient.auth.signOut();
       limpiarUrlRecuperacion();
       mostrarFormularioAcceso();
       loginPassword.value = '';
@@ -2087,6 +2132,10 @@
 
     async function verificarSesionInicial() {
       try {
+        if (await procesarRecuperacionDesdeUrl()) {
+          return;
+        }
+
         const { data, error } = await supabaseClient.auth.getSession();
 
         if (error) {
@@ -2169,6 +2218,11 @@
         }
 
         mostrarApp();
+        return;
+      }
+
+      if (urlIndicaRecuperacion()) {
+        mostrarFormularioRecuperacion();
         return;
       }
 
