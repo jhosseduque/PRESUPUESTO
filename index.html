@@ -904,274 +904,905 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-    const SUPABASE_URL = 'https://vpaqslncpewdszwtraat.supabase.co';
-    const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_iiw7qQDDAVI9WY0TILlO5A_x1bAN-M_';
+   <script>
+  const SUPABASE_URL = 'https://vpaqslncpewdszwtraat.supabase.co';
+  const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_iiw7qQDDAVI9WY0TILlO5A_x1bAN-M_';
 
-    const supabaseClient = window.supabase.createClient(
-      SUPABASE_URL,
-      SUPABASE_PUBLISHABLE_KEY
+  const supabaseClient = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_PUBLISHABLE_KEY
+  );
+
+  const loginScreen = document.getElementById('loginScreen');
+  const appShell = document.getElementById('appShell');
+  const loginAccessForm = document.getElementById('loginAccessForm');
+  const passwordRecoveryPanel = document.getElementById('passwordRecoveryPanel');
+  const loginEmail = document.getElementById('loginEmail');
+  const loginPassword = document.getElementById('loginPassword');
+  const loginBtn = document.getElementById('loginBtn');
+  const forgotPasswordBtn = document.getElementById('forgotPasswordBtn');
+  const loginError = document.getElementById('loginError');
+  const resetRequestMessage = document.getElementById('resetRequestMessage');
+  const recoveryPassword = document.getElementById('recoveryPassword');
+  const recoveryPasswordConfirm = document.getElementById('recoveryPasswordConfirm');
+  const recoverySaveBtn = document.getElementById('recoverySaveBtn');
+  const recoveryCancelBtn = document.getElementById('recoveryCancelBtn');
+  const recoveryError = document.getElementById('recoveryError');
+  const recoverySuccess = document.getElementById('recoverySuccess');
+  const logoutBtn = document.getElementById('logoutBtn');
+
+  const mesSelect = document.getElementById('mes');
+  const anioInput = document.getElementById('anio');
+  const presupuestoAnteriorBtn = document.getElementById('presupuestoAnteriorBtn');
+  const presupuestoSiguienteBtn = document.getElementById('presupuestoSiguienteBtn');
+  const presupuestoActivo = document.getElementById('presupuestoActivo');
+  const presupuestoActivoTexto = document.getElementById('presupuestoActivoTexto');
+  const eliminarPresupuestoBtn = document.getElementById('eliminarPresupuestoBtn');
+  const crearPresupuestoWrap = document.getElementById('crearPresupuestoWrap');
+  const crearPresupuestoBtn = document.getElementById('crearPresupuestoBtn');
+  const modulosPresupuesto = document.getElementById('modulosPresupuesto');
+
+  const tablaIngresos = document.getElementById('tablaIngresos');
+  const totalIngresos = document.getElementById('totalIngresos');
+  const agregarIngresoBtn = document.getElementById('agregarIngresoBtn');
+
+  const tablaGastos = document.getElementById('tablaGastos');
+  const totalGastos = document.getElementById('totalGastos');
+  const agregarGastoBtn = document.getElementById('agregarGastoBtn');
+
+  const tablaAhorros = document.getElementById('tablaAhorros');
+  const totalAhorros = document.getElementById('totalAhorros');
+  const agregarAhorroBtn = document.getElementById('agregarAhorroBtn');
+
+  const disponibleBaseInput = document.getElementById('disponibleBaseInput');
+  const disponibleManualToggle = document.getElementById('disponibleManualToggle');
+  const pendientePorPagar = document.getElementById('pendientePorPagar');
+  const disponibleReal = document.getElementById('disponibleReal');
+
+  const storageKey = 'presupuestosMensualesApp';
+  const storageOwnerKey = 'presupuestosMensualesAppOwner';
+
+  function leerPresupuestosLocales() {
+    try {
+      return JSON.parse(localStorage.getItem(storageKey)) || {};
+    } catch (error) {
+      console.error('Error leyendo presupuestos locales:', error);
+      return {};
+    }
+  }
+
+  let presupuestos = leerPresupuestosLocales();
+  let presupuestoActualKey = localStorage.getItem('presupuestoActualKey') || '';
+  let guardadoSupabaseTimeout = null;
+  const presupuestosPendientesSync = new Set();
+  let recoveryModeActivo = false;
+  let forcePasswordChangeMode = false;
+
+  function formatoMoneda(numero) {
+    return new Intl.NumberFormat('es-CO', {
+      style: 'currency',
+      currency: 'COP',
+      maximumFractionDigits: 0
+    }).format(Number(numero) || 0);
+  }
+
+  function obtenerNombreMes(mes) {
+    const option = mesSelect.querySelector(`option[value="${String(mes).padStart(2, '0')}"]`);
+    return option ? option.textContent : String(mes);
+  }
+
+  function actualizarEtiquetaPresupuestoActivo() {
+    if (!presupuestoActualKey || !presupuestos[presupuestoActualKey]) {
+      presupuestoActivoTexto.textContent = '';
+      return;
+    }
+
+    const presupuesto = presupuestos[presupuestoActualKey];
+    presupuestoActivoTexto.textContent = `Presupuesto activo: ${obtenerNombreMes(presupuesto.mes)} ${presupuesto.anio}`;
+  }
+
+  function formatoNumeroInput(valor) {
+    const limpio = String(valor || '').replace(/\D/g, '');
+    if (!limpio) return '';
+    return new Intl.NumberFormat('es-CO', {
+      maximumFractionDigits: 0
+    }).format(Number(limpio));
+  }
+
+  function ocultarMensajesAcceso() {
+    loginError.style.display = 'none';
+    loginError.textContent = '';
+    resetRequestMessage.style.display = 'none';
+    resetRequestMessage.textContent = '';
+    recoveryError.style.display = 'none';
+    recoveryError.textContent = '';
+    recoverySuccess.style.display = 'none';
+    recoverySuccess.textContent = '';
+  }
+
+  function obtenerRecoveryRedirectUrl() {
+    const url = new URL(`${window.location.origin}${window.location.pathname}`);
+    url.searchParams.set('recovery', '1');
+    return url.toString();
+  }
+
+  function limpiarUrlRecuperacion() {
+    if (window.location.hash || window.location.search) {
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  }
+
+  function obtenerHashParams() {
+    const hash = (window.location.hash || '').replace(/^#/, '');
+    return new URLSearchParams(hash);
+  }
+
+  function obtenerSearchParams() {
+    return new URLSearchParams(window.location.search || '');
+  }
+
+  function urlIndicaRecuperacion() {
+    const hashParams = obtenerHashParams();
+    const searchParams = obtenerSearchParams();
+    return (
+      hashParams.get('type') === 'recovery' ||
+      searchParams.get('type') === 'recovery' ||
+      searchParams.get('recovery') === '1' ||
+      searchParams.has('code')
     );
+  }
 
-    const loginScreen = document.getElementById('loginScreen');
-    const appShell = document.getElementById('appShell');
-    const loginAccessForm = document.getElementById('loginAccessForm');
-    const passwordRecoveryPanel = document.getElementById('passwordRecoveryPanel');
-    const loginEmail = document.getElementById('loginEmail');
-    const loginPassword = document.getElementById('loginPassword');
-    const loginBtn = document.getElementById('loginBtn');
-    const forgotPasswordBtn = document.getElementById('forgotPasswordBtn');
-    const loginError = document.getElementById('loginError');
-    const resetRequestMessage = document.getElementById('resetRequestMessage');
-    const recoveryPassword = document.getElementById('recoveryPassword');
-    const recoveryPasswordConfirm = document.getElementById('recoveryPasswordConfirm');
-    const recoverySaveBtn = document.getElementById('recoverySaveBtn');
-    const recoveryCancelBtn = document.getElementById('recoveryCancelBtn');
-    const recoveryError = document.getElementById('recoveryError');
-    const recoverySuccess = document.getElementById('recoverySuccess');
-    const logoutBtn = document.getElementById('logoutBtn');
+  async function procesarRecuperacionDesdeUrl() {
+    const searchParams = obtenerSearchParams();
+    const hashParams = obtenerHashParams();
+    const code = searchParams.get('code');
+    const esRecuperacion =
+      searchParams.get('recovery') === '1' ||
+      searchParams.get('type') === 'recovery' ||
+      hashParams.get('type') === 'recovery';
 
-    const mesSelect = document.getElementById('mes');
-    const anioInput = document.getElementById('anio');
-    const presupuestoAnteriorBtn = document.getElementById('presupuestoAnteriorBtn');
-    const presupuestoSiguienteBtn = document.getElementById('presupuestoSiguienteBtn');
-    const presupuestoActivo = document.getElementById('presupuestoActivo');
-    const presupuestoActivoTexto = document.getElementById('presupuestoActivoTexto');
-    const eliminarPresupuestoBtn = document.getElementById('eliminarPresupuestoBtn');
-    const crearPresupuestoWrap = document.getElementById('crearPresupuestoWrap');
-    const crearPresupuestoBtn = document.getElementById('crearPresupuestoBtn');
-    const modulosPresupuesto = document.getElementById('modulosPresupuesto');
-
-    const tablaIngresos = document.getElementById('tablaIngresos');
-    const totalIngresos = document.getElementById('totalIngresos');
-    const agregarIngresoBtn = document.getElementById('agregarIngresoBtn');
-
-    const tablaGastos = document.getElementById('tablaGastos');
-    const totalGastos = document.getElementById('totalGastos');
-    const agregarGastoBtn = document.getElementById('agregarGastoBtn');
-
-    const tablaAhorros = document.getElementById('tablaAhorros');
-    const totalAhorros = document.getElementById('totalAhorros');
-    const agregarAhorroBtn = document.getElementById('agregarAhorroBtn');
-
-    const disponibleBaseInput = document.getElementById('disponibleBaseInput');
-    const disponibleManualToggle = document.getElementById('disponibleManualToggle');
-    const pendientePorPagar = document.getElementById('pendientePorPagar');
-    const disponibleReal = document.getElementById('disponibleReal');
-
-    const storageKey = 'presupuestosMensualesApp';
-    const storageOwnerKey = 'presupuestosMensualesAppOwner';
-
-    function leerPresupuestosLocales() {
-      try {
-        return JSON.parse(localStorage.getItem(storageKey)) || {};
-      } catch (error) {
-        console.error('Error leyendo presupuestos locales:', error);
-        return {};
+    if (code && esRecuperacion) {
+      const { error } = await supabaseClient.auth.exchangeCodeForSession(code);
+      if (error) {
+        console.error('Error intercambiando código de recuperación:', error.message);
+        loginError.textContent = 'El enlace de recuperación no es válido o ya expiró. Solicita uno nuevo.';
+        loginError.style.display = 'block';
+        mostrarFormularioAcceso();
+        return false;
       }
     }
 
-    let presupuestos = leerPresupuestosLocales();
-    let presupuestoActualKey = localStorage.getItem('presupuestoActualKey') || '';
-    let guardadoSupabaseTimeout = null;
-    const presupuestosPendientesSync = new Set();
-    let recoveryModeActivo = false;
-
-    function formatoMoneda(numero) {
-      return new Intl.NumberFormat('es-CO', {
-        style: 'currency',
-        currency: 'COP',
-        maximumFractionDigits: 0
-      }).format(Number(numero) || 0);
+    if (esRecuperacion || hashParams.get('type') === 'recovery') {
+      mostrarFormularioRecuperacion(false);
+      return true;
     }
 
+    return false;
+  }
 
-    function obtenerNombreMes(mes) {
-      const option = mesSelect.querySelector(`option[value="${String(mes).padStart(2, '0')}"]`);
-      return option ? option.textContent : String(mes);
+  function mostrarFormularioAcceso() {
+    recoveryModeActivo = false;
+    forcePasswordChangeMode = false;
+    loginAccessForm.style.display = 'block';
+    passwordRecoveryPanel.style.display = 'none';
+    recoveryPassword.value = '';
+    recoveryPasswordConfirm.value = '';
+  }
+
+  function mostrarFormularioRecuperacion(forzarCambio = false) {
+    recoveryModeActivo = true;
+    forcePasswordChangeMode = forzarCambio;
+    ocultarMensajesAcceso();
+    loginAccessForm.style.display = 'none';
+    passwordRecoveryPanel.style.display = 'block';
+    loginScreen.style.display = 'block';
+    appShell.style.display = 'none';
+    recoveryCancelBtn.style.display = forzarCambio ? 'none' : 'block';
+
+    const subtitulo = passwordRecoveryPanel.querySelector('.login-subtitle');
+    if (subtitulo) {
+      subtitulo.textContent = forzarCambio
+        ? 'Es tu primer ingreso. Debes crear una nueva contraseña para continuar.'
+        : 'Escribe tu nueva contraseña para terminar la recuperación.';
     }
 
-    function actualizarEtiquetaPresupuestoActivo() {
-      if (!presupuestoActualKey || !presupuestos[presupuestoActualKey]) {
-        presupuestoActivoTexto.textContent = '';
-        return;
-      }
+    setTimeout(() => recoveryPassword.focus(), 50);
+  }
 
-      const presupuesto = presupuestos[presupuestoActualKey];
-      presupuestoActivoTexto.textContent = `Presupuesto activo: ${obtenerNombreMes(presupuesto.mes)} ${presupuesto.anio}`;
+  async function solicitarRestablecimientoClave() {
+    ocultarMensajesAcceso();
+
+    const email = loginEmail.value.trim();
+
+    if (!email) {
+      loginError.textContent = 'Escribe tu correo para enviarte el enlace de recuperación.';
+      loginError.style.display = 'block';
+      return;
     }
 
-    function formatoNumeroInput(valor) {
-      const limpio = String(valor || '').replace(/\D/g, '');
-      if (!limpio) return '';
-      return new Intl.NumberFormat('es-CO', {
-        maximumFractionDigits: 0
-      }).format(Number(limpio));
+    const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
+      redirectTo: obtenerRecoveryRedirectUrl()
+    });
+
+    if (error) {
+      loginError.textContent = 'No pudimos enviar el correo de recuperación. Intenta de nuevo.';
+      loginError.style.display = 'block';
+      return;
     }
 
-    function ocultarMensajesAcceso() {
-      loginError.style.display = 'none';
-      loginError.textContent = '';
-      resetRequestMessage.style.display = 'none';
-      resetRequestMessage.textContent = '';
-      recoveryError.style.display = 'none';
-      recoveryError.textContent = '';
-      recoverySuccess.style.display = 'none';
-      recoverySuccess.textContent = '';
+    resetRequestMessage.textContent = 'Si el correo existe, te enviamos un enlace para cambiar la contraseña.';
+    resetRequestMessage.style.display = 'block';
+  }
+
+  async function obtenerUsuarioActual() {
+    const { data, error } = await supabaseClient.auth.getUser();
+
+    if (error) {
+      console.error('Error obteniendo usuario actual:', error.message);
+      return null;
     }
 
-    function obtenerRecoveryRedirectUrl() {
-      const url = new URL(`${window.location.origin}${window.location.pathname}`);
-      url.searchParams.set('recovery', '1');
-      return url.toString();
+    return data?.user || null;
+  }
+
+  async function obtenerPerfilActual() {
+    const user = await obtenerUsuarioActual();
+    if (!user) return null;
+
+    const { data, error } = await supabaseClient
+      .from('profiles')
+      .select('id, email, must_change_password')
+      .eq('id', user.id)
+      .maybeSingle();
+
+    if (error) {
+      console.error('Error obteniendo perfil:', error.message);
+      return null;
     }
 
-    function limpiarUrlRecuperacion() {
-      if (window.location.hash || window.location.search) {
-        window.history.replaceState({}, document.title, window.location.pathname);
-      }
-    }
+    return data;
+  }
 
-    function obtenerHashParams() {
-      const hash = (window.location.hash || '').replace(/^#/, '');
-      return new URLSearchParams(hash);
-    }
+  async function marcarCambioClaveCompleto() {
+    const user = await obtenerUsuarioActual();
+    if (!user) return false;
 
-    function obtenerSearchParams() {
-      return new URLSearchParams(window.location.search || '');
-    }
+    const { error } = await supabaseClient
+      .from('profiles')
+      .update({ must_change_password: false })
+      .eq('id', user.id);
 
-    function urlIndicaRecuperacion() {
-      const hashParams = obtenerHashParams();
-      const searchParams = obtenerSearchParams();
-      return (
-        hashParams.get('type') === 'recovery' ||
-        searchParams.get('type') === 'recovery' ||
-        searchParams.get('recovery') === '1' ||
-        searchParams.has('code')
-      );
-    }
-
-    async function procesarRecuperacionDesdeUrl() {
-      const searchParams = obtenerSearchParams();
-      const hashParams = obtenerHashParams();
-      const code = searchParams.get('code');
-      const esRecuperacion =
-        searchParams.get('recovery') === '1' ||
-        searchParams.get('type') === 'recovery' ||
-        hashParams.get('type') === 'recovery';
-
-      if (code && esRecuperacion) {
-        const { error } = await supabaseClient.auth.exchangeCodeForSession(code);
-        if (error) {
-          console.error('Error intercambiando código de recuperación:', error.message);
-          loginError.textContent = 'El enlace de recuperación no es válido o ya expiró. Solicita uno nuevo.';
-          loginError.style.display = 'block';
-          mostrarFormularioAcceso();
-          return false;
-        }
-      }
-
-      if (esRecuperacion || hashParams.get('type') === 'recovery') {
-        mostrarFormularioRecuperacion();
-        return true;
-      }
-
+    if (error) {
+      console.error('Error actualizando must_change_password:', error.message);
       return false;
     }
 
-    function mostrarFormularioAcceso() {
-      recoveryModeActivo = false;
-      loginAccessForm.style.display = 'block';
-      passwordRecoveryPanel.style.display = 'none';
-      recoveryPassword.value = '';
-      recoveryPasswordConfirm.value = '';
+    return true;
+  }
+
+  async function guardarNuevaClave() {
+    ocultarMensajesAcceso();
+
+    const nueva = recoveryPassword.value;
+    const confirmacion = recoveryPasswordConfirm.value;
+
+    if (!nueva || !confirmacion) {
+      recoveryError.textContent = 'Completa los dos campos de contraseña.';
+      recoveryError.style.display = 'block';
+      return;
     }
 
-    function mostrarFormularioRecuperacion() {
-      recoveryModeActivo = true;
-      ocultarMensajesAcceso();
-      loginAccessForm.style.display = 'none';
-      passwordRecoveryPanel.style.display = 'block';
-      loginScreen.style.display = 'block';
-      appShell.style.display = 'none';
-      setTimeout(() => recoveryPassword.focus(), 50);
+    if (nueva.length < 6) {
+      recoveryError.textContent = 'La contraseña debe tener al menos 6 caracteres.';
+      recoveryError.style.display = 'block';
+      return;
     }
 
-    async function solicitarRestablecimientoClave() {
-      ocultarMensajesAcceso();
-
-      const email = loginEmail.value.trim();
-
-      if (!email) {
-        loginError.textContent = 'Escribe tu correo para enviarte el enlace de recuperación.';
-        loginError.style.display = 'block';
-        return;
-      }
-
-      const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
-        redirectTo: obtenerRecoveryRedirectUrl()
-      });
-
-      if (error) {
-        loginError.textContent = 'No pudimos enviar el correo de recuperación. Intenta de nuevo.';
-        loginError.style.display = 'block';
-        return;
-      }
-
-      resetRequestMessage.textContent = 'Si el correo existe, te enviamos un enlace para cambiar la contraseña.';
-      resetRequestMessage.style.display = 'block';
+    if (nueva !== confirmacion) {
+      recoveryError.textContent = 'Las contraseñas no coinciden.';
+      recoveryError.style.display = 'block';
+      return;
     }
 
-    async function guardarNuevaClave() {
-      ocultarMensajesAcceso();
+    const { error } = await supabaseClient.auth.updateUser({
+      password: nueva
+    });
 
-      const nueva = recoveryPassword.value;
-      const confirmacion = recoveryPasswordConfirm.value;
+    if (error) {
+      recoveryError.textContent = 'No pudimos actualizar la contraseña. Intenta de nuevo.';
+      recoveryError.style.display = 'block';
+      return;
+    }
 
-      if (!nueva || !confirmacion) {
-        recoveryError.textContent = 'Completa los dos campos de contraseña.';
+    if (forcePasswordChangeMode) {
+      const actualizoPerfil = await marcarCambioClaveCompleto();
+
+      if (!actualizoPerfil) {
+        recoveryError.textContent = 'La contraseña cambió, pero no pudimos actualizar el perfil. Vuelve a entrar.';
         recoveryError.style.display = 'block';
         return;
       }
 
-      if (nueva.length < 6) {
-        recoveryError.textContent = 'La contraseña debe tener al menos 6 caracteres.';
-        recoveryError.style.display = 'block';
-        return;
-      }
-
-      if (nueva !== confirmacion) {
-        recoveryError.textContent = 'Las contraseñas no coinciden.';
-        recoveryError.style.display = 'block';
-        return;
-      }
-
-      const { error } = await supabaseClient.auth.updateUser({
-        password: nueva
-      });
-
-      if (error) {
-        recoveryError.textContent = 'No pudimos actualizar la contraseña. Abre de nuevo el enlace del correo.';
-        recoveryError.style.display = 'block';
-        return;
-      }
-
-      recoverySuccess.textContent = 'Contraseña actualizada. Ya puedes entrar de nuevo.';
+      recoverySuccess.textContent = 'Contraseña actualizada. Ya puedes usar tu presupuesto.';
       recoverySuccess.style.display = 'block';
-      await supabaseClient.auth.signOut();
-      limpiarUrlRecuperacion();
-      mostrarFormularioAcceso();
-      loginPassword.value = '';
+      forcePasswordChangeMode = false;
+      recoveryModeActivo = false;
+
+      mostrarApp();
+      await sincronizarPresupuestosIniciales();
+      cargarInicial();
+      return;
     }
 
-    async function cancelarRecuperacion() {
-      limpiarUrlRecuperacion();
-      recoveryPassword.value = '';
-      recoveryPasswordConfirm.value = '';
-      mostrarFormularioAcceso();
-      await supabaseClient.auth.signOut();
+    recoverySuccess.textContent = 'Contraseña actualizada. Ya puedes entrar de nuevo.';
+    recoverySuccess.style.display = 'block';
+    await supabaseClient.auth.signOut();
+    limpiarUrlRecuperacion();
+    mostrarFormularioAcceso();
+    loginPassword.value = '';
+  }
+
+  async function cancelarRecuperacion() {
+    if (forcePasswordChangeMode) return;
+
+    limpiarUrlRecuperacion();
+    recoveryPassword.value = '';
+    recoveryPasswordConfirm.value = '';
+    mostrarFormularioAcceso();
+    await supabaseClient.auth.signOut();
+    mostrarLogin();
+  }
+
+  function construirDataPresupuesto(presupuesto) {
+    return {
+      ingresos: Array.isArray(presupuesto.ingresos) ? presupuesto.ingresos : [],
+      gastos: Array.isArray(presupuesto.gastos) ? presupuesto.gastos : [],
+      ahorros: Array.isArray(presupuesto.ahorros) ? presupuesto.ahorros : [],
+      disponibleActual: presupuesto.disponibleActual || {
+        valorManual: '',
+        usarManual: false
+      }
+    };
+  }
+
+  function normalizarPresupuestoDesdeFila(row) {
+    const data = row.data || {};
+
+    return {
+      mes: String(row.mes).padStart(2, '0'),
+      anio: String(row.anio),
+      ingresos: Array.isArray(data.ingresos) ? data.ingresos : [],
+      gastos: Array.isArray(data.gastos) ? data.gastos : [],
+      ahorros: Array.isArray(data.ahorros) ? data.ahorros : [],
+      disponibleActual: data.disponibleActual || {
+        valorManual: '',
+        usarManual: false
+      }
+    };
+  }
+
+  async function cargarPresupuestosDesdeSupabase() {
+    const user = await obtenerUsuarioActual();
+    if (!user) return false;
+
+    const { data, error } = await supabaseClient
+      .from('presupuestos')
+      .select('user_id, presupuesto_key, mes, anio, data')
+      .eq('user_id', user.id)
+      .order('anio', { ascending: true })
+      .order('mes', { ascending: true });
+
+    if (error) {
+      console.error('Error cargando presupuestos desde Supabase:', error.message);
+      return false;
+    }
+
+    const presupuestosRemotos = {};
+
+    (data || []).forEach((row) => {
+      const key = row.presupuesto_key || `${row.anio}-${String(row.mes).padStart(2, '0')}`;
+      presupuestosRemotos[key] = normalizarPresupuestoDesdeFila(row);
+    });
+
+    presupuestos = presupuestosRemotos;
+    Object.keys(presupuestos).forEach(asegurarEstructuraPresupuesto);
+    guardarOwnerLocal(user.id);
+
+    if (presupuestoActualKey && !presupuestos[presupuestoActualKey]) {
+      presupuestoActualKey = '';
+    }
+
+    guardarTodoLocal();
+    return true;
+  }
+
+  async function guardarPresupuestoEnSupabase(key) {
+    if (!key || !presupuestos[key]) return;
+
+    const user = await obtenerUsuarioActual();
+    if (!user) return;
+
+    asegurarEstructuraPresupuesto(key);
+    const presupuesto = presupuestos[key];
+
+    const payload = {
+      user_id: user.id,
+      presupuesto_key: key,
+      mes: presupuesto.mes,
+      anio: Number(presupuesto.anio),
+      data: construirDataPresupuesto(presupuesto)
+    };
+
+    const { error } = await supabaseClient
+      .from('presupuestos')
+      .upsert(payload, { onConflict: 'user_id,presupuesto_key' });
+
+    if (error) {
+      console.error(`Error guardando presupuesto ${key} en Supabase:`, error.message);
+    }
+  }
+
+  async function eliminarPresupuestoDeSupabase(key) {
+    if (!key) return false;
+
+    const user = await obtenerUsuarioActual();
+    if (!user) return false;
+
+    const { error } = await supabaseClient
+      .from('presupuestos')
+      .delete()
+      .eq('user_id', user.id)
+      .eq('presupuesto_key', key);
+
+    if (error) {
+      console.error(`Error eliminando presupuesto ${key} en Supabase:`, error.message);
+      return false;
+    }
+
+    return true;
+  }
+
+  async function guardarTodosLosPresupuestosEnSupabase() {
+    const keys = Object.keys(presupuestos);
+    if (!keys.length) return;
+
+    const user = await obtenerUsuarioActual();
+    if (!user) return;
+
+    const payload = keys.map((key) => {
+      asegurarEstructuraPresupuesto(key);
+      const presupuesto = presupuestos[key];
+
+      return {
+        user_id: user.id,
+        presupuesto_key: key,
+        mes: presupuesto.mes,
+        anio: Number(presupuesto.anio),
+        data: construirDataPresupuesto(presupuesto)
+      };
+    });
+
+    const { error } = await supabaseClient
+      .from('presupuestos')
+      .upsert(payload, { onConflict: 'user_id,presupuesto_key' });
+
+    if (error) {
+      console.error('Error migrando presupuestos a Supabase:', error.message);
+    }
+  }
+
+  function programarGuardadoSupabase(key) {
+    if (!key || !presupuestos[key]) return;
+
+    presupuestosPendientesSync.add(key);
+
+    if (guardadoSupabaseTimeout) {
+      clearTimeout(guardadoSupabaseTimeout);
+    }
+
+    guardadoSupabaseTimeout = setTimeout(async () => {
+      const keysPendientes = Array.from(presupuestosPendientesSync);
+      presupuestosPendientesSync.clear();
+
+      for (const keyPendiente of keysPendientes) {
+        await guardarPresupuestoEnSupabase(keyPendiente);
+      }
+    }, 500);
+  }
+
+  async function sincronizarPresupuestosIniciales() {
+    const presupuestosLocales = leerPresupuestosLocales();
+    const ownerLocal = localStorage.getItem(storageOwnerKey) || '';
+    const user = await obtenerUsuarioActual();
+    const cargoRemotos = await cargarPresupuestosDesdeSupabase();
+
+    if (!cargoRemotos) {
+      presupuestos = presupuestosLocales;
+      Object.keys(presupuestos).forEach(asegurarEstructuraPresupuesto);
+      if (user) guardarOwnerLocal(user.id);
+      guardarTodoLocal();
+      return;
+    }
+
+    const hayRemotos = Object.keys(presupuestos).length > 0;
+    const hayLocales = Object.keys(presupuestosLocales).length > 0;
+    const localPerteneceAlUsuario = !ownerLocal || (user && ownerLocal === user.id);
+
+    if (!hayRemotos && hayLocales && localPerteneceAlUsuario) {
+      presupuestos = presupuestosLocales;
+      Object.keys(presupuestos).forEach(asegurarEstructuraPresupuesto);
+      if (user) guardarOwnerLocal(user.id);
+      guardarTodoLocal();
+      await guardarTodosLosPresupuestosEnSupabase();
+      await cargarPresupuestosDesdeSupabase();
+    }
+  }
+
+  function guardarTodo() {
+    guardarTodoLocal();
+    programarGuardadoSupabase(presupuestoActualKey);
+  }
+
+  function crearIngresoVacio() {
+    return {
+      descripcion: '',
+      valor: '',
+      periodicidad: 'MENSUAL',
+      recibido: false
+    };
+  }
+
+  function crearGastoVacio() {
+    return {
+      descripcion: '',
+      valor: '',
+      periodicidad: 'MENSUAL',
+      pagado: false
+    };
+  }
+
+  function crearAhorroVacio() {
+    return {
+      descripcion: '',
+      valor: '',
+      periodicidad: 'MENSUAL',
+      pagado: false
+    };
+  }
+
+  function asegurarEstructuraPresupuesto(key) {
+    if (!presupuestos[key]) return;
+
+    if (!Array.isArray(presupuestos[key].ingresos)) {
+      presupuestos[key].ingresos = [];
+    }
+
+    presupuestos[key].ingresos = presupuestos[key].ingresos.map((ingreso) => ({
+      descripcion: ingreso.descripcion || '',
+      valor: ingreso.valor || '',
+      periodicidad: ingreso.periodicidad || 'MENSUAL',
+      recibido: Boolean(ingreso.recibido)
+    }));
+
+    if (!Array.isArray(presupuestos[key].gastos)) {
+      presupuestos[key].gastos = [];
+    }
+
+    presupuestos[key].gastos = presupuestos[key].gastos.map((gasto) => ({
+      descripcion: gasto.descripcion || '',
+      valor: gasto.valor || '',
+      periodicidad: gasto.periodicidad || 'MENSUAL',
+      pagado: Boolean(gasto.pagado)
+    }));
+
+    if (!Array.isArray(presupuestos[key].ahorros)) {
+      presupuestos[key].ahorros = [];
+    }
+
+    presupuestos[key].ahorros = presupuestos[key].ahorros.map((ahorro) => ({
+      descripcion: ahorro.descripcion || '',
+      valor: ahorro.valor || '',
+      periodicidad: ahorro.periodicidad || 'MENSUAL',
+      pagado: Boolean(ahorro.pagado)
+    }));
+
+    const disponibleAnterior = presupuestos[key].disponibleActual || {};
+    const sumaAnterior =
+      Number(disponibleAnterior.cuentasBancarias || 0) +
+      Number(disponibleAnterior.efectivo || 0);
+
+    presupuestos[key].disponibleActual = {
+      valorManual: String(disponibleAnterior.valorManual ?? (sumaAnterior || '')),
+      usarManual: Boolean(disponibleAnterior.usarManual)
+    };
+  }
+
+  function mostrarSoloEncabezado() {
+    modulosPresupuesto.style.display = 'none';
+    crearPresupuestoWrap.style.display = 'flex';
+    presupuestoActivo.style.display = 'none';
+    presupuestoActivoTexto.textContent = '';
+  }
+
+  function mostrarPresupuestoActivo() {
+    modulosPresupuesto.style.display = 'block';
+    crearPresupuestoWrap.style.display = 'none';
+    actualizarEtiquetaPresupuestoActivo();
+    presupuestoActivo.style.display = 'flex';
+  }
+
+  function obtenerKeySeleccionActual() {
+    const mes = mesSelect.value;
+    const anio = anioInput.value.trim();
+
+    if (!/^\d{4}$/.test(anio)) return '';
+    return `${anio}-${mes}`;
+  }
+
+  function calcularDisponibleAutomatico(presupuesto) {
+    const ingresosRecibidos = presupuesto.ingresos
+      .filter((item) => item.recibido)
+      .reduce((acc, item) => acc + (Number(item.valor) || 0), 0);
+
+    const gastosPagados = presupuesto.gastos
+      .filter((item) => item.pagado)
+      .reduce((acc, item) => acc + (Number(item.valor) || 0), 0);
+
+    const ahorrosPagados = presupuesto.ahorros
+      .filter((item) => item.pagado)
+      .reduce((acc, item) => acc + (Number(item.valor) || 0), 0);
+
+    return ingresosRecibidos - gastosPagados - ahorrosPagados;
+  }
+
+  function calcularPendiente(presupuesto) {
+    const gastosPendientes = presupuesto.gastos
+      .filter((item) => !item.pagado)
+      .reduce((acc, item) => acc + (Number(item.valor) || 0), 0);
+
+    const ahorrosPendientes = presupuesto.ahorros
+      .filter((item) => !item.pagado)
+      .reduce((acc, item) => acc + (Number(item.valor) || 0), 0);
+
+    return gastosPendientes + ahorrosPendientes;
+  }
+
+  function obtenerDisponibleBase(presupuesto) {
+    if (presupuesto.disponibleActual?.usarManual) {
+      return Number(presupuesto.disponibleActual?.valorManual || 0);
+    }
+    return calcularDisponibleAutomatico(presupuesto);
+  }
+
+  function abrirPresupuestoExistente(key) {
+    if (!presupuestos[key]) return;
+
+    presupuestoActualKey = key;
+    asegurarEstructuraPresupuesto(key);
+
+    guardarTodo();
+    renderIngresos();
+    renderGastos();
+    renderAhorros();
+    actualizarDisponibleActual();
+    mostrarPresupuestoActivo();
+  }
+
+  function evaluarVistaSegunSeleccion() {
+    const key = obtenerKeySeleccionActual();
+
+    if (!key) {
+      mostrarSoloEncabezado();
+      return;
+    }
+
+    if (presupuestos[key]) {
+      abrirPresupuestoExistente(key);
+      return;
+    }
+
+    mostrarSoloEncabezado();
+  }
+
+  function actualizarResumenIngresos() {
+    if (!presupuestoActualKey || !presupuestos[presupuestoActualKey]) {
+      totalIngresos.textContent = formatoMoneda(0);
+      return;
+    }
+
+    const ingresos = presupuestos[presupuestoActualKey].ingresos;
+    const total = ingresos.reduce((acc, fila) => acc + (Number(fila.valor) || 0), 0);
+    totalIngresos.textContent = formatoMoneda(total);
+  }
+
+  function actualizarResumenGastos() {
+    if (!presupuestoActualKey || !presupuestos[presupuestoActualKey]) {
+      totalGastos.textContent = formatoMoneda(0);
+      return;
+    }
+
+    const gastos = presupuestos[presupuestoActualKey].gastos;
+    const total = gastos.reduce((acc, fila) => acc + (Number(fila.valor) || 0), 0);
+    totalGastos.textContent = formatoMoneda(total);
+  }
+
+  function actualizarResumenAhorros() {
+    if (!presupuestoActualKey || !presupuestos[presupuestoActualKey]) {
+      totalAhorros.textContent = formatoMoneda(0);
+      return;
+    }
+
+    const ahorros = presupuestos[presupuestoActualKey].ahorros;
+    const total = ahorros.reduce((acc, fila) => acc + (Number(fila.valor) || 0), 0);
+    totalAhorros.textContent = formatoMoneda(total);
+  }
+
+  function actualizarDisponibleActual() {
+    if (!presupuestoActualKey || !presupuestos[presupuestoActualKey]) {
+      pendientePorPagar.textContent = formatoMoneda(0);
+      disponibleReal.textContent = formatoMoneda(0);
+      disponibleBaseInput.value = '';
+      disponibleBaseInput.readOnly = true;
+      disponibleManualToggle.checked = false;
+      return;
+    }
+
+    asegurarEstructuraPresupuesto(presupuestoActualKey);
+
+    const presupuesto = presupuestos[presupuestoActualKey];
+    const disponibleBase = obtenerDisponibleBase(presupuesto);
+    const pendiente = calcularPendiente(presupuesto);
+    const disponible = disponibleBase - pendiente;
+
+    pendientePorPagar.textContent = formatoMoneda(pendiente);
+    disponibleReal.textContent = formatoMoneda(disponible);
+
+    disponibleManualToggle.checked = Boolean(presupuesto.disponibleActual.usarManual);
+    disponibleBaseInput.readOnly = !presupuesto.disponibleActual.usarManual;
+    disponibleBaseInput.value = formatoNumeroInput(
+      presupuesto.disponibleActual.usarManual
+        ? presupuesto.disponibleActual.valorManual
+        : String(disponibleBase)
+    );
+  }
+
+  async function iniciarSesion() {
+    ocultarMensajesAcceso();
+
+    const email = loginEmail.value.trim();
+    const password = loginPassword.value;
+
+    if (!email || !password) {
+      loginError.textContent = 'Completa correo y contraseña.';
+      loginError.style.display = 'block';
+      return;
+    }
+
+    const { error } = await supabaseClient.auth.signInWithPassword({
+      email,
+      password
+    });
+
+    if (error) {
+      loginError.textContent = 'No pudimos iniciar sesión. Revisa correo y contraseña.';
+      loginError.style.display = 'block';
+      return;
+    }
+
+    loginPassword.value = '';
+
+    const perfil = await obtenerPerfilActual();
+
+    if (perfil?.must_change_password) {
+      mostrarFormularioRecuperacion(true);
+      return;
+    }
+
+    mostrarApp();
+    await sincronizarPresupuestosIniciales();
+    cargarInicial();
+  }
+
+  function mostrarLogin() {
+    loginScreen.style.display = 'block';
+    appShell.style.display = 'none';
+  }
+
+  function mostrarApp() {
+    loginScreen.style.display = 'none';
+    appShell.style.display = 'block';
+  }
+
+  async function verificarSesionInicial() {
+    try {
+      if (await procesarRecuperacionDesdeUrl()) {
+        return;
+      }
+
+      const { data, error } = await supabaseClient.auth.getSession();
+
+      if (error) {
+        console.error('Error obteniendo sesión:', error.message);
+        mostrarLogin();
+        return;
+      }
+
+      if (data.session) {
+        if (urlIndicaRecuperacion()) {
+          mostrarFormularioRecuperacion(false);
+          return;
+        }
+
+        const perfil = await obtenerPerfilActual();
+
+        if (perfil?.must_change_password) {
+          mostrarFormularioRecuperacion(true);
+          return;
+        }
+
+        mostrarApp();
+        await sincronizarPresupuestosIniciales();
+        cargarInicial();
+      } else {
+        mostrarLogin();
+        mostrarFormularioAcceso();
+      }
+    } catch (err) {
+      console.error(err);
       mostrarLogin();
     }
+  }
+
+  async function cerrarSesion() {
+    if (guardadoSupabaseTimeout) {
+      clearTimeout(guardadoSupabaseTimeout);
+      guardadoSupabaseTimeout = null;
+    }
+
+    await guardarTodosLosPresupuestosEnSupabase();
+    await supabaseClient.auth.signOut();
+    recoveryModeActivo = false;
+    forcePasswordChangeMode = false;
+    mostrarFormularioAcceso();
+    mostrarLogin();
+  }
+
+  supabaseClient.auth.onAuthStateChange(async (event, session) => {
+    if (event === 'PASSWORD_RECOVERY') {
+      mostrarFormularioRecuperacion(false);
+      return;
+    }
+
+    if (session) {
+      if (recoveryModeActivo || urlIndicaRecuperacion()) {
+        mostrarFormularioRecuperacion(forcePasswordChangeMode);
+        return;
+      }
+
+      const perfil = await obtenerPerfilActual();
+
+      if (perfil?.must_change_password) {
+        mostrarFormularioRecuperacion(true);
+        return;
+      }
+
+      mostrarApp();
+      return;
+    }
+
+    if (urlIndicaRecuperacion()) {
+      mostrarFormularioRecuperacion(false);
+      return;
+    }
+
+    recoveryModeActivo = false;
+    forcePasswordChangeMode = false;
+    presupuestoActualKey = '';
+    localStorage.removeItem('presupuestoActualKey');
+    mostrarFormularioAcceso();
+    mostrarLogin();
+  });
+
 
     function nombreMes(valorMes) {
       const meses = {
