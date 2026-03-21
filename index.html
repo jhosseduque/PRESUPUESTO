@@ -1135,48 +1135,82 @@ async function procesarRecuperacionDesdeUrl() {
       resetRequestMessage.style.display = 'block';
     }
 
-    async function guardarNuevaClave() {
-      ocultarMensajesAcceso();
+   async function guardarNuevaClave() {
+  ocultarMensajesAcceso();
 
-      const nueva = recoveryPassword.value;
-      const confirmacion = recoveryPasswordConfirm.value;
+  const nueva = recoveryPassword.value.trim();
+  const confirmacion = recoveryPasswordConfirm.value.trim();
 
-      if (!nueva || !confirmacion) {
-        recoveryError.textContent = 'Completa los dos campos de contraseña.';
-        recoveryError.style.display = 'block';
-        return;
-      }
+  if (!nueva || !confirmacion) {
+    recoveryError.textContent = 'Completa los dos campos de contraseña.';
+    recoveryError.style.display = 'block';
+    return;
+  }
 
-      if (nueva.length < 6) {
-        recoveryError.textContent = 'La contraseña debe tener al menos 6 caracteres.';
-        recoveryError.style.display = 'block';
-        return;
-      }
+  if (nueva.length < 6) {
+    recoveryError.textContent = 'La contraseña debe tener al menos 6 caracteres.';
+    recoveryError.style.display = 'block';
+    return;
+  }
 
-      if (nueva !== confirmacion) {
-        recoveryError.textContent = 'Las contraseñas no coinciden.';
-        recoveryError.style.display = 'block';
-        return;
-      }
+  if (nueva !== confirmacion) {
+    recoveryError.textContent = 'Las contraseñas no coinciden.';
+    recoveryError.style.display = 'block';
+    return;
+  }
 
-      const { error } = await supabaseClient.auth.updateUser({
-        password: nueva
-      });
+  recoverySaveBtn.disabled = true;
+  recoverySaveBtn.textContent = 'Guardando...';
 
-      if (error) {
-        recoveryError.textContent = 'No pudimos actualizar la contraseña. Abre de nuevo el enlace del correo.';
-        recoveryError.style.display = 'block';
-        return;
-      }
+  try {
+    const { error } = await supabaseClient.auth.updateUser({
+      password: nueva
+    });
 
-      recoverySuccess.textContent = 'Contraseña actualizada. Ya puedes entrar de nuevo.';
-      recoverySuccess.style.display = 'block';
+    if (error) {
+      recoveryError.textContent = 'No pudimos actualizar la contraseña. Intenta de nuevo.';
+      recoveryError.style.display = 'block';
+      return;
+    }
+
+    // Si existe perfil, lo dejamos listo
+    const user = await obtenerUsuarioActual();
+    if (user) {
+      await supabaseClient
+        .from('profiles')
+        .upsert({
+          id: user.id,
+          email: user.email,
+          must_change_password: false
+        });
+    }
+
+    recoverySuccess.textContent = 'Contraseña actualizada con éxito. Ahora inicia sesión.';
+    recoverySuccess.style.display = 'block';
+
+    recoveryPassword.value = '';
+    recoveryPasswordConfirm.value = '';
+    forcePasswordChangeMode = false;
+    recoveryModeActivo = false;
+
+    setTimeout(async () => {
       await supabaseClient.auth.signOut();
       limpiarUrlRecuperacion();
       mostrarFormularioAcceso();
+      mostrarLogin();
       loginPassword.value = '';
-    }
+      recoverySuccess.style.display = 'none';
+    }, 1500);
 
+  } catch (e) {
+    console.error('Error guardando nueva contraseña:', e);
+    recoveryError.textContent = 'Ocurrió un error al guardar la contraseña.';
+    recoveryError.style.display = 'block';
+  } finally {
+    recoverySaveBtn.disabled = false;
+    recoverySaveBtn.textContent = 'Guardar nueva contraseña';
+  }
+}
     async function cancelarRecuperacion() {
       limpiarUrlRecuperacion();
       recoveryPassword.value = '';
