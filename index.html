@@ -975,6 +975,7 @@
     let guardadoSupabaseTimeout = null;
     const presupuestosPendientesSync = new Set();
     let recoveryModeActivo = false;
+    let forcePasswordChangeMode = false;
 
     function formatoMoneda(numero) {
       return new Intl.NumberFormat('es-CO', {
@@ -1043,70 +1044,81 @@
     function urlIndicaRecuperacion() {
       const hashParams = obtenerHashParams();
       const searchParams = obtenerSearchParams();
+      const tipoHash = hashParams.get('type');
+      const tipoSearch = searchParams.get('type');
+
       return (
-        hashParams.get('type') === 'recovery' ||
-        searchParams.get('type') === 'recovery' ||
+        tipoHash === 'recovery' ||
+        tipoHash === 'invite' ||
+        tipoSearch === 'recovery' ||
+        tipoSearch === 'invite' ||
         searchParams.get('recovery') === '1' ||
-        searchParams.has('code')
+        searchParams.has('code') ||
+        hashParams.has('access_token')
       );
     }
 
-async function procesarRecuperacionDesdeUrl() {
-  const searchParams = obtenerSearchParams();
-  const hashParams = obtenerHashParams();
+    async function procesarRecuperacionDesdeUrl() {
+      const searchParams = obtenerSearchParams();
+      const hashParams = obtenerHashParams();
 
-  const code = searchParams.get('code');
-  const tipoHash = hashParams.get('type');
-  const tipoSearch = searchParams.get('type');
+      const code = searchParams.get('code');
+      const tipoHash = hashParams.get('type');
+      const tipoSearch = searchParams.get('type');
 
-  const esInvite =
-    tipoHash === 'invite' ||
-    tipoSearch === 'invite';
+      const esInvite = tipoHash === 'invite' || tipoSearch === 'invite';
+      const esRecovery =
+        searchParams.get('recovery') === '1' ||
+        tipoHash === 'recovery' ||
+        tipoSearch === 'recovery';
+      const tieneToken = hashParams.has('access_token');
+      const esFlujoPassword = esInvite || esRecovery || tieneToken;
 
-  const esRecovery =
-    searchParams.get('recovery') === '1' ||
-    tipoHash === 'recovery' ||
-    tipoSearch === 'recovery';
+      if (code && esFlujoPassword) {
+        const { error } = await supabaseClient.auth.exchangeCodeForSession(code);
+        if (error) {
+          console.error('Error intercambiando código:', error.message);
+          loginError.textContent = 'El enlace no es válido o ya expiró. Solicita uno nuevo.';
+          loginError.style.display = 'block';
+          mostrarFormularioAcceso();
+          return false;
+        }
+      }
 
-  const tieneToken = hashParams.has('access_token');
+      if (esFlujoPassword) {
+        mostrarFormularioRecuperacion(esInvite);
+        return true;
+      }
 
-  const esFlujoPassword = esInvite || esRecovery || tieneToken;
-
-  if (code && esFlujoPassword) {
-    const { error } = await supabaseClient.auth.exchangeCodeForSession(code);
-
-    if (error) {
-      console.error('Error intercambiando código:', error.message);
-      loginError.textContent = 'El enlace no es válido o ya expiró. Solicita uno nuevo.';
-      loginError.style.display = 'block';
-      mostrarFormularioAcceso();
       return false;
     }
-  }
-
-  if (esFlujoPassword) {
-    mostrarFormularioRecuperacion(esInvite);
-    return true;
-  }
-
-  return false;
-}
 
     function mostrarFormularioAcceso() {
       recoveryModeActivo = false;
+      forcePasswordChangeMode = false;
       loginAccessForm.style.display = 'block';
       passwordRecoveryPanel.style.display = 'none';
       recoveryPassword.value = '';
       recoveryPasswordConfirm.value = '';
     }
 
-    function mostrarFormularioRecuperacion() {
+    function mostrarFormularioRecuperacion(forzarCambio = false) {
       recoveryModeActivo = true;
+      forcePasswordChangeMode = forzarCambio;
       ocultarMensajesAcceso();
       loginAccessForm.style.display = 'none';
       passwordRecoveryPanel.style.display = 'block';
       loginScreen.style.display = 'block';
       appShell.style.display = 'none';
+      recoveryCancelBtn.style.display = forzarCambio ? 'none' : 'block';
+
+      const subtitulo = passwordRecoveryPanel.querySelector('.login-subtitle');
+      if (subtitulo) {
+        subtitulo.textContent = forzarCambio
+          ? 'Crea tu contraseña para activar tu acceso.'
+          : 'Escribe tu nueva contraseña para terminar la recuperación.';
+      }
+
       setTimeout(() => recoveryPassword.focus(), 50);
     }
 
@@ -1135,83 +1147,92 @@ async function procesarRecuperacionDesdeUrl() {
       resetRequestMessage.style.display = 'block';
     }
 
-   async function guardarNuevaClave() {
-  ocultarMensajesAcceso();
+    async function guardarNuevaClave() {
+      ocultarMensajesAcceso();
 
-  const nueva = recoveryPassword.value.trim();
-  const confirmacion = recoveryPasswordConfirm.value.trim();
+      const nueva = recoveryPassword.value.trim();
+      const confirmacion = recoveryPasswordConfirm.value.trim();
 
-  if (!nueva || !confirmacion) {
-    recoveryError.textContent = 'Completa los dos campos de contraseña.';
-    recoveryError.style.display = 'block';
-    return;
-  }
+      if (!nueva || !confirmacion) {
+        recoveryError.textContent = 'Completa los dos campos de contraseña.';
+        recoveryError.style.display = 'block';
+        return;
+      }
 
-  if (nueva.length < 6) {
-    recoveryError.textContent = 'La contraseña debe tener al menos 6 caracteres.';
-    recoveryError.style.display = 'block';
-    return;
-  }
+      if (nueva.length < 6) {
+        recoveryError.textContent = 'La contraseña debe tener al menos 6 caracteres.';
+        recoveryError.style.display = 'block';
+        return;
+      }
 
-  if (nueva !== confirmacion) {
-    recoveryError.textContent = 'Las contraseñas no coinciden.';
-    recoveryError.style.display = 'block';
-    return;
-  }
+      if (nueva !== confirmacion) {
+        recoveryError.textContent = 'Las contraseñas no coinciden.';
+        recoveryError.style.display = 'block';
+        return;
+      }
 
-  recoverySaveBtn.disabled = true;
-  recoverySaveBtn.textContent = 'Guardando...';
+      recoverySaveBtn.disabled = true;
+      recoverySaveBtn.textContent = 'Guardando...';
 
-  try {
-    const { error } = await supabaseClient.auth.updateUser({
-      password: nueva
-    });
-
-    if (error) {
-      recoveryError.textContent = 'No pudimos actualizar la contraseña. Intenta de nuevo.';
-      recoveryError.style.display = 'block';
-      return;
-    }
-
-    // Si existe perfil, lo dejamos listo
-    const user = await obtenerUsuarioActual();
-    if (user) {
-      await supabaseClient
-        .from('profiles')
-        .upsert({
-          id: user.id,
-          email: user.email,
-          must_change_password: false
+      try {
+        const { error: passwordError } = await supabaseClient.auth.updateUser({
+          password: nueva
         });
+
+        if (passwordError) {
+          console.error('Error updateUser:', passwordError.message);
+          recoveryError.textContent = passwordError.message || 'No pudimos actualizar la contraseña.';
+          recoveryError.style.display = 'block';
+          return;
+        }
+
+        const user = await obtenerUsuarioActual();
+        if (user) {
+          const { error: profileError } = await supabaseClient
+            .from('profiles')
+            .upsert({
+              id: user.id,
+              email: user.email,
+              must_change_password: false
+            });
+
+          if (profileError) {
+            console.error('Error guardando perfil:', profileError.message);
+            recoveryError.textContent = 'La contraseña cambió, pero hubo un problema actualizando el perfil.';
+            recoveryError.style.display = 'block';
+            return;
+          }
+        }
+
+        recoverySuccess.textContent = 'Contraseña actualizada con éxito. Ahora inicia sesión.';
+        recoverySuccess.style.display = 'block';
+
+        recoveryPassword.value = '';
+        recoveryPasswordConfirm.value = '';
+        recoveryModeActivo = false;
+        forcePasswordChangeMode = false;
+
+        setTimeout(async () => {
+          await supabaseClient.auth.signOut();
+          limpiarUrlRecuperacion();
+          mostrarFormularioAcceso();
+          mostrarLogin();
+          loginPassword.value = '';
+          recoverySuccess.style.display = 'none';
+        }, 1500);
+      } catch (e) {
+        console.error('Error guardando nueva contraseña:', e);
+        recoveryError.textContent = 'Ocurrió un error al guardar la contraseña.';
+        recoveryError.style.display = 'block';
+      } finally {
+        recoverySaveBtn.disabled = false;
+        recoverySaveBtn.textContent = 'Guardar nueva contraseña';
+      }
     }
 
-    recoverySuccess.textContent = 'Contraseña actualizada con éxito. Ahora inicia sesión.';
-    recoverySuccess.style.display = 'block';
-
-    recoveryPassword.value = '';
-    recoveryPasswordConfirm.value = '';
-    forcePasswordChangeMode = false;
-    recoveryModeActivo = false;
-
-    setTimeout(async () => {
-      await supabaseClient.auth.signOut();
-      limpiarUrlRecuperacion();
-      mostrarFormularioAcceso();
-      mostrarLogin();
-      loginPassword.value = '';
-      recoverySuccess.style.display = 'none';
-    }, 1500);
-
-  } catch (e) {
-    console.error('Error guardando nueva contraseña:', e);
-    recoveryError.textContent = 'Ocurrió un error al guardar la contraseña.';
-    recoveryError.style.display = 'block';
-  } finally {
-    recoverySaveBtn.disabled = false;
-    recoverySaveBtn.textContent = 'Guardar nueva contraseña';
-  }
-}
     async function cancelarRecuperacion() {
+      if (forcePasswordChangeMode) return;
+
       limpiarUrlRecuperacion();
       recoveryPassword.value = '';
       recoveryPasswordConfirm.value = '';
@@ -1334,46 +1355,47 @@ async function procesarRecuperacionDesdeUrl() {
     }
 
 
-async function asegurarPerfilUsuario() {
-  const user = await obtenerUsuarioActual();
-  if (!user) return null;
+    async function asegurarPerfilUsuario() {
+      const user = await obtenerUsuarioActual();
+      if (!user) return null;
 
-  const { data: perfilExistente, error: errorConsulta } = await supabaseClient
-    .from('profiles')
-    .select('id, email, must_change_password')
-    .eq('id', user.id)
-    .maybeSingle();
+      const { data: perfilExistente, error: errorConsulta } = await supabaseClient
+        .from('profiles')
+        .select('id, email, must_change_password')
+        .eq('id', user.id)
+        .maybeSingle();
 
-  if (errorConsulta) {
-    console.error('Error consultando perfil:', errorConsulta.message);
-    return null;
-  }
+      if (errorConsulta) {
+        console.error('Error consultando perfil:', errorConsulta.message);
+        return null;
+      }
 
-  if (perfilExistente) return perfilExistente;
+      if (perfilExistente) return perfilExistente;
 
-  const nuevoPerfil = {
-    id: user.id,
-    email: user.email,
-    must_change_password: true
-  };
+      const nuevoPerfil = {
+        id: user.id,
+        email: user.email,
+        must_change_password: true
+      };
 
-  const { data: perfilCreado, error: errorCreacion } = await supabaseClient
-    .from('profiles')
-    .insert(nuevoPerfil)
-    .select('id, email, must_change_password')
-    .single();
+      const { data: perfilCreado, error: errorCreacion } = await supabaseClient
+        .from('profiles')
+        .insert(nuevoPerfil)
+        .select('id, email, must_change_password')
+        .single();
 
-  if (errorCreacion) {
-    console.error('Error creando perfil:', errorCreacion.message);
-    return null;
-  }
+      if (errorCreacion) {
+        console.error('Error creando perfil:', errorCreacion.message);
+        return null;
+      }
 
-  return perfilCreado;
-}
+      return perfilCreado;
+    }
 
-async function obtenerPerfilActual() {
-  return await asegurarPerfilUsuario();
-}
+    async function obtenerPerfilActual() {
+      return await asegurarPerfilUsuario();
+    }
+
 
     function construirDataPresupuesto(presupuesto) {
       return {
@@ -2331,97 +2353,58 @@ async function obtenerPerfilActual() {
       appShell.style.display = 'none';
     }
 
-async function asegurarPerfilUsuario() {
-  const user = await obtenerUsuarioActual();
-  if (!user) return null;
-
-  const { data: perfilExistente, error: errorConsulta } = await supabaseClient
-    .from('profiles')
-    .select('id, email, must_change_password')
-    .eq('id', user.id)
-    .maybeSingle();
-
-  if (errorConsulta) {
-    console.error('Error consultando perfil:', errorConsulta.message);
-    return null;
-  }
-
-  if (perfilExistente) return perfilExistente;
-
-  const nuevoPerfil = {
-    id: user.id,
-    email: user.email,
-    must_change_password: true
-  };
-
-  const { data: perfilCreado, error: errorCreacion } = await supabaseClient
-    .from('profiles')
-    .insert(nuevoPerfil)
-    .select('id, email, must_change_password')
-    .single();
-
-  if (errorCreacion) {
-    console.error('Error creando perfil:', errorCreacion.message);
-    return null;
-  }
-
-  return perfilCreado;
-}
-
     function mostrarApp() {
       loginScreen.style.display = 'none';
       appShell.style.display = 'block';
     }
 
     async function verificarSesionInicial() {
-  try {
-    const hashParams = obtenerHashParams();
-    const searchParams = obtenerSearchParams();
+      try {
+        const hashParams = obtenerHashParams();
+        const searchParams = obtenerSearchParams();
+        const esInvite =
+          hashParams.get('type') === 'invite' ||
+          searchParams.get('type') === 'invite';
 
-    const esInvite =
-      hashParams.get('type') === 'invite' ||
-      searchParams.get('type') === 'invite';
+        if (await procesarRecuperacionDesdeUrl()) {
+          if (esInvite) {
+            forcePasswordChangeMode = true;
+          }
+          return;
+        }
 
-    if (await procesarRecuperacionDesdeUrl()) {
-      if (esInvite) {
-        forcePasswordChangeMode = true;
+        const { data, error } = await supabaseClient.auth.getSession();
+
+        if (error) {
+          console.error('Error obteniendo sesión:', error.message);
+          mostrarLogin();
+          return;
+        }
+
+        if (data.session) {
+          if (urlIndicaRecuperacion()) {
+            mostrarFormularioRecuperacion(esInvite);
+            return;
+          }
+
+          const perfil = await obtenerPerfilActual();
+          if (perfil?.must_change_password) {
+            mostrarFormularioRecuperacion(true);
+            return;
+          }
+
+          mostrarApp();
+          await sincronizarPresupuestosIniciales();
+          cargarInicial();
+        } else {
+          mostrarLogin();
+          mostrarFormularioAcceso();
+        }
+      } catch (err) {
+        console.error(err);
+        mostrarLogin();
       }
-      return;
     }
-
-    const { data, error } = await supabaseClient.auth.getSession();
-
-    if (error) {
-      console.error('Error obteniendo sesión:', error.message);
-      mostrarLogin();
-      return;
-    }
-
-    if (data.session) {
-      if (urlIndicaRecuperacion()) {
-        mostrarFormularioRecuperacion(esInvite);
-        return;
-      }
-
-      const perfil = await obtenerPerfilActual();
-
-      if (perfil?.must_change_password) {
-        mostrarFormularioRecuperacion(true);
-        return;
-      }
-
-      mostrarApp();
-      await sincronizarPresupuestosIniciales();
-      cargarInicial();
-    } else {
-      mostrarLogin();
-      mostrarFormularioAcceso();
-    }
-  } catch (err) {
-    console.error(err);
-    mostrarLogin();
-  }
-}
 
     async function iniciarSesion() {
       ocultarMensajesAcceso();
@@ -2447,6 +2430,13 @@ async function asegurarPerfilUsuario() {
       }
 
       loginPassword.value = '';
+
+      const perfil = await obtenerPerfilActual();
+      if (perfil?.must_change_password) {
+        mostrarFormularioRecuperacion(true);
+        return;
+      }
+
       mostrarApp();
       await sincronizarPresupuestosIniciales();
       cargarInicial();
@@ -2461,57 +2451,56 @@ async function asegurarPerfilUsuario() {
       await guardarTodosLosPresupuestosEnSupabase();
       await supabaseClient.auth.signOut();
       recoveryModeActivo = false;
+      forcePasswordChangeMode = false;
       mostrarFormularioAcceso();
       mostrarLogin();
     }
 
-   supabaseClient.auth.onAuthStateChange(async (event, session) => {
-  const hashParams = obtenerHashParams();
-  const searchParams = obtenerSearchParams();
+    supabaseClient.auth.onAuthStateChange(async (event, session) => {
+      const hashParams = obtenerHashParams();
+      const searchParams = obtenerSearchParams();
+      const esInvite =
+        hashParams.get('type') === 'invite' ||
+        searchParams.get('type') === 'invite';
 
-  const esInvite =
-    hashParams.get('type') === 'invite' ||
-    searchParams.get('type') === 'invite';
+      if (event === 'PASSWORD_RECOVERY') {
+        mostrarFormularioRecuperacion(false);
+        return;
+      }
 
-  if (event === 'PASSWORD_RECOVERY') {
-    mostrarFormularioRecuperacion(false);
-    return;
-  }
+      if (session) {
+        if (esInvite) {
+          mostrarFormularioRecuperacion(true);
+          return;
+        }
 
-  if (session) {
-    if (esInvite) {
-      mostrarFormularioRecuperacion(true);
-      return;
-    }
+        if (recoveryModeActivo || urlIndicaRecuperacion()) {
+          mostrarFormularioRecuperacion(forcePasswordChangeMode);
+          return;
+        }
 
-    if (recoveryModeActivo || urlIndicaRecuperacion()) {
-      mostrarFormularioRecuperacion(forcePasswordChangeMode);
-      return;
-    }
+        const perfil = await obtenerPerfilActual();
+        if (perfil?.must_change_password) {
+          mostrarFormularioRecuperacion(true);
+          return;
+        }
 
-    const perfil = await obtenerPerfilActual();
+        mostrarApp();
+        return;
+      }
 
-    if (perfil?.must_change_password) {
-      mostrarFormularioRecuperacion(true);
-      return;
-    }
+      if (urlIndicaRecuperacion()) {
+        mostrarFormularioRecuperacion(esInvite);
+        return;
+      }
 
-    mostrarApp();
-    return;
-  }
-
-  if (urlIndicaRecuperacion()) {
-    mostrarFormularioRecuperacion(esInvite);
-    return;
-  }
-
-  recoveryModeActivo = false;
-  forcePasswordChangeMode = false;
-  presupuestoActualKey = '';
-  localStorage.removeItem('presupuestoActualKey');
-  mostrarFormularioAcceso();
-  mostrarLogin();
-});
+      recoveryModeActivo = false;
+      forcePasswordChangeMode = false;
+      presupuestoActualKey = '';
+      localStorage.removeItem('presupuestoActualKey');
+      mostrarFormularioAcceso();
+      mostrarLogin();
+    });
 
     presupuestoAnteriorBtn.addEventListener('click', () => navegarPresupuesto(-1));
     presupuestoSiguienteBtn.addEventListener('click', () => navegarPresupuesto(1));
