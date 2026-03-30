@@ -684,7 +684,7 @@
   </style>
 </head>
 <body>
-  <div id="loginScreen" class="login-screen" style="display:none;">
+  <div id="loginScreen" class="login-screen" style="display:block;">
     <div class="login-card">
       <h1 class="login-title">Mi Presupuesto</h1>
       <p class="login-subtitle">Ingresa con tu correo y contraseña.</p>
@@ -907,7 +907,22 @@
     const SUPABASE_URL = 'https://vpaqslncpewdszwtraat.supabase.co';
     const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_iiw7qQDDAVI9WY0TILlO5A_x1bAN-M_';
 
-    const supabaseClient = window.supabase.createClient(
+    const supabaseLib = window.supabase;
+    if (!supabaseLib || !supabaseLib.createClient) {
+      console.error('No se pudo cargar la librería de Supabase.');
+      const fallbackLogin = document.getElementById('loginScreen');
+      const fallbackApp = document.getElementById('appShell');
+      const fallbackError = document.getElementById('loginError');
+      if (fallbackLogin) fallbackLogin.style.display = 'block';
+      if (fallbackApp) fallbackApp.style.display = 'none';
+      if (fallbackError) {
+        fallbackError.textContent = 'No pudimos cargar la app. Recarga la página o intenta en otro navegador.';
+        fallbackError.style.display = 'block';
+      }
+      throw new Error('Supabase library not loaded');
+    }
+
+    const supabaseClient = supabaseLib.createClient(
       SUPABASE_URL,
       SUPABASE_PUBLISHABLE_KEY
     );
