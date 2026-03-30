@@ -2375,29 +2375,56 @@
         return;
       }
 
-      const { error } = await supabaseClient.auth.signInWithPassword({
-        email,
-        password
-      });
+      loginBtn.disabled = true;
+      loginBtn.textContent = 'Ingresando...';
 
-      if (error) {
-        loginError.textContent = 'No pudimos iniciar sesión. Revisa correo y contraseña.';
+      try {
+        const { error } = await supabaseClient.auth.signInWithPassword({
+          email,
+          password
+        });
+
+        if (error) {
+          loginError.textContent = 'No pudimos iniciar sesión. Revisa correo y contraseña.';
+          loginError.style.display = 'block';
+          return;
+        }
+
+        loginPassword.value = '';
+
+        let perfil = null;
+        try {
+          perfil = await obtenerPerfilActual();
+        } catch (e) {
+          console.error('Error obteniendo perfil:', e);
+        }
+
+        if (perfil?.must_change_password) {
+          mostrarFormularioRecuperacion(true);
+          return;
+        }
+
+        mostrarApp();
+
+        try {
+          await sincronizarPresupuestosIniciales();
+        } catch (e) {
+          console.error('Error sincronizando presupuestos:', e);
+        }
+
+        try {
+          cargarInicial();
+        } catch (e) {
+          console.error('Error cargando app:', e);
+        }
+      } catch (e) {
+        console.error('Error general en iniciarSesion:', e);
+        loginError.textContent = 'Ocurrió un error al iniciar sesión.';
         loginError.style.display = 'block';
-        return;
+      } finally {
+        loginBtn.disabled = false;
+        loginBtn.textContent = 'Ingresar';
       }
-
-      loginPassword.value = '';
-
-      const perfil = await obtenerPerfilActual();
-
-      if (perfil?.must_change_password) {
-        mostrarFormularioRecuperacion(true);
-        return;
-      }
-
-      mostrarApp();
-      await sincronizarPresupuestosIniciales();
-      cargarInicial();
     }
 
     function mostrarLogin() {
@@ -2511,39 +2538,16 @@
         return;
       }
 
-      if (session) {
-        if (esInvite) {
-          mostrarFormularioRecuperacion(true);
+      if (!session) {
+        if (urlIndicaRecuperacion()) {
+          mostrarFormularioRecuperacion(esInvite);
           return;
         }
 
-        if (recoveryModeActivo || urlIndicaRecuperacion()) {
-          mostrarFormularioRecuperacion(forcePasswordChangeMode);
-          return;
-        }
-
-        const perfil = await obtenerPerfilActual();
-
-        if (perfil?.must_change_password) {
-          mostrarFormularioRecuperacion(true);
-          return;
-        }
-
-        mostrarApp();
+        limpiarUrlRecuperacion();
+        mostrarLogin();
         return;
       }
-
-      if (urlIndicaRecuperacion()) {
-        mostrarFormularioRecuperacion(esInvite);
-        return;
-      }
-
-      recoveryModeActivo = false;
-      forcePasswordChangeMode = false;
-      presupuestoActualKey = '';
-      localStorage.removeItem('presupuestoActualKey');
-      limpiarUrlRecuperacion();
-      mostrarLogin();
     });
 
     presupuestoAnteriorBtn.addEventListener('click', () => navegarPresupuesto(-1));
