@@ -1027,9 +1027,8 @@
     }
 
     function limpiarUrlRecuperacion() {
-      if (window.location.hash || window.location.search) {
-        window.history.replaceState({}, document.title, window.location.pathname);
-      }
+      const cleanUrl = `${window.location.origin}${window.location.pathname}`;
+      window.history.replaceState({}, document.title, cleanUrl);
     }
 
     function obtenerHashParams() {
@@ -2351,6 +2350,7 @@
     function mostrarLogin() {
       loginScreen.style.display = 'block';
       appShell.style.display = 'none';
+      mostrarFormularioAcceso();
     }
 
     function mostrarApp() {
@@ -2362,6 +2362,7 @@
       try {
         const hashParams = obtenerHashParams();
         const searchParams = obtenerSearchParams();
+
         const esInvite =
           hashParams.get('type') === 'invite' ||
           searchParams.get('type') === 'invite';
@@ -2388,6 +2389,7 @@
           }
 
           const perfil = await obtenerPerfilActual();
+
           if (perfil?.must_change_password) {
             mostrarFormularioRecuperacion(true);
             return;
@@ -2397,49 +2399,14 @@
           await sincronizarPresupuestosIniciales();
           cargarInicial();
         } else {
+          limpiarUrlRecuperacion();
           mostrarLogin();
-          mostrarFormularioAcceso();
         }
       } catch (err) {
         console.error(err);
+        limpiarUrlRecuperacion();
         mostrarLogin();
       }
-    }
-
-    async function iniciarSesion() {
-      ocultarMensajesAcceso();
-
-      const email = loginEmail.value.trim();
-      const password = loginPassword.value;
-
-      if (!email || !password) {
-        loginError.textContent = 'Completa correo y contraseña.';
-        loginError.style.display = 'block';
-        return;
-      }
-
-      const { error } = await supabaseClient.auth.signInWithPassword({
-        email,
-        password
-      });
-
-      if (error) {
-        loginError.textContent = 'No pudimos iniciar sesión. Revisa correo y contraseña.';
-        loginError.style.display = 'block';
-        return;
-      }
-
-      loginPassword.value = '';
-
-      const perfil = await obtenerPerfilActual();
-      if (perfil?.must_change_password) {
-        mostrarFormularioRecuperacion(true);
-        return;
-      }
-
-      mostrarApp();
-      await sincronizarPresupuestosIniciales();
-      cargarInicial();
     }
 
     async function cerrarSesion() {
@@ -2448,20 +2415,43 @@
         guardadoSupabaseTimeout = null;
       }
 
-      await guardarTodosLosPresupuestosEnSupabase();
-      await supabaseClient.auth.signOut();
-      recoveryModeActivo = false;
-      forcePasswordChangeMode = false;
-      mostrarFormularioAcceso();
-      mostrarLogin();
+      try {
+        await guardarTodosLosPresupuestosEnSupabase();
+      } catch (error) {
+        console.error('Error guardando antes de cerrar sesión:', error);
+      }
+
+      try {
+        await supabaseClient.auth.signOut();
+      } catch (error) {
+        console.error('Error cerrando sesión:', error);
+      } finally {
+        recoveryModeActivo = false;
+        forcePasswordChangeMode = false;
+        presupuestoActualKey = '';
+        localStorage.removeItem('presupuestoActualKey');
+        limpiarUrlRecuperacion();
+        mostrarLogin();
+      }
     }
 
     supabaseClient.auth.onAuthStateChange(async (event, session) => {
       const hashParams = obtenerHashParams();
       const searchParams = obtenerSearchParams();
+
       const esInvite =
         hashParams.get('type') === 'invite' ||
         searchParams.get('type') === 'invite';
+
+      if (event === 'SIGNED_OUT') {
+        recoveryModeActivo = false;
+        forcePasswordChangeMode = false;
+        presupuestoActualKey = '';
+        localStorage.removeItem('presupuestoActualKey');
+        limpiarUrlRecuperacion();
+        mostrarLogin();
+        return;
+      }
 
       if (event === 'PASSWORD_RECOVERY') {
         mostrarFormularioRecuperacion(false);
@@ -2480,6 +2470,7 @@
         }
 
         const perfil = await obtenerPerfilActual();
+
         if (perfil?.must_change_password) {
           mostrarFormularioRecuperacion(true);
           return;
@@ -2498,7 +2489,7 @@
       forcePasswordChangeMode = false;
       presupuestoActualKey = '';
       localStorage.removeItem('presupuestoActualKey');
-      mostrarFormularioAcceso();
+      limpiarUrlRecuperacion();
       mostrarLogin();
     });
 
