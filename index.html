@@ -2339,6 +2339,19 @@
       evaluarVistaSegunSeleccion();
     }
 
+    function obtenerUltimoPresupuestoGuardado() {
+      const keys = Object.keys(presupuestos);
+      if (!keys.length) return '';
+
+      return keys.sort((a, b) => {
+        const [anioA, mesA] = a.split('-').map(Number);
+        const [anioB, mesB] = b.split('-').map(Number);
+
+        if (anioA !== anioB) return anioB - anioA;
+        return mesB - mesA;
+      })[0];
+    }
+
     function cargarInicial() {
       const hoy = new Date();
       const mesActual = String(hoy.getMonth() + 1).padStart(2, '0');
@@ -2352,14 +2365,28 @@
         mesSelect.value = mesGuardado;
         anioInput.value = anioGuardado;
         abrirPresupuestoExistente(presupuestoActualKey);
-      } else {
-        totalIngresos.textContent = formatoMoneda(0);
-        totalGastos.textContent = formatoMoneda(0);
-        totalAhorros.textContent = formatoMoneda(0);
-        pendientePorPagar.textContent = formatoMoneda(0);
-        disponibleReal.textContent = formatoMoneda(0);
-        mostrarSoloEncabezado();
+        return;
       }
+
+      const ultimoKey = obtenerUltimoPresupuestoGuardado();
+
+      if (ultimoKey && presupuestos[ultimoKey]) {
+        presupuestoActualKey = ultimoKey;
+        localStorage.setItem('presupuestoActualKey', presupuestoActualKey);
+
+        const [anioGuardado, mesGuardado] = ultimoKey.split('-');
+        mesSelect.value = mesGuardado;
+        anioInput.value = anioGuardado;
+        abrirPresupuestoExistente(ultimoKey);
+        return;
+      }
+
+      totalIngresos.textContent = formatoMoneda(0);
+      totalGastos.textContent = formatoMoneda(0);
+      totalAhorros.textContent = formatoMoneda(0);
+      pendientePorPagar.textContent = formatoMoneda(0);
+      disponibleReal.textContent = formatoMoneda(0);
+      mostrarSoloEncabezado();
     }
 
 
@@ -2594,6 +2621,10 @@
     });
 
     logoutBtn.addEventListener('click', cerrarSesion);
+
+    window.addEventListener('beforeunload', () => {
+      guardarTodoLocal();
+    });
 
     verificarSesionInicial();
   </script>
