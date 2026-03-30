@@ -2347,6 +2347,44 @@
       }
     }
 
+
+    async function iniciarSesion() {
+      ocultarMensajesAcceso();
+
+      const email = loginEmail.value.trim();
+      const password = loginPassword.value;
+
+      if (!email || !password) {
+        loginError.textContent = 'Completa correo y contraseña.';
+        loginError.style.display = 'block';
+        return;
+      }
+
+      const { error } = await supabaseClient.auth.signInWithPassword({
+        email,
+        password
+      });
+
+      if (error) {
+        loginError.textContent = 'No pudimos iniciar sesión. Revisa correo y contraseña.';
+        loginError.style.display = 'block';
+        return;
+      }
+
+      loginPassword.value = '';
+
+      const perfil = await obtenerPerfilActual();
+
+      if (perfil?.must_change_password) {
+        mostrarFormularioRecuperacion(true);
+        return;
+      }
+
+      mostrarApp();
+      await sincronizarPresupuestosIniciales();
+      cargarInicial();
+    }
+
     function mostrarLogin() {
       loginScreen.style.display = 'block';
       appShell.style.display = 'none';
