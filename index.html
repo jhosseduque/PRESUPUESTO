@@ -474,6 +474,203 @@
       font-size: 13px;
     }
 
+
+.topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.page-title {
+  margin: 0;
+  font-size: 28px;
+  color: var(--text);
+}
+
+.menu-btn {
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
+  border: 1px solid #d8dbe2;
+  background: #f4f7ff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.menu-btn:hover {
+  background: #edf2ff;
+}
+
+.menu-icon {
+  position: relative;
+  width: 20px;
+  height: 14px;
+  display: inline-block;
+}
+
+.menu-icon::before,
+.menu-icon::after,
+.menu-icon span {
+  content: '';
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 2.5px;
+  border-radius: 999px;
+  background: #5f78a9;
+}
+
+.menu-icon::before {
+  top: 0;
+}
+
+.menu-icon span {
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.menu-icon::after {
+  bottom: 0;
+}
+
+.drawer-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(36, 48, 65, 0.18);
+  display: none;
+  z-index: 30;
+}
+
+.drawer-overlay.open {
+  display: block;
+}
+
+.side-drawer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: min(300px, 86vw);
+  height: 100vh;
+  background: #fffdfb;
+  box-shadow: 0 18px 40px rgba(36, 48, 65, 0.16);
+  border-right: 1px solid rgba(0,0,0,0.05);
+  padding: 18px 16px 24px;
+  transform: translateX(-105%);
+  transition: transform 0.24s ease;
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.side-drawer.open {
+  transform: translateX(0);
+}
+
+.drawer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.drawer-title {
+  margin: 0;
+  font-size: 18px;
+  color: var(--text);
+}
+
+.drawer-close {
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  background: #fff;
+  border: 1px solid #d8dbe2;
+  padding: 0;
+  font-size: 22px;
+  line-height: 1;
+}
+
+.drawer-nav {
+  display: grid;
+  gap: 10px;
+}
+
+.drawer-link {
+  width: 100%;
+  text-align: left;
+  border-radius: 16px;
+  border: 1px solid #dce4f3;
+  background: #f5f8ff;
+  color: #4f6896;
+  font-weight: 700;
+  padding: 14px 16px;
+}
+
+.drawer-link.is-active {
+  background: #eaf1ff;
+  border-color: #c9d8f7;
+  color: #3b5786;
+}
+
+.app-view {
+  display: none;
+}
+
+.app-view.active {
+  display: block;
+}
+
+.card-provision {
+  background: #fbfdff;
+  border: 1px solid #d9e6fb;
+}
+
+.card-provision h2 {
+  color: #5f7ea9;
+}
+
+.provision-copy {
+  background: #f2f7ff;
+  border: 1px solid #d8e6fb;
+  border-radius: 18px;
+  padding: 14px;
+  margin-bottom: 16px;
+  color: #566b8f;
+  line-height: 1.5;
+  font-size: 14px;
+}
+
+.provision-copy strong {
+  color: #405877;
+}
+
+.card-provision th {
+  background: #eef5ff;
+}
+
+.card-provision .actions-row button {
+  border-color: #c7daf6;
+  color: #5f7ea9;
+  background: #f8fbff;
+}
+
+.provision-note {
+  margin-top: 14px;
+  background: #fff7ef;
+  border: 1px solid #efdbc2;
+  color: #8a6a46;
+  border-radius: 16px;
+  padding: 14px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+
     .login-screen {
       min-height: 100vh;
       padding: 24px;
@@ -727,13 +924,32 @@
     </div>
   </div>
 
-  <div id="appShell" style="display:none;">
-    <div class="container">
-      <div class="topbar">
-        <h1 style="margin:0;">Mi Presupuesto</h1>
-        <button id="logoutBtn" type="button" class="logout-btn">Cerrar sesión</button>
-      </div>
+  
+<div id="appShell" style="display:none;">
+  <div id="drawerOverlay" class="drawer-overlay"></div>
+  <aside id="sideDrawer" class="side-drawer" aria-hidden="true">
+    <div class="drawer-header">
+      <h3 class="drawer-title">Menú</h3>
+      <button id="drawerCloseBtn" type="button" class="drawer-close" aria-label="Cerrar menú">×</button>
+    </div>
+    <div class="drawer-nav">
+      <button id="menuPresupuestoBtn" type="button" class="drawer-link is-active">Mi Presupuesto</button>
+      <button id="menuProvisionBtn" type="button" class="drawer-link">Provisión gasto</button>
+    </div>
+  </aside>
 
+  <div class="container">
+    <div class="topbar">
+      <div class="topbar-left">
+        <button id="menuToggleBtn" type="button" class="menu-btn" aria-label="Abrir menú">
+          <span class="menu-icon"><span></span></span>
+        </button>
+        <h1 id="pageTitle" class="page-title">Mi Presupuesto</h1>
+      </div>
+      <button id="logoutBtn" type="button" class="logout-btn">Cerrar sesión</button>
+    </div>
+
+    <div id="viewPresupuesto" class="app-view active">
       <div class="card card-presupuesto">
         <h2>Crear nuevo presupuesto</h2>
         <div class="grid-top">
@@ -900,8 +1116,52 @@
         </div>
       </div>
     </div>
-  </div>
 
+    <div id="viewProvision" class="app-view">
+      <div class="card card-provision">
+        <h2>PROVISIÓN GASTO</h2>
+        <div class="provision-copy">
+          <strong>Convierte gastos grandes en pequeños aportes mensuales.</strong><br />
+          Así mantienes tu flujo estable y evitas golpes financieros inesperados.<br /><br />
+          Lista a continuación tus gastos anuales con su valor, y la app calculará cuánto deberías apartar cada mes.
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th class="col-concepto">Concepto</th>
+                <th class="col-valor">Valor anual</th>
+                <th class="col-eliminar">X</th>
+              </tr>
+            </thead>
+            <tbody id="tablaProvision"></tbody>
+          </table>
+        </div>
+
+        <div class="actions-row">
+          <button id="agregarProvisionBtn" type="button">+ Agregar gasto anual</button>
+        </div>
+
+        <div class="summary">
+          <div class="summary-box">
+            <div class="label">Total anual proyectado</div>
+            <div class="value" id="totalProvisionAnual">$0</div>
+          </div>
+
+          <div class="summary-box value-success">
+            <div class="label">Mensualmente debes ahorrar</div>
+            <div class="value" id="totalProvisionMensual">$0</div>
+          </div>
+        </div>
+
+        <div class="provision-note">
+          <strong>Importante:</strong> si inicias este ahorro con menos de 12 meses de anticipación, la primera vez tendrás que complementar una parte adicional desde tu presupuesto actual. Después de ese primer ciclo, si mantienes el ahorro mensual, ya tendrás el valor proyectado a tiempo para tus próximos pagos.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
     const SUPABASE_URL = 'https://vpaqslncpewdszwtraat.supabase.co';
@@ -944,6 +1204,15 @@
     const recoveryError = document.getElementById('recoveryError');
     const recoverySuccess = document.getElementById('recoverySuccess');
     const logoutBtn = document.getElementById('logoutBtn');
+    const menuToggleBtn = document.getElementById('menuToggleBtn');
+    const drawerCloseBtn = document.getElementById('drawerCloseBtn');
+    const drawerOverlay = document.getElementById('drawerOverlay');
+    const sideDrawer = document.getElementById('sideDrawer');
+    const menuPresupuestoBtn = document.getElementById('menuPresupuestoBtn');
+    const menuProvisionBtn = document.getElementById('menuProvisionBtn');
+    const pageTitle = document.getElementById('pageTitle');
+    const viewPresupuesto = document.getElementById('viewPresupuesto');
+    const viewProvision = document.getElementById('viewProvision');
 
     const mesSelect = document.getElementById('mes');
     const anioInput = document.getElementById('anio');
@@ -968,6 +1237,11 @@
     const totalAhorros = document.getElementById('totalAhorros');
     const agregarAhorroBtn = document.getElementById('agregarAhorroBtn');
 
+    const tablaProvision = document.getElementById('tablaProvision');
+    const totalProvisionAnual = document.getElementById('totalProvisionAnual');
+    const totalProvisionMensual = document.getElementById('totalProvisionMensual');
+    const agregarProvisionBtn = document.getElementById('agregarProvisionBtn');
+
     const disponibleBaseInput = document.getElementById('disponibleBaseInput');
     const disponibleManualToggle = document.getElementById('disponibleManualToggle');
     const pendientePorPagar = document.getElementById('pendientePorPagar');
@@ -975,6 +1249,8 @@
 
     const storageKey = 'presupuestosMensualesApp';
     const storageOwnerKey = 'presupuestosMensualesAppOwner';
+    const provisionStorageKey = 'provisionGastoApp';
+    const provisionStorageOwnerKey = 'provisionGastoAppOwner';
 
     function leerPresupuestosLocales() {
       try {
@@ -991,6 +1267,21 @@
     const presupuestosPendientesSync = new Set();
     let recoveryModeActivo = false;
     let forcePasswordChangeMode = false;
+    let vistaActual = 'presupuesto';
+    let provisionGastoData = leerProvisionLocal();
+    let guardadoProvisionTimeout = null;
+
+    function leerProvisionLocal() {
+      try {
+        const data = JSON.parse(localStorage.getItem(provisionStorageKey));
+        return {
+          items: Array.isArray(data?.items) ? data.items : []
+        };
+      } catch (error) {
+        console.error('Error leyendo provisión local:', error);
+        return { items: [] };
+      }
+    }
 
     function formatoMoneda(numero) {
       return new Intl.NumberFormat('es-CO', {
@@ -1023,6 +1314,82 @@
         maximumFractionDigits: 0
       }).format(Number(limpio));
     }
+
+
+function crearProvisionVacia() {
+  return {
+    descripcion: '',
+    valor: ''
+  };
+}
+
+function normalizarProvisionData(data) {
+  return {
+    items: Array.isArray(data?.items)
+      ? data.items.map((item) => ({
+          descripcion: item?.descripcion || '',
+          valor: item?.valor || ''
+        }))
+      : []
+  };
+}
+
+function guardarProvisionLocal() {
+  localStorage.setItem(provisionStorageKey, JSON.stringify(provisionGastoData));
+}
+
+function guardarProvisionOwnerLocal(userId) {
+  if (userId) {
+    localStorage.setItem(provisionStorageOwnerKey, userId);
+  }
+}
+
+function abrirMenu() {
+  sideDrawer.classList.add('open');
+  drawerOverlay.classList.add('open');
+  sideDrawer.setAttribute('aria-hidden', 'false');
+}
+
+function cerrarMenu() {
+  sideDrawer.classList.remove('open');
+  drawerOverlay.classList.remove('open');
+  sideDrawer.setAttribute('aria-hidden', 'true');
+}
+
+function actualizarMenuActivo() {
+  menuPresupuestoBtn.classList.toggle('is-active', vistaActual === 'presupuesto');
+  menuProvisionBtn.classList.toggle('is-active', vistaActual === 'provision');
+  pageTitle.textContent = vistaActual === 'presupuesto' ? 'Mi Presupuesto' : 'Provisión gasto';
+}
+
+function mostrarVista(nombreVista) {
+  vistaActual = nombreVista;
+  const esPresupuesto = nombreVista === 'presupuesto';
+  viewPresupuesto.classList.toggle('active', esPresupuesto);
+  viewProvision.classList.toggle('active', !esPresupuesto);
+  actualizarMenuActivo();
+  cerrarMenu();
+}
+
+function irAMiPresupuesto() {
+  mostrarVista('presupuesto');
+  const ultimoKey = obtenerUltimoPresupuestoGuardado();
+  if (ultimoKey && presupuestos[ultimoKey]) {
+    presupuestoActualKey = ultimoKey;
+    localStorage.setItem('presupuestoActualKey', presupuestoActualKey);
+    const [anioGuardado, mesGuardado] = ultimoKey.split('-');
+    mesSelect.value = mesGuardado;
+    anioInput.value = anioGuardado;
+    abrirPresupuestoExistente(ultimoKey);
+  } else {
+    cargarInicial();
+  }
+}
+
+function irAProvisionGasto() {
+  mostrarVista('provision');
+  renderProvisionGasto();
+}
 
     function ocultarMensajesAcceso() {
       loginError.style.display = 'none';
@@ -1356,6 +1723,84 @@
         localStorage.setItem(storageOwnerKey, userId);
       }
     }
+
+
+async function cargarProvisionDesdeSupabase() {
+  const user = await obtenerUsuarioActual();
+  if (!user) return false;
+
+  const { data, error } = await supabaseClient
+    .from('provision_gasto')
+    .select('data')
+    .eq('user_id', user.id)
+    .maybeSingle();
+
+  if (error) {
+    console.error('Error cargando provisión desde Supabase:', error.message);
+    return false;
+  }
+
+  provisionGastoData = normalizarProvisionData(data?.data || { items: [] });
+  guardarProvisionOwnerLocal(user.id);
+  guardarProvisionLocal();
+  return true;
+}
+
+async function guardarProvisionEnSupabase() {
+  const user = await obtenerUsuarioActual();
+  if (!user) return;
+
+  const payload = {
+    user_id: user.id,
+    data: normalizarProvisionData(provisionGastoData)
+  };
+
+  const { error } = await supabaseClient
+    .from('provision_gasto')
+    .upsert(payload, { onConflict: 'user_id' });
+
+  if (error) {
+    console.error('Error guardando provisión en Supabase:', error.message);
+  }
+}
+
+function programarGuardadoProvision() {
+  guardarProvisionLocal();
+
+  if (guardadoProvisionTimeout) {
+    clearTimeout(guardadoProvisionTimeout);
+  }
+
+  guardadoProvisionTimeout = setTimeout(async () => {
+    await guardarProvisionEnSupabase();
+  }, 500);
+}
+
+async function sincronizarProvisionInicial() {
+  const provisionLocal = leerProvisionLocal();
+  const ownerLocal = localStorage.getItem(provisionStorageOwnerKey) || '';
+  const user = await obtenerUsuarioActual();
+  const cargoRemoto = await cargarProvisionDesdeSupabase();
+
+  if (!cargoRemoto) {
+    provisionGastoData = provisionLocal;
+    if (user) guardarProvisionOwnerLocal(user.id);
+    guardarProvisionLocal();
+    return;
+  }
+
+  const hayRemoto = Array.isArray(provisionGastoData.items) && provisionGastoData.items.length > 0;
+  const hayLocal = Array.isArray(provisionLocal.items) && provisionLocal.items.length > 0;
+  const localPerteneceAlUsuario = !ownerLocal || (user && ownerLocal === user.id);
+
+  if (!hayRemoto && hayLocal && localPerteneceAlUsuario) {
+    provisionGastoData = provisionLocal;
+    if (user) guardarProvisionOwnerLocal(user.id);
+    guardarProvisionLocal();
+    await guardarProvisionEnSupabase();
+    await cargarProvisionDesdeSupabase();
+  }
+}
 
     async function obtenerUsuarioActual() {
       const { data, error } = await supabaseClient.auth.getUser();
@@ -1824,6 +2269,92 @@
           : String(disponibleBase)
       );
     }
+
+
+function actualizarResumenProvision() {
+  const totalAnual = provisionGastoData.items.reduce((acc, item) => acc + (Number(item.valor) || 0), 0);
+  const mensual = totalAnual / 12;
+
+  totalProvisionAnual.textContent = formatoMoneda(totalAnual);
+  totalProvisionMensual.textContent = formatoMoneda(mensual);
+}
+
+function renderProvisionGasto() {
+  tablaProvision.innerHTML = '';
+
+  if (!Array.isArray(provisionGastoData.items) || provisionGastoData.items.length === 0) {
+    const tr = document.createElement('tr');
+    tr.innerHTML = '<td colspan="3" class="empty-row">Aún no has agregado gastos anuales para provisionar.</td>';
+    tablaProvision.appendChild(tr);
+  }
+
+  provisionGastoData.items.forEach((fila, index) => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td class="col-concepto">
+        <input type="text" value="${fila.descripcion || ''}" placeholder="Ej. SOAT, impuestos, matrícula" data-index="${index}" data-field="descripcion" />
+      </td>
+      <td class="col-valor">
+        <input type="text" inputmode="numeric" value="${formatoNumeroInput(fila.valor)}" placeholder="0" data-index="${index}" data-field="valor" />
+      </td>
+      <td class="col-eliminar">
+        <button type="button" class="delete-mini" data-index="${index}" data-action="eliminar" title="Eliminar gasto anual">×</button>
+      </td>
+    `;
+    tablaProvision.appendChild(tr);
+  });
+
+  actualizarResumenProvision();
+  activarEventosFilasProvision();
+}
+
+function activarEventosFilasProvision() {
+  const campos = tablaProvision.querySelectorAll('input');
+  campos.forEach((campo) => {
+    campo.addEventListener('input', manejarCambioProvision);
+    campo.addEventListener('change', manejarCambioProvision);
+  });
+}
+
+function manejarCambioProvision(e) {
+  const index = Number(e.target.dataset.index);
+  const field = e.target.dataset.field;
+
+  if (Number.isNaN(index) || !provisionGastoData.items[index]) return;
+
+  let value = e.target.value;
+  if (field === 'valor') {
+    value = value.replace(/\D/g, '');
+    provisionGastoData.items[index][field] = value;
+    e.target.value = formatoNumeroInput(value);
+  } else {
+    provisionGastoData.items[index][field] = value;
+  }
+
+  programarGuardadoProvision();
+  actualizarResumenProvision();
+}
+
+function manejarAccionesTablaProvision(e) {
+  const action = e.target.dataset.action;
+  const index = Number(e.target.dataset.index);
+
+  if (action !== 'eliminar' || Number.isNaN(index)) return;
+
+  provisionGastoData.items.splice(index, 1);
+  programarGuardadoProvision();
+  renderProvisionGasto();
+}
+
+function agregarProvision() {
+  provisionGastoData.items.push(crearProvisionVacia());
+  programarGuardadoProvision();
+  renderProvisionGasto();
+
+  const nuevoIndex = provisionGastoData.items.length - 1;
+  const nuevoCampo = tablaProvision.querySelector(`[data-index="${nuevoIndex}"][data-field="descripcion"]`);
+  if (nuevoCampo) nuevoCampo.focus();
+}
 
     function renderIngresos() {
       tablaIngresos.innerHTML = '';
@@ -2504,7 +3035,9 @@
 
           mostrarApp();
           await sincronizarPresupuestosIniciales();
+          await sincronizarProvisionInicial();
           cargarInicial();
+          renderProvisionGasto();
         } else {
           limpiarUrlRecuperacion();
           mostrarLogin();
@@ -2524,6 +3057,7 @@
 
       try {
         await guardarTodosLosPresupuestosEnSupabase();
+        await guardarProvisionEnSupabase();
       } catch (error) {
         console.error('Error guardando antes de cerrar sesión:', error);
       }
@@ -2589,6 +3123,14 @@
     tablaIngresos.addEventListener('click', manejarAccionesTablaIngresos);
     tablaGastos.addEventListener('click', manejarAccionesTablaGastos);
     tablaAhorros.addEventListener('click', manejarAccionesTablaAhorros);
+    tablaProvision.addEventListener('click', manejarAccionesTablaProvision);
+
+    agregarProvisionBtn.addEventListener('click', agregarProvision);
+    menuToggleBtn.addEventListener('click', abrirMenu);
+    drawerCloseBtn.addEventListener('click', cerrarMenu);
+    drawerOverlay.addEventListener('click', cerrarMenu);
+    menuPresupuestoBtn.addEventListener('click', irAMiPresupuesto);
+    menuProvisionBtn.addEventListener('click', irAProvisionGasto);
 
     disponibleBaseInput.addEventListener('input', manejarCambioDisponibleBase);
     disponibleManualToggle.addEventListener('change', manejarCambioModoManual);
@@ -2622,8 +3164,15 @@
 
     logoutBtn.addEventListener('click', cerrarSesion);
 
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        cerrarMenu();
+      }
+    });
+
     window.addEventListener('beforeunload', () => {
       guardarTodoLocal();
+      guardarProvisionLocal();
     });
 
     verificarSesionInicial();
