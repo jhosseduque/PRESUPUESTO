@@ -348,6 +348,11 @@
       color: var(--success);
     }
 
+    .value-warning {
+      color: #C46A2D; /* naranja oscuro elegante */
+      font-weight: 700;
+      font-size: 20px;
+    }
     .summary-box.value-danger .label,
     .summary-box.value-danger .value {
       color: var(--danger);
@@ -1206,7 +1211,7 @@
           <div class="summary" style="margin-top: 0;">
             <div class="summary-box">
               <div class="label">Disponible antes de pagos pendientes</div>
-              <input id="disponibleBaseInput" type="text" inputmode="numeric" placeholder="0" />
+              <div class="value value-warning" id="disponibleBase">$0</div>
               <input id="disponibleManualToggle" type="checkbox" style="display:none;" aria-hidden="true" tabindex="-1" />
             </div>
 
@@ -1417,7 +1422,7 @@
     const totalProvisionMensual = document.getElementById('totalProvisionMensual');
     const agregarProvisionBtn = document.getElementById('agregarProvisionBtn');
 
-    const disponibleBaseInput = document.getElementById('disponibleBaseInput');
+    const disponibleBase = document.getElementById('disponibleBase');
     const disponibleManualToggle = document.getElementById('disponibleManualToggle');
     const pendientePorPagar = document.getElementById('pendientePorPagar');
     const disponibleReal = document.getElementById('disponibleReal');
@@ -2507,7 +2512,7 @@ async function sincronizarProvisionInicial() {
 
       if (disponibleManualToggle) disponibleManualToggle.checked = false;
       disponibleBaseInput.readOnly = true;
-      disponibleBaseInput.value = formatoNumeroInput(String(disponibleBase));
+      disponibleBase.textContent = formatoMoneda(disponibleBase);
     }
 
 
