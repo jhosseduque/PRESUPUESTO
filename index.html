@@ -36,6 +36,19 @@
       --available-soft: #f9f2ea;
       --available-border: #eadbc9;
       --available-title: #7c6a57;
+      --info-banner-bg: #edf4ff;
+      --info-banner-border: #d4e3fb;
+      --info-banner-title: #58779f;
+      --receivable-soft: #eef7ff;
+      --receivable-border: #d6e6f8;
+      --receivable-title: #56779d;
+      --receivable-pending: #f5faff;
+      --receivable-pending-border: #dce9f8;
+      --payable-soft: #fff5f0;
+      --payable-border: #f1dacd;
+      --payable-title: #b7775a;
+      --payable-pending: #fff7f3;
+      --payable-pending-border: #f1ddd2;
 
       --input-bg: #ffffff;
       --shadow: 0 10px 30px rgba(84, 64, 44, 0.08);
@@ -69,9 +82,8 @@
 
     h1 {
       margin: 0 0 14px;
-      font-size: 22px;
+      font-size: 28px;
       color: var(--text);
-      white-space: nowrap;
     }
 
     h2 {
@@ -745,6 +757,81 @@
       line-height: 1.4;
     }
 
+    .card-informativo-banner {
+      background: var(--info-banner-bg);
+      border: 1px solid var(--info-banner-border);
+      padding: 14px 16px;
+    }
+
+    .card-informativo-banner h2 {
+      color: var(--info-banner-title);
+      margin-bottom: 6px;
+    }
+
+    .info-banner-copy {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .card-cxc {
+      background: var(--card);
+      border: 1px solid var(--receivable-border);
+    }
+
+    .card-cxc h2 {
+      color: var(--receivable-title);
+    }
+
+    .card-cxc th {
+      background: var(--receivable-soft);
+    }
+
+    .card-cxc .actions-row button {
+      border-color: #c7d8ef;
+      color: var(--receivable-title);
+      background: #fbfdff;
+    }
+
+    .card-cxp {
+      background: var(--card);
+      border: 1px solid var(--payable-border);
+    }
+
+    .card-cxp h2 {
+      color: var(--payable-title);
+    }
+
+    .card-cxp th {
+      background: var(--payable-soft);
+    }
+
+    .card-cxp .actions-row button {
+      border-color: #ecd4c7;
+      color: var(--payable-title);
+      background: #fffaf8;
+    }
+
+    .fila-cxc-pendiente td {
+      background: var(--receivable-pending);
+      border-bottom: 1px solid var(--receivable-pending-border);
+    }
+
+    .fila-cxc-pendiente input {
+      background: #fbfdff !important;
+      border-color: #cfe0f3 !important;
+    }
+
+    .fila-cxp-pendiente td {
+      background: var(--payable-pending);
+      border-bottom: 1px solid var(--payable-pending-border);
+    }
+
+    .fila-cxp-pendiente input {
+      background: #fffaf8 !important;
+      border-color: #ecd4c7 !important;
+    }
+
     @media (max-width: 720px) {
       .container {
         padding: 12px;
@@ -1115,6 +1202,74 @@
             </div>
           </div>
         </div>
+
+        <div class="card card-informativo-banner">
+          <h2>INFORMATIVO</h2>
+          <div class="info-banner-copy">
+            Lleva aquí tus cuentas por cobrar y por pagar. Lo que marques como resuelto no pasará al mes siguiente; lo que siga abierto se arrastrará automáticamente cuando crees el próximo presupuesto.
+          </div>
+        </div>
+
+        <div class="card card-cxc">
+          <h2>CUENTAS POR COBRAR</h2>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th class="col-concepto">Concepto</th>
+                  <th class="col-valor">Valor</th>
+                  <th class="col-pagado">✓</th>
+                  <th class="col-eliminar">X</th>
+                </tr>
+              </thead>
+              <tbody id="tablaCxc"></tbody>
+            </table>
+          </div>
+
+          <div class="mini-legend">Marca el chulito cuando esa cuenta ya fue cobrada. Solo las que sigan abiertas pasarán al siguiente mes.</div>
+
+          <div class="actions-row">
+            <button id="agregarCxcBtn" type="button">+ Agregar cuenta por cobrar</button>
+          </div>
+
+          <div class="summary">
+            <div class="summary-box">
+              <div class="label">Total cuentas por cobrar abiertas</div>
+              <div class="value" id="totalCxc">$0</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card card-cxp">
+          <h2>CUENTAS POR PAGAR</h2>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th class="col-concepto">Concepto</th>
+                  <th class="col-valor">Valor</th>
+                  <th class="col-pagado">✓</th>
+                  <th class="col-eliminar">X</th>
+                </tr>
+              </thead>
+              <tbody id="tablaCxp"></tbody>
+            </table>
+          </div>
+
+          <div class="mini-legend">Marca el chulito cuando esa cuenta ya fue pagada. Solo las que sigan abiertas pasarán al siguiente mes.</div>
+
+          <div class="actions-row">
+            <button id="agregarCxpBtn" type="button">+ Agregar cuenta por pagar</button>
+          </div>
+
+          <div class="summary">
+            <div class="summary-box">
+              <div class="label">Total cuentas por pagar abiertas</div>
+              <div class="value" id="totalCxp">$0</div>
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
 
@@ -1247,6 +1402,14 @@
     const disponibleManualToggle = document.getElementById('disponibleManualToggle');
     const pendientePorPagar = document.getElementById('pendientePorPagar');
     const disponibleReal = document.getElementById('disponibleReal');
+
+    const tablaCxc = document.getElementById('tablaCxc');
+    const totalCxc = document.getElementById('totalCxc');
+    const agregarCxcBtn = document.getElementById('agregarCxcBtn');
+
+    const tablaCxp = document.getElementById('tablaCxp');
+    const totalCxp = document.getElementById('totalCxp');
+    const agregarCxpBtn = document.getElementById('agregarCxpBtn');
 
     const storageKey = 'presupuestosMensualesApp';
     const storageOwnerKey = 'presupuestosMensualesAppOwner';
@@ -1714,6 +1877,28 @@ function irAProvisionGasto() {
       return obtenerItemsArrastrados('ahorros', mes, anio, 'pagado');
     }
 
+    function obtenerPendientesMesAnterior(tipo, mes, anio, estadoField) {
+      const keyMesAnterior = obtenerKeyMesAnterior(mes, anio);
+      const presupuestoMesAnterior = presupuestos[keyMesAnterior];
+      if (!presupuestoMesAnterior || !Array.isArray(presupuestoMesAnterior[tipo])) return [];
+
+      return presupuestoMesAnterior[tipo]
+        .filter((item) => itemTieneContenido(item) && !item[estadoField])
+        .map((item) => ({
+          descripcion: item.descripcion || '',
+          valor: item.valor || '',
+          [estadoField]: false
+        }));
+    }
+
+    function obtenerCxcIniciales(mes, anio) {
+      return obtenerPendientesMesAnterior('cuentasPorCobrar', mes, anio, 'cobrado');
+    }
+
+    function obtenerCxpIniciales(mes, anio) {
+      return obtenerPendientesMesAnterior('cuentasPorPagar', mes, anio, 'pagado');
+    }
+
     function guardarTodoLocal() {
       localStorage.setItem(storageKey, JSON.stringify(presupuestos));
       localStorage.setItem('presupuestoActualKey', presupuestoActualKey);
@@ -1862,6 +2047,8 @@ async function sincronizarProvisionInicial() {
         ingresos: Array.isArray(presupuesto.ingresos) ? presupuesto.ingresos : [],
         gastos: Array.isArray(presupuesto.gastos) ? presupuesto.gastos : [],
         ahorros: Array.isArray(presupuesto.ahorros) ? presupuesto.ahorros : [],
+        cuentasPorCobrar: Array.isArray(presupuesto.cuentasPorCobrar) ? presupuesto.cuentasPorCobrar : [],
+        cuentasPorPagar: Array.isArray(presupuesto.cuentasPorPagar) ? presupuesto.cuentasPorPagar : [],
         disponibleActual: presupuesto.disponibleActual || {
           valorManual: '',
           usarManual: false
@@ -1878,6 +2065,8 @@ async function sincronizarProvisionInicial() {
         ingresos: Array.isArray(data.ingresos) ? data.ingresos : [],
         gastos: Array.isArray(data.gastos) ? data.gastos : [],
         ahorros: Array.isArray(data.ahorros) ? data.ahorros : [],
+        cuentasPorCobrar: Array.isArray(data.cuentasPorCobrar) ? data.cuentasPorCobrar : [],
+        cuentasPorPagar: Array.isArray(data.cuentasPorPagar) ? data.cuentasPorPagar : [],
         disponibleActual: data.disponibleActual || {
           valorManual: '',
           usarManual: false
@@ -2075,6 +2264,22 @@ async function sincronizarProvisionInicial() {
       };
     }
 
+    function crearCxcVacia() {
+      return {
+        descripcion: '',
+        valor: '',
+        cobrado: false
+      };
+    }
+
+    function crearCxpVacia() {
+      return {
+        descripcion: '',
+        valor: '',
+        pagado: false
+      };
+    }
+
     function asegurarEstructuraPresupuesto(key) {
       if (!presupuestos[key]) return;
 
@@ -2109,6 +2314,26 @@ async function sincronizarProvisionInicial() {
         valor: ahorro.valor || '',
         periodicidad: ahorro.periodicidad || 'MENSUAL',
         pagado: Boolean(ahorro.pagado)
+      }));
+
+      if (!Array.isArray(presupuestos[key].cuentasPorCobrar)) {
+        presupuestos[key].cuentasPorCobrar = [];
+      }
+
+      presupuestos[key].cuentasPorCobrar = presupuestos[key].cuentasPorCobrar.map((item) => ({
+        descripcion: item.descripcion || '',
+        valor: item.valor || '',
+        cobrado: Boolean(item.cobrado)
+      }));
+
+      if (!Array.isArray(presupuestos[key].cuentasPorPagar)) {
+        presupuestos[key].cuentasPorPagar = [];
+      }
+
+      presupuestos[key].cuentasPorPagar = presupuestos[key].cuentasPorPagar.map((item) => ({
+        descripcion: item.descripcion || '',
+        valor: item.valor || '',
+        pagado: Boolean(item.pagado)
       }));
 
       const disponibleAnterior = presupuestos[key].disponibleActual || {};
@@ -2189,6 +2414,8 @@ async function sincronizarProvisionInicial() {
       renderIngresos();
       renderGastos();
       renderAhorros();
+      renderCxc();
+      renderCxp();
       actualizarDisponibleActual();
       mostrarPresupuestoActivo();
     }
@@ -2513,6 +2740,251 @@ function agregarProvision() {
       activarEventosFilasAhorros();
     }
 
+
+    function actualizarResumenCxc() {
+      if (!presupuestoActualKey || !presupuestos[presupuestoActualKey]) {
+        totalCxc.textContent = formatoMoneda(0);
+        return;
+      }
+
+      const items = presupuestos[presupuestoActualKey].cuentasPorCobrar || [];
+      const total = items
+        .filter((item) => !item.cobrado)
+        .reduce((acc, fila) => acc + (Number(fila.valor) || 0), 0);
+      totalCxc.textContent = formatoMoneda(total);
+    }
+
+    function actualizarResumenCxp() {
+      if (!presupuestoActualKey || !presupuestos[presupuestoActualKey]) {
+        totalCxp.textContent = formatoMoneda(0);
+        return;
+      }
+
+      const items = presupuestos[presupuestoActualKey].cuentasPorPagar || [];
+      const total = items
+        .filter((item) => !item.pagado)
+        .reduce((acc, fila) => acc + (Number(fila.valor) || 0), 0);
+      totalCxp.textContent = formatoMoneda(total);
+    }
+
+    function renderCxc() {
+      tablaCxc.innerHTML = '';
+
+      if (!presupuestoActualKey || !presupuestos[presupuestoActualKey]) {
+        totalCxc.textContent = formatoMoneda(0);
+        return;
+      }
+
+      asegurarEstructuraPresupuesto(presupuestoActualKey);
+      const items = presupuestos[presupuestoActualKey].cuentasPorCobrar;
+
+      if (items.length === 0) {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td colspan="4" class="empty-row">Aún no has agregado cuentas por cobrar para este mes.</td>`;
+        tablaCxc.appendChild(tr);
+      }
+
+      items.forEach((fila, index) => {
+        const clasePendiente = fila.cobrado ? '' : 'fila-cxc-pendiente';
+        const tr = document.createElement('tr');
+        tr.className = clasePendiente;
+        tr.innerHTML = `
+          <td class="col-concepto">
+            <input type="text" value="${fila.descripcion || ''}" placeholder="Ej. Préstamo a Juan" data-index="${index}" data-field="descripcion" />
+          </td>
+          <td class="col-valor">
+            <input type="text" inputmode="numeric" value="${formatoNumeroInput(fila.valor)}" placeholder="0" data-index="${index}" data-field="valor" />
+          </td>
+          <td class="col-pagado">
+            <div class="check-wrap">
+              <input type="checkbox" class="paid-check" ${fila.cobrado ? 'checked' : ''} data-index="${index}" data-field="cobrado" title="Marcar como cobrado" />
+            </div>
+          </td>
+          <td class="col-eliminar">
+            <button type="button" class="delete-mini" data-index="${index}" data-action="eliminar" title="Eliminar cuenta">×</button>
+          </td>
+        `;
+        tablaCxc.appendChild(tr);
+      });
+
+      actualizarResumenCxc();
+      activarEventosFilasCxc();
+    }
+
+    function renderCxp() {
+      tablaCxp.innerHTML = '';
+
+      if (!presupuestoActualKey || !presupuestos[presupuestoActualKey]) {
+        totalCxp.textContent = formatoMoneda(0);
+        return;
+      }
+
+      asegurarEstructuraPresupuesto(presupuestoActualKey);
+      const items = presupuestos[presupuestoActualKey].cuentasPorPagar;
+
+      if (items.length === 0) {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td colspan="4" class="empty-row">Aún no has agregado cuentas por pagar para este mes.</td>`;
+        tablaCxp.appendChild(tr);
+      }
+
+      items.forEach((fila, index) => {
+        const clasePendiente = fila.pagado ? '' : 'fila-cxp-pendiente';
+        const tr = document.createElement('tr');
+        tr.className = clasePendiente;
+        tr.innerHTML = `
+          <td class="col-concepto">
+            <input type="text" value="${fila.descripcion || ''}" placeholder="Ej. Cuota pendiente" data-index="${index}" data-field="descripcion" />
+          </td>
+          <td class="col-valor">
+            <input type="text" inputmode="numeric" value="${formatoNumeroInput(fila.valor)}" placeholder="0" data-index="${index}" data-field="valor" />
+          </td>
+          <td class="col-pagado">
+            <div class="check-wrap">
+              <input type="checkbox" class="paid-check" ${fila.pagado ? 'checked' : ''} data-index="${index}" data-field="pagado" title="Marcar como pagado" />
+            </div>
+          </td>
+          <td class="col-eliminar">
+            <button type="button" class="delete-mini" data-index="${index}" data-action="eliminar" title="Eliminar cuenta">×</button>
+          </td>
+        `;
+        tablaCxp.appendChild(tr);
+      });
+
+      actualizarResumenCxp();
+      activarEventosFilasCxp();
+    }
+
+    function activarEventosFilasCxc() {
+      const campos = tablaCxc.querySelectorAll('input');
+      campos.forEach((campo) => {
+        if (campo.type === 'checkbox') {
+          campo.addEventListener('change', manejarCambioCxc);
+        } else {
+          campo.addEventListener('input', manejarCambioCxc);
+          campo.addEventListener('change', manejarCambioCxc);
+        }
+      });
+    }
+
+    function activarEventosFilasCxp() {
+      const campos = tablaCxp.querySelectorAll('input');
+      campos.forEach((campo) => {
+        if (campo.type === 'checkbox') {
+          campo.addEventListener('change', manejarCambioCxp);
+        } else {
+          campo.addEventListener('input', manejarCambioCxp);
+          campo.addEventListener('change', manejarCambioCxp);
+        }
+      });
+    }
+
+    function manejarCambioCxc(e) {
+      const index = Number(e.target.dataset.index);
+      const field = e.target.dataset.field;
+
+      if (!presupuestoActualKey || !presupuestos[presupuestoActualKey] || Number.isNaN(index)) return;
+
+      if (field === 'cobrado') {
+        presupuestos[presupuestoActualKey].cuentasPorCobrar[index][field] = e.target.checked;
+        guardarTodo();
+        renderCxc();
+        return;
+      }
+
+      let value = e.target.value;
+      if (field === 'valor') {
+        value = value.replace(/\D/g, '');
+        presupuestos[presupuestoActualKey].cuentasPorCobrar[index][field] = value;
+        e.target.value = formatoNumeroInput(value);
+      } else {
+        presupuestos[presupuestoActualKey].cuentasPorCobrar[index][field] = value;
+      }
+
+      guardarTodo();
+      actualizarResumenCxc();
+    }
+
+    function manejarCambioCxp(e) {
+      const index = Number(e.target.dataset.index);
+      const field = e.target.dataset.field;
+
+      if (!presupuestoActualKey || !presupuestos[presupuestoActualKey] || Number.isNaN(index)) return;
+
+      if (field === 'pagado') {
+        presupuestos[presupuestoActualKey].cuentasPorPagar[index][field] = e.target.checked;
+        guardarTodo();
+        renderCxp();
+        return;
+      }
+
+      let value = e.target.value;
+      if (field === 'valor') {
+        value = value.replace(/\D/g, '');
+        presupuestos[presupuestoActualKey].cuentasPorPagar[index][field] = value;
+        e.target.value = formatoNumeroInput(value);
+      } else {
+        presupuestos[presupuestoActualKey].cuentasPorPagar[index][field] = value;
+      }
+
+      guardarTodo();
+      actualizarResumenCxp();
+    }
+
+    function manejarAccionesTablaCxc(e) {
+      const action = e.target.dataset.action;
+      const index = Number(e.target.dataset.index);
+
+      if (action !== 'eliminar' || !presupuestoActualKey || !presupuestos[presupuestoActualKey] || Number.isNaN(index)) return;
+
+      presupuestos[presupuestoActualKey].cuentasPorCobrar.splice(index, 1);
+      guardarTodo();
+      renderCxc();
+    }
+
+    function manejarAccionesTablaCxp(e) {
+      const action = e.target.dataset.action;
+      const index = Number(e.target.dataset.index);
+
+      if (action !== 'eliminar' || !presupuestoActualKey || !presupuestos[presupuestoActualKey] || Number.isNaN(index)) return;
+
+      presupuestos[presupuestoActualKey].cuentasPorPagar.splice(index, 1);
+      guardarTodo();
+      renderCxp();
+    }
+
+    function agregarCxc() {
+      if (!presupuestoActualKey || !presupuestos[presupuestoActualKey]) {
+        alert('Primero crea o abre un presupuesto.');
+        return;
+      }
+
+      asegurarEstructuraPresupuesto(presupuestoActualKey);
+      presupuestos[presupuestoActualKey].cuentasPorCobrar.push(crearCxcVacia());
+      guardarTodo();
+      renderCxc();
+
+      const nuevoIndex = presupuestos[presupuestoActualKey].cuentasPorCobrar.length - 1;
+      const nuevoCampo = tablaCxc.querySelector(`[data-index="${nuevoIndex}"][data-field="descripcion"]`);
+      if (nuevoCampo) nuevoCampo.focus();
+    }
+
+    function agregarCxp() {
+      if (!presupuestoActualKey || !presupuestos[presupuestoActualKey]) {
+        alert('Primero crea o abre un presupuesto.');
+        return;
+      }
+
+      asegurarEstructuraPresupuesto(presupuestoActualKey);
+      presupuestos[presupuestoActualKey].cuentasPorPagar.push(crearCxpVacia());
+      guardarTodo();
+      renderCxp();
+
+      const nuevoIndex = presupuestos[presupuestoActualKey].cuentasPorPagar.length - 1;
+      const nuevoCampo = tablaCxp.querySelector(`[data-index="${nuevoIndex}"][data-field="descripcion"]`);
+      if (nuevoCampo) nuevoCampo.focus();
+    }
+
     function activarEventosFilasIngresos() {
       const campos = tablaIngresos.querySelectorAll('input, select');
 
@@ -2798,6 +3270,8 @@ function agregarProvision() {
       const ingresosArrastrados = obtenerIngresosIniciales(mes, anio);
       const gastosArrastrados = obtenerGastosIniciales(mes, anio);
       const ahorrosArrastrados = obtenerAhorrosIniciales(mes, anio);
+      const cxcArrastradas = obtenerCxcIniciales(mes, anio);
+      const cxpArrastradas = obtenerCxpIniciales(mes, anio);
 
       if (!presupuestos[key]) {
         presupuestos[key] = {
@@ -2806,6 +3280,8 @@ function agregarProvision() {
           ingresos: ingresosArrastrados,
           gastos: gastosArrastrados,
           ahorros: ahorrosArrastrados,
+          cuentasPorCobrar: cxcArrastradas,
+          cuentasPorPagar: cxpArrastradas,
           disponibleActual: {
             valorManual: '',
             usarManual: false
@@ -2817,6 +3293,8 @@ function agregarProvision() {
         const ingresosVacios = presupuestos[key].ingresos.length === 0;
         const gastosVacios = presupuestos[key].gastos.length === 0;
         const ahorrosVacios = presupuestos[key].ahorros.length === 0;
+        const cxcVacias = presupuestos[key].cuentasPorCobrar.length === 0;
+        const cxpVacias = presupuestos[key].cuentasPorPagar.length === 0;
 
         if (ingresosVacios && ingresosArrastrados.length > 0) {
           presupuestos[key].ingresos = ingresosArrastrados;
@@ -2828,6 +3306,14 @@ function agregarProvision() {
 
         if (ahorrosVacios && ahorrosArrastrados.length > 0) {
           presupuestos[key].ahorros = ahorrosArrastrados;
+        }
+
+        if (cxcVacias && cxcArrastradas.length > 0) {
+          presupuestos[key].cuentasPorCobrar = cxcArrastradas;
+        }
+
+        if (cxpVacias && cxpArrastradas.length > 0) {
+          presupuestos[key].cuentasPorPagar = cxpArrastradas;
         }
       }
 
@@ -2916,6 +3402,8 @@ function agregarProvision() {
       totalIngresos.textContent = formatoMoneda(0);
       totalGastos.textContent = formatoMoneda(0);
       totalAhorros.textContent = formatoMoneda(0);
+      totalCxc.textContent = formatoMoneda(0);
+      totalCxp.textContent = formatoMoneda(0);
       pendientePorPagar.textContent = formatoMoneda(0);
       disponibleReal.textContent = formatoMoneda(0);
       mostrarSoloEncabezado();
@@ -3118,12 +3606,16 @@ function agregarProvision() {
     agregarIngresoBtn.addEventListener('click', agregarIngreso);
     agregarGastoBtn.addEventListener('click', agregarGasto);
     agregarAhorroBtn.addEventListener('click', agregarAhorro);
+    agregarCxcBtn.addEventListener('click', agregarCxc);
+    agregarCxpBtn.addEventListener('click', agregarCxp);
     crearPresupuestoBtn.addEventListener('click', crearOAbrirPresupuesto);
     eliminarPresupuestoBtn.addEventListener('click', eliminarPresupuestoActual);
 
     tablaIngresos.addEventListener('click', manejarAccionesTablaIngresos);
     tablaGastos.addEventListener('click', manejarAccionesTablaGastos);
     tablaAhorros.addEventListener('click', manejarAccionesTablaAhorros);
+    tablaCxc.addEventListener('click', manejarAccionesTablaCxc);
+    tablaCxp.addEventListener('click', manejarAccionesTablaCxp);
     tablaProvision.addEventListener('click', manejarAccionesTablaProvision);
 
     agregarProvisionBtn.addEventListener('click', agregarProvision);
