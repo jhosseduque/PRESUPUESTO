@@ -477,30 +477,6 @@
       margin-bottom: 14px;
     }
 
-
-    .info-banner {
-  width: 100%;
-  background: #EAF3FF;
-  border: 1px solid #CFE0F5;
-  border-radius: 16px;
-  padding: 18px 16px;
-  margin: 20px 0 28px 0;
-  text-align: center;
-}
-
-.info-banner h2 {
-  margin: 0 0 6px;
-  font-size: 16px;
-  letter-spacing: 1px;
-  color: #4F6D8A;
-}
-
-.info-banner p {
-  margin: 0;
-  font-size: 13px;
-  color: #6B7C8F;
-  line-height: 1.4;
-}
     .logout-btn {
       width: auto;
       min-width: auto;
@@ -521,7 +497,9 @@
 
 .page-title {
   margin: 0;
-  font-size: 28px;
+  font-size: 22px;
+  line-height: 1.1;
+  white-space: nowrap;
   color: var(--text);
 }
 
@@ -669,6 +647,9 @@
 
 .card-provision h2 {
   color: #5f7ea9;
+  font-size: 22px;
+  line-height: 1.1;
+  white-space: nowrap;
 }
 
 .provision-copy {
@@ -784,18 +765,24 @@
     .card-informativo-banner {
       background: var(--info-banner-bg);
       border: 1px solid var(--info-banner-border);
-      padding: 14px 16px;
+      padding: 16px 18px;
+      text-align: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.04);
     }
 
     .card-informativo-banner h2 {
       color: var(--info-banner-title);
-      margin-bottom: 6px;
+      margin-bottom: 8px;
+      font-size: 15px;
+      letter-spacing: 1.5px;
     }
 
     .info-banner-copy {
       color: var(--muted);
       font-size: 13px;
       line-height: 1.5;
+      max-width: 680px;
+      margin: 0 auto;
     }
 
     .card-cxc {
@@ -983,11 +970,22 @@
       }
 
       .topbar {
-        align-items: flex-start;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .topbar-left {
+        gap: 10px;
+      }
+
+      .page-title {
+        font-size: 22px;
       }
 
       .logout-btn {
         white-space: nowrap;
+        padding: 8px 10px;
+        font-size: 12px;
       }
     }
   </style>
@@ -1204,15 +1202,12 @@
         </div>
 
         <div class="card card-disponible">
-          <h2>DISPONIBLE ACTUAL</h2>
+          <h2>RESUMEN</h2>
           <div class="summary" style="margin-top: 0;">
             <div class="summary-box">
-              <div class="label">Disponible</div>
+              <div class="label">Disponible antes de pagos pendientes</div>
               <input id="disponibleBaseInput" type="text" inputmode="numeric" placeholder="0" />
-              <label class="manual-toggle">
-                <input id="disponibleManualToggle" type="checkbox" />
-                Editar manualmente
-              </label>
+              <input id="disponibleManualToggle" type="checkbox" style="display:none;" aria-hidden="true" tabindex="-1" />
             </div>
 
             <div class="summary-box value-danger">
@@ -2367,7 +2362,7 @@ async function sincronizarProvisionInicial() {
 
       presupuestos[key].disponibleActual = {
         valorManual: String(disponibleAnterior.valorManual ?? (sumaAnterior || '')),
-        usarManual: Boolean(disponibleAnterior.usarManual)
+        usarManual: false
       };
     }
 
@@ -2422,9 +2417,6 @@ async function sincronizarProvisionInicial() {
     }
 
     function obtenerDisponibleBase(presupuesto) {
-      if (presupuesto.disponibleActual?.usarManual) {
-        return Number(presupuesto.disponibleActual?.valorManual || 0);
-      }
       return calcularDisponibleAutomatico(presupuesto);
     }
 
@@ -2499,7 +2491,7 @@ async function sincronizarProvisionInicial() {
         disponibleReal.textContent = formatoMoneda(0);
         disponibleBaseInput.value = '';
         disponibleBaseInput.readOnly = true;
-        disponibleManualToggle.checked = false;
+        if (disponibleManualToggle) disponibleManualToggle.checked = false;
         return;
       }
 
@@ -2513,13 +2505,9 @@ async function sincronizarProvisionInicial() {
       pendientePorPagar.textContent = formatoMoneda(pendiente);
       disponibleReal.textContent = formatoMoneda(disponible);
 
-      disponibleManualToggle.checked = Boolean(presupuesto.disponibleActual.usarManual);
-      disponibleBaseInput.readOnly = !presupuesto.disponibleActual.usarManual;
-      disponibleBaseInput.value = formatoNumeroInput(
-        presupuesto.disponibleActual.usarManual
-          ? presupuesto.disponibleActual.valorManual
-          : String(disponibleBase)
-      );
+      if (disponibleManualToggle) disponibleManualToggle.checked = false;
+      disponibleBaseInput.readOnly = true;
+      disponibleBaseInput.value = formatoNumeroInput(String(disponibleBase));
     }
 
 
@@ -3133,37 +3121,11 @@ function agregarProvision() {
       actualizarDisponibleActual();
     }
 
-    function manejarCambioDisponibleBase(e) {
-      if (!presupuestoActualKey || !presupuestos[presupuestoActualKey]) return;
-      const presupuesto = presupuestos[presupuestoActualKey];
-
-      if (!presupuesto.disponibleActual.usarManual) {
-        actualizarDisponibleActual();
-        return;
-      }
-
-      const value = e.target.value.replace(/\D/g, '');
-      presupuesto.disponibleActual.valorManual = value;
-      e.target.value = formatoNumeroInput(value);
-
-      guardarTodo();
+    function manejarCambioDisponibleBase() {
       actualizarDisponibleActual();
     }
 
-    function manejarCambioModoManual(e) {
-      if (!presupuestoActualKey || !presupuestos[presupuestoActualKey]) return;
-      const presupuesto = presupuestos[presupuestoActualKey];
-
-      presupuesto.disponibleActual.usarManual = e.target.checked;
-
-      if (e.target.checked) {
-        const disponibleAuto = calcularDisponibleAutomatico(presupuesto);
-        if (!presupuesto.disponibleActual.valorManual) {
-          presupuesto.disponibleActual.valorManual = String(disponibleAuto);
-        }
-      }
-
-      guardarTodo();
+    function manejarCambioModoManual() {
       actualizarDisponibleActual();
     }
 
@@ -3650,7 +3612,9 @@ function agregarProvision() {
     menuProvisionBtn.addEventListener('click', irAProvisionGasto);
 
     disponibleBaseInput.addEventListener('input', manejarCambioDisponibleBase);
-    disponibleManualToggle.addEventListener('change', manejarCambioModoManual);
+    if (disponibleManualToggle) {
+      disponibleManualToggle.addEventListener('change', manejarCambioModoManual);
+    }
 
     mesSelect.addEventListener('change', intentarAbrirPresupuestoAutomatico);
     anioInput.addEventListener('change', intentarAbrirPresupuestoAutomatico);
