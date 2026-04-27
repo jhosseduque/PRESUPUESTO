@@ -1209,9 +1209,9 @@
         <div class="card card-disponible">
           <h2>RESUMEN</h2>
           <div class="summary" style="margin-top: 0;">
-            <div class="summary-box">
+            <div class="summary-box value-warning" id="disponibleBaseBox">
               <div class="label">Disponible antes de pagos pendientes</div>
-              <div class="value value-warning" id="disponibleBase">$0</div>
+              <div class="value" id="disponibleBase">$0</div>
               <input id="disponibleManualToggle" type="checkbox" style="display:none;" aria-hidden="true" tabindex="-1" />
             </div>
 
@@ -1458,6 +1458,7 @@
     let vistaActual = 'presupuesto';
     let provisionGastoData = leerProvisionLocal();
     let guardadoProvisionTimeout = null;
+let provisionInicialSincronizada = false;
 
     function leerProvisionLocal() {
       try {
@@ -1951,6 +1952,7 @@ async function cargarProvisionDesdeSupabase() {
   }
 
   provisionGastoData = normalizarProvisionData(data?.data || { items: [] });
+  provisionInicialSincronizada = true;
   guardarProvisionOwnerLocal(user.id);
   guardarProvisionLocal();
   return true;
@@ -1959,6 +1961,7 @@ async function cargarProvisionDesdeSupabase() {
 async function guardarProvisionEnSupabase() {
   const user = await obtenerUsuarioActual();
   if (!user) return;
+  if (!provisionInicialSincronizada && (!Array.isArray(provisionGastoData.items) || provisionGastoData.items.length === 0)) return;
 
   const payload = {
     user_id: user.id,
@@ -1994,6 +1997,7 @@ async function sincronizarProvisionInicial() {
 
   if (!cargoRemoto) {
     provisionGastoData = provisionLocal;
+    provisionInicialSincronizada = true;
     if (user) guardarProvisionOwnerLocal(user.id);
     guardarProvisionLocal();
     return;
@@ -2005,6 +2009,7 @@ async function sincronizarProvisionInicial() {
 
   if (!hayRemoto && hayLocal && localPerteneceAlUsuario) {
     provisionGastoData = provisionLocal;
+    provisionInicialSincronizada = true;
     if (user) guardarProvisionOwnerLocal(user.id);
     guardarProvisionLocal();
     await guardarProvisionEnSupabase();
@@ -2490,12 +2495,38 @@ async function sincronizarProvisionInicial() {
       totalAhorros.textContent = formatoMoneda(total);
     }
 
+    function pintarValorResumen(elemento, caja, valor, clasePositiva) {
+      if (!elemento || !caja) return;
+
+      caja.classList.remove('value-warning', 'value-success', 'value-danger');
+
+      if (valor < 0) {
+        caja.classList.add('value-danger');
+        elemento.textContent = `⚠️ ${formatoMoneda(valor)}`;
+        return;
+      }
+
+      caja.classList.add(clasePositiva);
+      elemento.textContent = formatoMoneda(valor);
+    }
+
     function actualizarDisponibleActual() {
       if (!presupuestoActualKey || !presupuestos[presupuestoActualKey]) {
         pendientePorPagar.textContent = formatoMoneda(0);
+        disponibleBase.textContent = formatoMoneda(0);
         disponibleReal.textContent = formatoMoneda(0);
-        disponibleBaseInput.value = '';
-        disponibleBaseInput.readOnly = true;
+
+        if (disponibleBaseBox) {
+          disponibleBaseBox.classList.remove('value-danger', 'value-success');
+          disponibleBaseBox.classList.add('value-warning');
+        }
+
+        const disponibleRealBoxVacio = disponibleReal.closest('.summary-box');
+        if (disponibleRealBoxVacio) {
+          disponibleRealBoxVacio.classList.remove('value-danger');
+          disponibleRealBoxVacio.classList.add('value-success');
+        }
+
         if (disponibleManualToggle) disponibleManualToggle.checked = false;
         return;
       }
@@ -2503,16 +2534,18 @@ async function sincronizarProvisionInicial() {
       asegurarEstructuraPresupuesto(presupuestoActualKey);
 
       const presupuesto = presupuestos[presupuestoActualKey];
-      const disponibleBase = obtenerDisponibleBase(presupuesto);
+      const disponibleAntesPendientes = obtenerDisponibleBase(presupuesto);
       const pendiente = calcularPendiente(presupuesto);
-      const disponible = disponibleBase - pendiente;
+      const disponible = disponibleAntesPendientes - pendiente;
 
       pendientePorPagar.textContent = formatoMoneda(pendiente);
-      disponibleReal.textContent = formatoMoneda(disponible);
+
+      pintarValorResumen(disponibleBase, disponibleBaseBox, disponibleAntesPendientes, 'value-warning');
+
+      const disponibleRealBox = disponibleReal.closest('.summary-box');
+      pintarValorResumen(disponibleReal, disponibleRealBox, disponible, 'value-success');
 
       if (disponibleManualToggle) disponibleManualToggle.checked = false;
-      disponibleBaseInput.readOnly = true;
-      disponibleBase.textContent = formatoMoneda(disponibleBase);
     }
 
 
@@ -3451,7 +3484,14 @@ function agregarProvision() {
         }
 
         try {
+          await sincronizarProvisionInicial();
+        } catch (e) {
+          console.error('Error sincronizando provisión:', e);
+        }
+
+        try {
           cargarInicial();
+          renderProvisionGasto();
         } catch (e) {
           console.error('Error cargando app:', e);
         }
@@ -3615,9 +3655,7 @@ function agregarProvision() {
     drawerOverlay.addEventListener('click', cerrarMenu);
     menuPresupuestoBtn.addEventListener('click', irAMiPresupuesto);
     menuProvisionBtn.addEventListener('click', irAProvisionGasto);
-
-    disponibleBaseInput.addEventListener('input', manejarCambioDisponibleBase);
-    if (disponibleManualToggle) {
+if (disponibleManualToggle) {
       disponibleManualToggle.addEventListener('change', manejarCambioModoManual);
     }
 
