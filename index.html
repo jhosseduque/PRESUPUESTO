@@ -1509,10 +1509,11 @@ let provisionInicialSincronizada = false;
       }).format(Number(limpio));
     }
 
-    function normalizarNumeroConSigno(valor) {
+        function normalizarNumeroConSigno(valor) {
       if (valor === null || valor === undefined) return '';
       let texto = String(valor).trim();
       if (!texto) return '';
+      if (texto === '-') return '-';
 
       const esNegativo = texto.startsWith('-');
       texto = texto.replace(/\D/g, '');
@@ -1523,6 +1524,7 @@ let provisionInicialSincronizada = false;
     function formatoNumeroInputConSigno(valor) {
       const normalizado = normalizarNumeroConSigno(valor);
       if (!normalizado) return '';
+      if (normalizado === '-') return '-';
 
       const numero = Number(normalizado);
       if (!Number.isFinite(numero)) return '';
@@ -2524,7 +2526,7 @@ async function sincronizarProvisionInicial() {
       const ahorros = presupuestos[presupuestoActualKey].ahorros;
       const total = ahorros.reduce((acc, fila) => acc + (Number(fila.valor) || 0), 0);
       totalAhorros.textContent = formatoMoneda(total);
-      
+
       const totalAcumulado = Object.entries(presupuestos).reduce((acc, [key, presupuesto]) => {
         if (key > presupuestoActualKey) return acc;
         const subtotal = (presupuesto.ahorros || []).reduce((suma, fila) => suma + (Number(fila.valor) || 0), 0);
@@ -2781,7 +2783,7 @@ function agregarProvision() {
 
       if (!presupuestoActualKey || !presupuestos[presupuestoActualKey]) {
         totalAhorros.textContent = formatoMoneda(0);
-                totalAhorrosAcumulados.textContent = formatoMoneda(0);
+        totalAhorrosAcumulados.textContent = formatoMoneda(0);
         return;
       }
 
@@ -2804,8 +2806,9 @@ function agregarProvision() {
             <input type="text" value="${fila.descripcion || ''}" placeholder="Ej. Fondo viaje" data-index="${index}" data-field="descripcion" />
           </td>
           <td class="col-valor">
-            <input type="text" inputmode="numeric" value="${formatoNumeroInputConSigno(fila.valor)}" placeholder="0" data-index="${index}" data-field="valor" />          </td>
-          <td class="col-freq">
+            <input type="text" inputmode="text" value="${formatoNumeroInputConSigno(fila.valor)}" placeholder="0" data-index="${index}" data-field="valor" />          <td class="col-freq">
+                      </td>
+          <td class="col-freq">          
             <select data-index="${index}" data-field="periodicidad">
               <option value="MENSUAL" ${fila.periodicidad === 'MENSUAL' ? 'selected' : ''}>M</option>
               <option value="ANUAL" ${fila.periodicidad === 'ANUAL' ? 'selected' : ''}>A</option>
@@ -3460,12 +3463,13 @@ function agregarProvision() {
         abrirPresupuestoExistente(ultimoKey);
         return;
       }
+      
       totalIngresos.textContent = formatoMoneda(0);
       totalGastos.textContent = formatoMoneda(0);
       totalAhorros.textContent = formatoMoneda(0);
+totalAhorrosAcumulados.textContent = formatoMoneda(0);
       totalCxc.textContent = formatoMoneda(0);
       totalCxp.textContent = formatoMoneda(0);
-        totalAhorrosAcumulados.textContent = formatoMoneda(0);
       pendientePorPagar.textContent = formatoMoneda(0);
       disponibleReal.textContent = formatoMoneda(0);
       mostrarSoloEncabezado();
