@@ -216,7 +216,6 @@
       background: var(--saving-soft);
     }
 
-
     .col-concepto {
       width: 41%;
     }
@@ -250,12 +249,6 @@
       background: #fff !important;
     }
 
-       .card-ahorro .col-concepto input {
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-    
     .col-valor input {
       text-align: right;
     }
@@ -875,10 +868,11 @@
         margin-bottom: 8px;
       }
 
-      .grid-top {
-        grid-template-columns: 40px 1fr 96px 40px;
-        gap: 8px;
-      }
+.grid-top {
+  grid-template-columns: minmax(0, 2fr) 170px 90px 40px 40px;
+  gap: 12px;
+  align-items: center;
+}
 
       .nav-btn {
         width: 40px;
@@ -1210,7 +1204,7 @@
               <div class="label">Total ahorros registrados</div>
               <div class="value" id="totalAhorros">$0</div>
             </div>
-            <div class="summary-box">
+                        <div class="summary-box">
               <div class="label">Ahorro total acumulado</div>
               <div class="value" id="totalAhorrosAcumulados">$0</div>
             </div>
@@ -2615,17 +2609,29 @@ function renderProvisionGasto() {
 
   provisionGastoData.items.forEach((fila, index) => {
     const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td class="col-concepto">
-        <input type="text" value="${fila.descripcion || ''}" placeholder="Ej. SOAT, impuestos, matrícula" data-index="${index}" data-field="descripcion" />
-      </td>
-      <td class="col-valor">
-        <input type="text" inputmode="numeric" value="${formatoNumeroInput(fila.valor)}" placeholder="0" data-index="${index}" data-field="valor" />
-      </td>
-      <td class="col-eliminar">
-        <button type="button" class="delete-mini" data-index="${index}" data-action="eliminar" title="Eliminar gasto anual">×</button>
-      </td>
-    `;
+tr.innerHTML = `
+  <td class="col-concepto">
+    <input type="text" value="${fila.descripcion || ''}" placeholder="Ej. Fondo viaje" data-index="${index}" data-field="descripcion" />
+  </td>
+  <td class="col-valor">
+    <input type="text" inputmode="text" value="${formatoNumeroInputConSigno(fila.valor)}" placeholder="0" data-index="${index}" data-field="valor" />
+  </td>
+  <td class="col-freq">
+    <select data-index="${index}" data-field="periodicidad">
+      <option value="MENSUAL" ${fila.periodicidad === 'MENSUAL' ? 'selected' : ''}>M</option>
+      <option value="ANUAL" ${fila.periodicidad === 'ANUAL' ? 'selected' : ''}>A</option>
+      <option value="OCASIONAL" ${fila.periodicidad === 'OCASIONAL' ? 'selected' : ''}>O</option>
+    </select>
+  </td>
+  <td class="col-pagado">
+    <div class="check-wrap">
+      <input type="checkbox" class="paid-check" ${fila.pagado ? 'checked' : ''} data-index="${index}" data-field="pagado" title="Marcar como realizado" />
+    </div>
+  </td>
+  <td class="col-eliminar">
+    <button type="button" class="delete-mini" data-index="${index}" data-action="eliminar" title="Eliminar ahorro">×</button>
+  </td>
+`;
     tablaProvision.appendChild(tr);
   });
 
