@@ -216,6 +216,12 @@
       background: var(--saving-soft);
     }
 
+       .card-ahorro .col-concepto { width: 36%; }
+    .card-ahorro .col-valor { width: 26%; }
+    .card-ahorro .col-freq { width: 18%; }
+    .card-ahorro .col-pagado { width: 10%; }
+    .card-ahorro .col-eliminar { width: 10%; }
+
     .col-concepto {
       width: 41%;
     }
@@ -249,6 +255,12 @@
       background: #fff !important;
     }
 
+       .card-ahorro .col-concepto input {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    
     .col-valor input {
       text-align: right;
     }
@@ -1203,7 +1215,7 @@
               <div class="label">Total ahorros registrados</div>
               <div class="value" id="totalAhorros">$0</div>
             </div>
-                        <div class="summary-box">
+            <div class="summary-box">
               <div class="label">Ahorro total acumulado</div>
               <div class="value" id="totalAhorrosAcumulados">$0</div>
             </div>
