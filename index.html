@@ -1,3743 +1,442 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MI PRESUPUESTO</title>
-  <style>
-    :root {
-      --bg: #f7f3f3;
-      --card: #fffdfb;
-      --text: #243041;
-      --muted: #6c7486;
-      --line: #e6e0dc;
-      --soft: #f7f4f1;
-      --accent: #e9eefc;
-      --danger: #d84b43;
-      --success: #16a34a;
-
-      --income-soft: #eef7ee;
-      --income-border: #d8ead8;
-      --income-title: #49634d;
-      --income-pending: #dff2df;
-      --income-pending-border: #b9ddb9;
-
-      --expense-soft: #fff1ee;
-      --expense-border: #f3d3cb;
-      --expense-title: #c56a58;
-      --expense-unpaid: #ffe2dc;
-      --expense-unpaid-border: #f0b9ab;
-
-      --saving-soft: #f1f5fb;
-      --saving-border: #d6e0f0;
-      --saving-title: #5b7a97;
-      --saving-unpaid: #e7eef9;
-
-      --available-soft: #f9f2ea;
-      --available-border: #eadbc9;
-      --available-title: #7c6a57;
-      --info-banner-bg: #edf4ff;
-      --info-banner-border: #d4e3fb;
-      --info-banner-title: #58779f;
-      --receivable-soft: #eef7ff;
-      --receivable-border: #d6e6f8;
-      --receivable-title: #56779d;
-      --receivable-pending: #f5faff;
-      --receivable-pending-border: #dce9f8;
-      --payable-soft: #fff5f0;
-      --payable-border: #f1dacd;
-      --payable-title: #b7775a;
-      --payable-pending: #fff7f3;
-      --payable-pending-border: #f1ddd2;
-
-      --input-bg: #ffffff;
-      --shadow: 0 10px 30px rgba(84, 64, 44, 0.08);
-    }
-
-    * {
-      box-sizing: border-box;
-    }
-
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-    }
-
-    .container {
-      max-width: 960px;
-      margin: 0 auto;
-      padding: 16px;
-    }
-
-    .card {
-      background: var(--card);
-      border-radius: 22px;
-      padding: 16px;
-      margin-bottom: 18px;
-      box-shadow: var(--shadow);
-      border: 1px solid rgba(0,0,0,0.03);
-    }
-
-    h1 {
-      margin: 0 0 14px;
-      font-size: 28px;
-      color: var(--text);
-    }
-
-    h2 {
-      margin: 0 0 12px;
-      font-size: 20px;
-      color: var(--text);
-    }
-
-    .card-presupuesto {
-      background: #fffaf8;
-    }
-
-    .card-ingresos {
-      background: var(--card);
-      border: 1px solid var(--income-border);
-    }
-
-    .card-gastos {
-      background: var(--card);
-      border: 1px solid var(--expense-border);
-    }
-
-    .card-ahorro {
-      background: var(--card);
-      border: 1px solid var(--saving-border);
-    }
-
-    .card-disponible {
-      background: var(--card);
-      border: 1px solid var(--available-border);
-    }
-
-    .card-ingresos h2 {
-      color: var(--income-title);
-    }
-
-    .card-gastos h2 {
-      color: var(--expense-title);
-    }
-
-    .card-ahorro h2 {
-      color: var(--saving-title);
-    }
-
-    .card-disponible h2 {
-      color: var(--available-title);
-    }
-
-    .grid-top {
-      display: grid;
-      grid-template-columns: 44px 1fr 120px 44px;
-      gap: 10px;
-      align-items: end;
-    }
-
-    .nav-spacer {
-      height: 22px;
-      display: block;
-    }
-
-    .nav-btn {
-      width: 44px;
-      height: 42px;
-      padding: 0;
-      border-radius: 14px;
-      font-size: 22px;
-      font-weight: bold;
-      line-height: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      background: #fff;
-      border: 1px solid #d8dbe2;
-    }
-
-    label {
-      display: block;
-      margin-bottom: 6px;
-      font-size: 14px;
-      font-weight: bold;
-      color: var(--text);
-    }
-
-    input, select, button {
-      width: 100%;
-      padding: 10px 12px;
-      border-radius: 14px;
-      border: 1px solid #d8dbe2;
-      font-size: 14px;
-      background: var(--input-bg);
-      color: var(--text);
-    }
-
-    button {
-      cursor: pointer;
-    }
-
-    .table-wrap {
-      overflow-x: hidden;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      table-layout: fixed;
-    }
-
-    th, td {
-      border-bottom: 1px solid var(--line);
-      padding: 10px 6px;
-      text-align: left;
-      vertical-align: middle;
-    }
-
-    th {
-      font-size: 12px;
-      color: var(--text);
-    }
-
-    .card-ingresos th {
-      background: var(--income-soft);
-    }
-
-    .card-gastos th {
-      background: var(--expense-soft);
-    }
-
-    .card-ahorro th {
-      background: var(--saving-soft);
-    }
-
-    .col-concepto {
-      width: 41%;
-    }
-
-    .col-valor {
-      width: 26%;
-    }
-
-    .col-freq {
-      width: 16%;
-    }
-
-    .col-pagado {
-      width: 8%;
-      text-align: center;
-    }
-
-    .col-eliminar {
-      width: 9%;
-      text-align: center;
-    }
-
-    .table-wrap input,
-    .table-wrap select {
-      width: 100%;
-      min-width: 0;
-      max-width: 100%;
-      border: 1px solid #cfd5df !important;
-      box-shadow: none !important;
-      outline: none !important;
-      background: #fff !important;
-    }
-
-    .col-valor input {
-      text-align: right;
-    }
-
-    .col-freq select {
-      font-size: 14px;
-      padding-left: 8px;
-      padding-right: 8px;
-      text-align: center;
-      text-align-last: center;
-      line-height: 1.2;
-    }
-
-    .delete-mini {
-      background: #f25a55;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      width: 15px;
-      height: 15px;
-      min-width: 15px;
-      padding: 0;
-      font-size: 8px;
-      line-height: 1;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .check-wrap {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .paid-check {
-      width: 10px;
-      height: 10px;
-      cursor: pointer;
-      accent-color: #243041;
-    }
-
-    .mini-legend {
-      margin-top: 8px;
-      font-size: 11px;
-      color: var(--muted);
-    }
-
-    .summary {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 12px;
-      margin-top: 14px;
-    }
-
-    .summary-box {
-      background: var(--soft);
-      border-radius: 18px;
-      padding: 14px;
-    }
-
-    .card-ingresos .summary-box {
-      background: var(--income-soft);
-    }
-
-    .card-gastos .summary-box {
-      background: #fff6f3;
-    }
-
-    .card-ahorro .summary-box {
-      background: var(--saving-soft);
-    }
-
-    .card-disponible .summary-box {
-      background: var(--available-soft);
-    }
-
-    .summary-box .label {
-      font-size: 12px;
-      color: var(--muted);
-      margin-bottom: 6px;
-    }
-
-    .summary-box .value {
-      font-size: 22px;
-      font-weight: bold;
-      color: var(--text);
-    }
-
-    .summary-box input {
-      width: 100%;
-      margin-top: 6px;
-      background: rgba(255,255,255,0.85);
-    }
-
-    .summary-box.value-success .value {
-      color: var(--success);
-    }
-
-    .value-warning {
-      color: #C46A2D; /* naranja oscuro elegante */
-      font-weight: 700;
-      font-size: 20px;
-    }
-    .summary-box.value-danger .label,
-    .summary-box.value-danger .value {
-      color: var(--danger);
-    }
-
-    .manual-toggle {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-top: 10px;
-      font-size: 12px;
-      color: var(--muted);
-      font-weight: normal;
-    }
-
-    .manual-toggle input {
-      width: auto;
-      margin: 0;
-      transform: translateY(0);
-    }
-
-    .actions-row {
-      margin-top: 14px;
-      display: flex;
-      justify-content: flex-start;
-    }
-
-    .actions-row button {
-      width: auto;
-      min-width: 180px;
-      padding: 12px 18px;
-      font-weight: 500;
-      background: #fff;
-    }
-
-
-    .presupuesto-activo {
-      margin-top: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      padding: 12px 14px;
-      border: 1px solid #eadfce;
-      border-radius: 16px;
-      background: #fffaf4;
-    }
-
-    .presupuesto-activo-texto {
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--text);
-    }
-
-    .danger-outline-btn {
-      width: auto;
-      min-width: auto;
-      padding: 10px 14px;
-      border: 1px solid #e5b8b0;
-      border-radius: 12px;
-      background: #fff7f6;
-      color: #9d3f33;
-      font-weight: 600;
-    }
-
-    .card-ingresos .actions-row button {
-      border-color: #bfd8bf;
-      color: var(--income-title);
-      background: #fcfffc;
-    }
-
-    .card-gastos .actions-row button {
-      border-color: #f0c2b8;
-      color: var(--expense-title);
-      background: #fff9f8;
-    }
-
-    .card-ahorro .actions-row button {
-      border-color: #c6d5e8;
-      color: var(--saving-title);
-      background: #fbfdff;
-    }
-
-    .empty-row {
-      color: var(--muted);
-      padding: 16px 8px;
-      font-size: 14px;
-    }
-
-    .fila-ingreso-pendiente td {
-      background: var(--income-pending);
-      border-bottom: 1px solid var(--income-pending-border);
-    }
-
-    .fila-ingreso-pendiente input,
-    .fila-ingreso-pendiente select {
-      background: #f8fff8 !important;
-      border-color: #b7dcb7 !important;
-    }
-
-    .fila-gasto-pendiente td {
-      background: var(--expense-unpaid);
-      border-bottom: 1px solid var(--expense-unpaid-border);
-    }
-
-    .fila-gasto-pendiente input,
-    .fila-gasto-pendiente select {
-      background: #fff8f6 !important;
-      border-color: #eab4a6 !important;
-    }
-
-    .fila-ahorro-pendiente td {
-      background: var(--saving-unpaid);
-    }
-
-    .fila-ahorro-pendiente input,
-    .fila-ahorro-pendiente select {
-      background: #f8fbff !important;
-      border-color: #c6d5e8 !important;
-    }
-
-    .topbar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 14px;
-    }
-
-    .logout-btn {
-      width: auto;
-      min-width: auto;
-      padding: 10px 14px;
-      background: #fff;
-      border: 1px solid #d8dbe2;
-      border-radius: 12px;
-      font-size: 13px;
-    }
-
-
-.topbar-left {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  min-width: 0;
-}
-
-.page-title {
-  margin: 0;
-  font-size: 22px;
-  line-height: 1.1;
-  white-space: nowrap;
-  color: var(--text);
-}
-
-.menu-btn {
-  width: 46px;
-  height: 46px;
-  border-radius: 14px;
-  border: 1px solid #d8dbe2;
-  background: #f4f7ff;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  flex-shrink: 0;
-}
-
-.menu-btn:hover {
-  background: #edf2ff;
-}
-
-.menu-icon {
-  position: relative;
-  width: 20px;
-  height: 14px;
-  display: inline-block;
-}
-
-.menu-icon::before,
-.menu-icon::after,
-.menu-icon span {
-  content: '';
-  position: absolute;
-  left: 0;
-  width: 100%;
-  height: 2.5px;
-  border-radius: 999px;
-  background: #5f78a9;
-}
-
-.menu-icon::before {
-  top: 0;
-}
-
-.menu-icon span {
-  top: 50%;
-  transform: translateY(-50%);
-}
-
-.menu-icon::after {
-  bottom: 0;
-}
-
-.drawer-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(36, 48, 65, 0.18);
-  display: none;
-  z-index: 30;
-}
-
-.drawer-overlay.open {
-  display: block;
-}
-
-.side-drawer {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: min(300px, 86vw);
-  height: 100vh;
-  background: #fffdfb;
-  box-shadow: 0 18px 40px rgba(36, 48, 65, 0.16);
-  border-right: 1px solid rgba(0,0,0,0.05);
-  padding: 18px 16px 24px;
-  transform: translateX(-105%);
-  transition: transform 0.24s ease;
-  z-index: 40;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.side-drawer.open {
-  transform: translateX(0);
-}
-
-.drawer-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-}
-
-.drawer-title {
-  margin: 0;
-  font-size: 18px;
-  color: var(--text);
-}
-
-.drawer-close {
-  width: 38px;
-  height: 38px;
-  border-radius: 12px;
-  background: #fff;
-  border: 1px solid #d8dbe2;
-  padding: 0;
-  font-size: 22px;
-  line-height: 1;
-}
-
-.drawer-nav {
-  display: grid;
-  gap: 10px;
-}
-
-.drawer-link {
-  width: 100%;
-  text-align: left;
-  border-radius: 16px;
-  border: 1px solid #dce4f3;
-  background: #f5f8ff;
-  color: #4f6896;
-  font-weight: 700;
-  padding: 14px 16px;
-}
-
-.drawer-link.is-active {
-  background: #eaf1ff;
-  border-color: #c9d8f7;
-  color: #3b5786;
-}
-
-.app-view {
-  display: none;
-}
-
-.app-view.active {
-  display: block;
-}
-
-.card-provision {
-  background: #fbfdff;
-  border: 1px solid #d9e6fb;
-}
-
-.card-provision h2 {
-  color: #5f7ea9;
-  font-size: 22px;
-  line-height: 1.1;
-  white-space: nowrap;
-}
-
-.provision-copy {
-  background: #f2f7ff;
-  border: 1px solid #d8e6fb;
-  border-radius: 18px;
-  padding: 14px;
-  margin-bottom: 16px;
-  color: #566b8f;
-  line-height: 1.5;
-  font-size: 14px;
-}
-
-.provision-copy strong {
-  color: #405877;
-}
-
-.card-provision th {
-  background: #eef5ff;
-}
-
-.card-provision .actions-row button {
-  border-color: #c7daf6;
-  color: #5f7ea9;
-  background: #f8fbff;
-}
-
-.provision-note {
-  margin-top: 14px;
-  background: #fff7ef;
-  border: 1px solid #efdbc2;
-  color: #8a6a46;
-  border-radius: 16px;
-  padding: 14px;
-  font-size: 13px;
-  line-height: 1.5;
-}
-
-
-    .login-screen {
-      min-height: 100vh;
-      padding: 24px;
-      background: var(--bg);
-    }
-
-    .login-card {
-      max-width: 420px;
-      margin: 48px auto;
-      background: #fffdfb;
-      border-radius: 22px;
-      padding: 24px;
-      box-shadow: 0 10px 30px rgba(84,64,44,0.08);
-      border: 1px solid rgba(0,0,0,0.04);
-    }
-
-    .login-title {
-      margin: 0 0 10px;
-      font-size: 30px;
-      color: var(--text);
-    }
-
-    .login-subtitle {
-      margin: 0 0 20px;
-      color: var(--muted);
-      font-size: 14px;
-    }
-
-    .login-error {
-      display: none;
-      margin-top: 12px;
-      color: var(--danger);
-      font-size: 13px;
-    }
-
-    .login-button {
-      width: 100%;
-      background: #243041;
-      color: white;
-      border: none;
-      padding: 12px 16px;
-      border-radius: 14px;
-      font-weight: bold;
-    }
-
-    .secondary-button {
-      width: 100%;
-      background: #fff;
-      color: var(--text);
-      border: 1px solid #d8dbe2;
-      padding: 12px 16px;
-      border-radius: 14px;
-      font-weight: bold;
-    }
-
-    .text-link-btn {
-      width: auto;
-      padding: 0;
-      border: none;
-      background: transparent;
-      color: #243041;
-      text-decoration: underline;
-      font-size: 13px;
-      font-weight: bold;
-    }
-
-    .login-note {
-      margin-top: 12px;
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.4;
-    }
-
-    .card-informativo-banner {
-      background: var(--info-banner-bg);
-      border: 1px solid var(--info-banner-border);
-      padding: 16px 18px;
-      text-align: center;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.04);
-    }
-
-    .card-informativo-banner h2 {
-      color: var(--info-banner-title);
-      margin-bottom: 8px;
-      font-size: 15px;
-      letter-spacing: 1.5px;
-    }
-
-    .info-banner-copy {
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.5;
-      max-width: 680px;
-      margin: 0 auto;
-    }
-
-    .card-cxc {
-      background: var(--card);
-      border: 1px solid var(--receivable-border);
-    }
-
-    .card-cxc h2 {
-      color: var(--receivable-title);
-    }
-
-    .card-cxc th {
-      background: var(--receivable-soft);
-    }
-
-    .card-cxc .actions-row button {
-      border-color: #c7d8ef;
-      color: var(--receivable-title);
-      background: #fbfdff;
-    }
-
-    .card-cxp {
-      background: var(--card);
-      border: 1px solid var(--payable-border);
-    }
-
-    .card-cxp h2 {
-      color: var(--payable-title);
-    }
-
-    .card-cxp th {
-      background: var(--payable-soft);
-    }
-
-    .card-cxp .actions-row button {
-      border-color: #ecd4c7;
-      color: var(--payable-title);
-      background: #fffaf8;
-    }
-
-    .fila-cxc-pendiente td {
-      background: var(--receivable-pending);
-      border-bottom: 1px solid var(--receivable-pending-border);
-    }
-
-    .fila-cxc-pendiente input {
-      background: #fbfdff !important;
-      border-color: #cfe0f3 !important;
-    }
-
-    .fila-cxp-pendiente td {
-      background: var(--payable-pending);
-      border-bottom: 1px solid var(--payable-pending-border);
-    }
-
-    .fila-cxp-pendiente input {
-      background: #fffaf8 !important;
-      border-color: #ecd4c7 !important;
-    }
-
-    @media (max-width: 720px) {
-      .container {
-        padding: 12px;
-      }
-
-      .card {
-        padding: 14px;
-        border-radius: 18px;
-      }
-
-      h1 {
-        font-size: 24px;
-        margin-bottom: 10px;
-      }
-
-      h2 {
-        font-size: 18px;
-        margin-bottom: 8px;
-      }
-
-      .grid-top {
-        grid-template-columns: 40px 1fr 96px 40px;
-        gap: 8px;
-      }
-
-      .nav-btn {
-        width: 40px;
-        height: 40px;
-        font-size: 20px;
-        border-radius: 12px;
-      }
-
-      th, td {
-        padding: 8px 4px;
-      }
-
-      th {
-        font-size: 10px;
-      }
-
-      .col-concepto {
-        width: 39%;
-      }
-
-      .col-valor {
-        width: 27%;
-      }
-
-      .col-freq {
-        width: 16%;
-      }
-
-      .col-pagado {
-        width: 8%;
-      }
-
-      .col-eliminar {
-        width: 8%;
-      }
-
-      table input,
-      table select {
-        padding: 8px 6px;
-        font-size: 16px;
-        border-radius: 10px;
-      }
-
-      .col-valor input {
-        font-size: 16px;
-        text-align: right;
-      }
-
-      .col-freq select {
-        font-size: 16px;
-        padding-left: 4px;
-        padding-right: 10px;
-        text-align: left;
-        text-align-last: auto;
-        line-height: 1.2;
-      }
-
-      .delete-mini {
-        width: 12px;
-        height: 12px;
-        min-width: 12px;
-        font-size: 7px;
-        border-radius: 3px;
-      }
-
-      .paid-check {
-        width: 9px;
-        height: 9px;
-      }
-
-      .summary {
-        grid-template-columns: 1fr;
-        gap: 10px;
-      }
-
-      .summary-box {
-        padding: 12px;
-      }
-
-      .summary-box .value {
-        font-size: 18px;
-      }
-
-      .actions-row button {
-        width: 100%;
-        min-width: 0;
-      }
-
-
-      .presupuesto-activo {
-        flex-direction: column;
-        align-items: stretch;
-      }
-
-      .danger-outline-btn {
-        width: 100%;
-      }
-
-      .mini-legend {
-        font-size: 10px;
-      }
-
-      .topbar {
-        align-items: center;
-        gap: 8px;
-      }
-
-      .topbar-left {
-        gap: 10px;
-      }
-
-      .page-title {
-        font-size: 22px;
-      }
-
-      .logout-btn {
-        white-space: nowrap;
-        padding: 8px 10px;
-        font-size: 12px;
-      }
-    }
-  </style>
-</head>
-<body>
-  <div id="loginScreen" class="login-screen" style="display:block;">
-    <div class="login-card">
-      <h1 class="login-title">Mi Presupuesto</h1>
-      <p class="login-subtitle">Ingresa con tu correo y contraseña.</p>
-
-      <div id="loginAccessForm">
-        <div style="margin-bottom:14px;">
-          <label for="loginEmail">Correo</label>
-          <input id="loginEmail" type="email" placeholder="tucorreo@ejemplo.com" />
-        </div>
-
-        <div style="margin-bottom:14px;">
-          <label for="loginPassword">Contraseña</label>
-          <input id="loginPassword" type="password" placeholder="********" />
-        </div>
-
-        <button id="loginBtn" type="button" class="login-button">Ingresar</button>
-        <button id="forgotPasswordBtn" type="button" class="text-link-btn" style="margin-top:12px;">Olvidé mi contraseña</button>
-        <p id="loginError" class="login-error"></p>
-        <p id="resetRequestMessage" class="login-note" style="display:none;"></p>
-      </div>
-
-      <div id="passwordRecoveryPanel" style="display:none;">
-        <p class="login-subtitle" style="margin-top:0;">Escribe tu nueva contraseña para terminar la recuperación.</p>
-
-        <div style="margin-bottom:14px;">
-          <label for="recoveryPassword">Nueva contraseña</label>
-          <input id="recoveryPassword" type="password" placeholder="Mínimo 6 caracteres" />
-        </div>
-
-        <div style="margin-bottom:14px;">
-          <label for="recoveryPasswordConfirm">Confirmar nueva contraseña</label>
-          <input id="recoveryPasswordConfirm" type="password" placeholder="Repite la contraseña" />
-        </div>
-
-        <button id="recoverySaveBtn" type="button" class="login-button">Guardar nueva contraseña</button>
-        <button id="recoveryCancelBtn" type="button" class="secondary-button" style="margin-top:10px;">Volver al inicio</button>
-        <p id="recoveryError" class="login-error"></p>
-        <p id="recoverySuccess" class="login-note" style="display:none;"></p>
-      </div>
-    </div>
-  </div>
-
-  
-<div id="appShell" style="display:none;">
-  <div id="drawerOverlay" class="drawer-overlay"></div>
-  <aside id="sideDrawer" class="side-drawer" aria-hidden="true">
-    <div class="drawer-header">
-      <h3 class="drawer-title">Menú</h3>
-      <button id="drawerCloseBtn" type="button" class="drawer-close" aria-label="Cerrar menú">×</button>
-    </div>
-    <div class="drawer-nav">
-      <button id="menuPresupuestoBtn" type="button" class="drawer-link is-active">Mi Presupuesto</button>
-      <button id="menuProvisionBtn" type="button" class="drawer-link">Provisión gasto</button>
-    </div>
-  </aside>
-
-  <div class="container">
-    <div class="topbar">
-      <div class="topbar-left">
-        <button id="menuToggleBtn" type="button" class="menu-btn" aria-label="Abrir menú">
-          <span class="menu-icon"><span></span></span>
-        </button>
-        <h1 id="pageTitle" class="page-title">Mi Presupuesto</h1>
-      </div>
-      <button id="logoutBtn" type="button" class="logout-btn">Cerrar sesión</button>
-    </div>
-
-    <div id="viewPresupuesto" class="app-view active">
-      <div class="card card-presupuesto">
-        <h2>Crear nuevo presupuesto</h2>
-        <div class="grid-top">
-          <div>
-            <span class="nav-spacer" aria-hidden="true"></span>
-            <button id="presupuestoAnteriorBtn" class="nav-btn" type="button" aria-label="Ir al presupuesto anterior">‹</button>
-          </div>
-
-          <div>
-            <label for="mes">Mes</label>
-            <select id="mes">
-              <option value="01">Enero</option>
-              <option value="02">Febrero</option>
-              <option value="03">Marzo</option>
-              <option value="04">Abril</option>
-              <option value="05">Mayo</option>
-              <option value="06">Junio</option>
-              <option value="07">Julio</option>
-              <option value="08">Agosto</option>
-              <option value="09">Septiembre</option>
-              <option value="10">Octubre</option>
-              <option value="11">Noviembre</option>
-              <option value="12">Diciembre</option>
-            </select>
-          </div>
-
-          <div>
-            <label for="anio">Año</label>
-            <input id="anio" type="number" placeholder="2026" min="2024" max="2100" />
-          </div>
-
-          <div>
-            <span class="nav-spacer" aria-hidden="true"></span>
-            <button id="presupuestoSiguienteBtn" class="nav-btn" type="button" aria-label="Ir al presupuesto siguiente">›</button>
-          </div>
-        </div>
-
-        <div class="actions-row" id="crearPresupuestoWrap" style="margin-top: 10px;">
-          <button id="crearPresupuestoBtn" type="button">Crear</button>
-        </div>
-
-        <div id="presupuestoActivo" class="presupuesto-activo" style="display: none;">
-          <div id="presupuestoActivoTexto" class="presupuesto-activo-texto"></div>
-          <button id="eliminarPresupuestoBtn" type="button" class="danger-outline-btn">Eliminar este presupuesto</button>
-        </div>
-      </div>
-
-      <div id="modulosPresupuesto" style="display: none;">
-        <div class="card card-ingresos">
-          <h2>INGRESOS</h2>
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th class="col-concepto">Concepto</th>
-                  <th class="col-valor">Valor</th>
-                  <th class="col-freq">Freq.</th>
-                  <th class="col-pagado">✓</th>
-                  <th class="col-eliminar">X</th>
-                </tr>
-              </thead>
-              <tbody id="tablaIngresos"></tbody>
-            </table>
-          </div>
-
-          <div class="mini-legend">M = Mensual · A = Anual · O = Ocasional</div>
-
-          <div class="actions-row">
-            <button id="agregarIngresoBtn" type="button">+ Agregar ingreso</button>
-          </div>
-
-          <div class="summary">
-            <div class="summary-box">
-              <div class="label">Total ingresos registrados</div>
-              <div class="value" id="totalIngresos">$0</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="card card-gastos">
-          <h2>GASTOS</h2>
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th class="col-concepto">Concepto</th>
-                  <th class="col-valor">Valor</th>
-                  <th class="col-freq">Freq.</th>
-                  <th class="col-pagado">✓</th>
-                  <th class="col-eliminar">X</th>
-                </tr>
-              </thead>
-              <tbody id="tablaGastos"></tbody>
-            </table>
-          </div>
-
-          <div class="mini-legend">M = Mensual · A = Anual · O = Ocasional</div>
-
-          <div class="actions-row">
-            <button id="agregarGastoBtn" type="button">+ Agregar gasto</button>
-          </div>
-
-          <div class="summary">
-            <div class="summary-box">
-              <div class="label">Total gastos registrados</div>
-              <div class="value" id="totalGastos">$0</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="card card-ahorro">
-          <h2>AHORRO</h2>
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th class="col-concepto">Concepto</th>
-                  <th class="col-valor">Valor</th>
-                  <th class="col-freq">Freq.</th>
-                  <th class="col-pagado">✓</th>
-                  <th class="col-eliminar">X</th>
-                </tr>
-              </thead>
-              <tbody id="tablaAhorros"></tbody>
-            </table>
-          </div>
-
-          <div class="mini-legend">M = Mensual · A = Anual · O = Ocasional</div>
-
-          <div class="actions-row">
-            <button id="agregarAhorroBtn" type="button">+ Agregar ahorro</button>
-          </div>
-
-          <div class="summary">
-            <div class="summary-box">
-              <div class="label">Total ahorros registrados</div>
-              <div class="value" id="totalAhorros">$0</div>
-            </div>
-                        <div class="summary-box">
-              <div class="label">Ahorro total acumulado</div>
-              <div class="value" id="totalAhorrosAcumulados">$0</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="card card-disponible">
-          <h2>RESUMEN</h2>
-          <div class="summary" style="margin-top: 0;">
-            <div class="summary-box value-warning" id="disponibleBaseBox">
-              <div class="label">Disponible antes de pagos pendientes</div>
-              <div class="value" id="disponibleBase">$0</div>
-              <input id="disponibleManualToggle" type="checkbox" style="display:none;" aria-hidden="true" tabindex="-1" />
-            </div>
-
-            <div class="summary-box value-danger">
-              <div class="label">Pendiente por pagar / apartar</div>
-              <div class="value" id="pendientePorPagar">$0</div>
-            </div>
-
-            <div class="summary-box value-success">
-              <div class="label">Disponible real</div>
-              <div class="value" id="disponibleReal">$0</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="card card-informativo-banner">
-          <h2>INFORMATIVO</h2>
-          <div class="info-banner-copy">
-            Lleva aquí tus cuentas por cobrar y por pagar. Lo que marques como resuelto no pasará al mes siguiente; lo que siga abierto se arrastrará automáticamente cuando crees el próximo presupuesto.
-          </div>
-        </div>
-
-        <div class="card card-cxc">
-          <h2>CUENTAS POR COBRAR</h2>
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th class="col-concepto">Concepto</th>
-                  <th class="col-valor">Valor</th>
-                  <th class="col-pagado">✓</th>
-                  <th class="col-eliminar">X</th>
-                </tr>
-              </thead>
-              <tbody id="tablaCxc"></tbody>
-            </table>
-          </div>
-
-          <div class="mini-legend">Marca el chulito cuando esa cuenta ya fue cobrada. Solo las que sigan abiertas pasarán al siguiente mes.</div>
-
-          <div class="actions-row">
-            <button id="agregarCxcBtn" type="button">+ Agregar cuenta por cobrar</button>
-          </div>
-
-          <div class="summary">
-            <div class="summary-box">
-              <div class="label">Total cuentas por cobrar abiertas</div>
-              <div class="value" id="totalCxc">$0</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="card card-cxp">
-          <h2>CUENTAS POR PAGAR</h2>
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th class="col-concepto">Concepto</th>
-                  <th class="col-valor">Valor</th>
-                  <th class="col-pagado">✓</th>
-                  <th class="col-eliminar">X</th>
-                </tr>
-              </thead>
-              <tbody id="tablaCxp"></tbody>
-            </table>
-          </div>
-
-          <div class="mini-legend">Marca el chulito cuando esa cuenta ya fue pagada. Solo las que sigan abiertas pasarán al siguiente mes.</div>
-
-          <div class="actions-row">
-            <button id="agregarCxpBtn" type="button">+ Agregar cuenta por pagar</button>
-          </div>
-
-          <div class="summary">
-            <div class="summary-box">
-              <div class="label">Total cuentas por pagar abiertas</div>
-              <div class="value" id="totalCxp">$0</div>
-            </div>
-          </div>
-        </div>
-
-      </div>
-    </div>
-
-    <div id="viewProvision" class="app-view">
-      <div class="card card-provision">
-        <h2>PROVISIÓN GASTO</h2>
-        <div class="provision-copy">
-          <strong>Convierte gastos grandes en pequeños aportes mensuales.</strong><br />
-          Así mantienes tu flujo estable y evitas golpes financieros inesperados.<br /><br />
-          Lista a continuación tus gastos anuales con su valor, y la app calculará cuánto deberías apartar cada mes.
-        </div>
-
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th class="col-concepto">Concepto</th>
-                <th class="col-valor">Valor anual</th>
-                <th class="col-eliminar">X</th>
-              </tr>
-            </thead>
-            <tbody id="tablaProvision"></tbody>
-          </table>
-        </div>
-
-        <div class="actions-row">
-          <button id="agregarProvisionBtn" type="button">+ Agregar gasto anual</button>
-        </div>
-
-        <div class="summary">
-          <div class="summary-box">
-            <div class="label">Total anual proyectado</div>
-            <div class="value" id="totalProvisionAnual">$0</div>
-          </div>
-
-          <div class="summary-box value-success">
-            <div class="label">Mensualmente debes ahorrar</div>
-            <div class="value" id="totalProvisionMensual">$0</div>
-          </div>
-        </div>
-
-        <div class="provision-note">
-          <strong>Importante:</strong> si inicias este ahorro con menos de 12 meses de anticipación, la primera vez tendrás que complementar una parte adicional desde tu presupuesto actual. Después de ese primer ciclo, si mantienes el ahorro mensual, ya tendrás el valor proyectado a tiempo para tus próximos pagos.
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script>
-    const SUPABASE_URL = 'https://vpaqslncpewdszwtraat.supabase.co';
-    const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_iiw7qQDDAVI9WY0TILlO5A_x1bAN-M_';
-
-    const supabaseLib = window.supabase;
-    if (!supabaseLib || !supabaseLib.createClient) {
-      console.error('No se pudo cargar la librería de Supabase.');
-      const fallbackLogin = document.getElementById('loginScreen');
-      const fallbackApp = document.getElementById('appShell');
-      const fallbackError = document.getElementById('loginError');
-      if (fallbackLogin) fallbackLogin.style.display = 'block';
-      if (fallbackApp) fallbackApp.style.display = 'none';
-      if (fallbackError) {
-        fallbackError.textContent = 'No pudimos cargar la app. Recarga la página o intenta en otro navegador.';
-        fallbackError.style.display = 'block';
-      }
-      throw new Error('Supabase library not loaded');
-    }
-
-    const supabaseClient = supabaseLib.createClient(
-      SUPABASE_URL,
-      SUPABASE_PUBLISHABLE_KEY
-    );
-
-    const loginScreen = document.getElementById('loginScreen');
-    const appShell = document.getElementById('appShell');
-    const loginAccessForm = document.getElementById('loginAccessForm');
-    const passwordRecoveryPanel = document.getElementById('passwordRecoveryPanel');
-    const loginEmail = document.getElementById('loginEmail');
-    const loginPassword = document.getElementById('loginPassword');
-    const loginBtn = document.getElementById('loginBtn');
-    const forgotPasswordBtn = document.getElementById('forgotPasswordBtn');
-    const loginError = document.getElementById('loginError');
-    const resetRequestMessage = document.getElementById('resetRequestMessage');
-    const recoveryPassword = document.getElementById('recoveryPassword');
-    const recoveryPasswordConfirm = document.getElementById('recoveryPasswordConfirm');
-    const recoverySaveBtn = document.getElementById('recoverySaveBtn');
-    const recoveryCancelBtn = document.getElementById('recoveryCancelBtn');
-    const recoveryError = document.getElementById('recoveryError');
-    const recoverySuccess = document.getElementById('recoverySuccess');
-    const logoutBtn = document.getElementById('logoutBtn');
-    const menuToggleBtn = document.getElementById('menuToggleBtn');
-    const drawerCloseBtn = document.getElementById('drawerCloseBtn');
-    const drawerOverlay = document.getElementById('drawerOverlay');
-    const sideDrawer = document.getElementById('sideDrawer');
-    const menuPresupuestoBtn = document.getElementById('menuPresupuestoBtn');
-    const menuProvisionBtn = document.getElementById('menuProvisionBtn');
-    const pageTitle = document.getElementById('pageTitle');
-    const viewPresupuesto = document.getElementById('viewPresupuesto');
-    const viewProvision = document.getElementById('viewProvision');
-
-    const mesSelect = document.getElementById('mes');
-    const anioInput = document.getElementById('anio');
-    const presupuestoAnteriorBtn = document.getElementById('presupuestoAnteriorBtn');
-    const presupuestoSiguienteBtn = document.getElementById('presupuestoSiguienteBtn');
-    const presupuestoActivo = document.getElementById('presupuestoActivo');
-    const presupuestoActivoTexto = document.getElementById('presupuestoActivoTexto');
-    const eliminarPresupuestoBtn = document.getElementById('eliminarPresupuestoBtn');
-    const crearPresupuestoWrap = document.getElementById('crearPresupuestoWrap');
-    const crearPresupuestoBtn = document.getElementById('crearPresupuestoBtn');
-    const modulosPresupuesto = document.getElementById('modulosPresupuesto');
-
-    const tablaIngresos = document.getElementById('tablaIngresos');
-    const totalIngresos = document.getElementById('totalIngresos');
-    const agregarIngresoBtn = document.getElementById('agregarIngresoBtn');
-
-    const tablaGastos = document.getElementById('tablaGastos');
-    const totalGastos = document.getElementById('totalGastos');
-    const agregarGastoBtn = document.getElementById('agregarGastoBtn');
-
-    const tablaAhorros = document.getElementById('tablaAhorros');
-    const totalAhorros = document.getElementById('totalAhorros');
-    const totalAhorrosAcumulados = document.getElementById('totalAhorrosAcumulados');
-    const agregarAhorroBtn = document.getElementById('agregarAhorroBtn');
-
-    const tablaProvision = document.getElementById('tablaProvision');
-    const totalProvisionAnual = document.getElementById('totalProvisionAnual');
-    const totalProvisionMensual = document.getElementById('totalProvisionMensual');
-    const agregarProvisionBtn = document.getElementById('agregarProvisionBtn');
-
-    const disponibleBase = document.getElementById('disponibleBase');
-    const disponibleManualToggle = document.getElementById('disponibleManualToggle');
-    const pendientePorPagar = document.getElementById('pendientePorPagar');
-    const disponibleReal = document.getElementById('disponibleReal');
-
-    const tablaCxc = document.getElementById('tablaCxc');
-    const totalCxc = document.getElementById('totalCxc');
-    const agregarCxcBtn = document.getElementById('agregarCxcBtn');
-
-    const tablaCxp = document.getElementById('tablaCxp');
-    const totalCxp = document.getElementById('totalCxp');
-    const agregarCxpBtn = document.getElementById('agregarCxpBtn');
-
-    const storageKey = 'presupuestosMensualesApp';
-    const storageOwnerKey = 'presupuestosMensualesAppOwner';
-    const provisionStorageKey = 'provisionGastoApp';
-    const provisionStorageOwnerKey = 'provisionGastoAppOwner';
-
-    function leerPresupuestosLocales() {
-      try {
-        return JSON.parse(localStorage.getItem(storageKey)) || {};
-      } catch (error) {
-        console.error('Error leyendo presupuestos locales:', error);
-        return {};
-      }
-    }
-
-    let presupuestos = leerPresupuestosLocales();
-    let presupuestoActualKey = localStorage.getItem('presupuestoActualKey') || '';
-    let guardadoSupabaseTimeout = null;
-    const presupuestosPendientesSync = new Set();
-    let recoveryModeActivo = false;
-    let forcePasswordChangeMode = false;
-    let vistaActual = 'presupuesto';
-    let provisionGastoData = leerProvisionLocal();
-    let guardadoProvisionTimeout = null;
-let provisionInicialSincronizada = false;
-
-    function leerProvisionLocal() {
-      try {
-        const data = JSON.parse(localStorage.getItem(provisionStorageKey));
-        return {
-          items: Array.isArray(data?.items) ? data.items : []
-        };
-      } catch (error) {
-        console.error('Error leyendo provisión local:', error);
-        return { items: [] };
-      }
-    }
-
-    function formatoMoneda(numero) {
-      return new Intl.NumberFormat('es-CO', {
-        style: 'currency',
-        currency: 'COP',
-        maximumFractionDigits: 0
-      }).format(Number(numero) || 0);
-    }
-
-
-    function obtenerNombreMes(mes) {
-      const option = mesSelect.querySelector(`option[value="${String(mes).padStart(2, '0')}"]`);
-      return option ? option.textContent : String(mes);
-    }
-
-    function actualizarEtiquetaPresupuestoActivo() {
-      if (!presupuestoActualKey || !presupuestos[presupuestoActualKey]) {
-        presupuestoActivoTexto.textContent = '';
-        return;
-      }
-
-      const presupuesto = presupuestos[presupuestoActualKey];
-      presupuestoActivoTexto.textContent = `Presupuesto activo: ${obtenerNombreMes(presupuesto.mes)} ${presupuesto.anio}`;
-    }
-
-    function formatoNumeroInput(valor) {
-      const limpio = String(valor || '').replace(/\D/g, '');
-      if (!limpio) return '';
-      return new Intl.NumberFormat('es-CO', {
-        maximumFractionDigits: 0
-      }).format(Number(limpio));
-    }
-
-    function normalizarNumeroConSigno(valor) {
-      if (valor === null || valor === undefined) return '';
-      let texto = String(valor).trim();
-      if (!texto) return '';
-
-      const esNegativo = texto.startsWith('-');
-      texto = texto.replace(/\D/g, '');
-      if (!texto) return '';
-      return esNegativo ? `-${texto}` : texto;
-    }
-
-    function formatoNumeroInputConSigno(valor) {
-      const normalizado = normalizarNumeroConSigno(valor);
-      if (!normalizado) return '';
-
-      const numero = Number(normalizado);
-      if (!Number.isFinite(numero)) return '';
-
-      const absolutoFormateado = new Intl.NumberFormat('es-CO', {
-        maximumFractionDigits: 0
-      }).format(Math.abs(numero));
-
-      return numero < 0 ? `-${absolutoFormateado}` : absolutoFormateado;
-    }
-
-    
-function crearProvisionVacia() {
-  return {
-    descripcion: '',
-    valor: ''
-  };
-}
-
-function normalizarProvisionData(data) {
-  return {
-    items: Array.isArray(data?.items)
-      ? data.items.map((item) => ({
-          descripcion: item?.descripcion || '',
-          valor: item?.valor || ''
-        }))
-      : []
-  };
-}
-
-function guardarProvisionLocal() {
-  localStorage.setItem(provisionStorageKey, JSON.stringify(provisionGastoData));
-}
-
-function guardarProvisionOwnerLocal(userId) {
-  if (userId) {
-    localStorage.setItem(provisionStorageOwnerKey, userId);
-  }
-}
-
-function abrirMenu() {
-  sideDrawer.classList.add('open');
-  drawerOverlay.classList.add('open');
-  sideDrawer.setAttribute('aria-hidden', 'false');
-}
-
-function cerrarMenu() {
-  sideDrawer.classList.remove('open');
-  drawerOverlay.classList.remove('open');
-  sideDrawer.setAttribute('aria-hidden', 'true');
-}
-
-function actualizarMenuActivo() {
-  menuPresupuestoBtn.classList.toggle('is-active', vistaActual === 'presupuesto');
-  menuProvisionBtn.classList.toggle('is-active', vistaActual === 'provision');
-  pageTitle.textContent = vistaActual === 'presupuesto' ? 'Mi Presupuesto' : 'Provisión gasto';
-}
-
-function mostrarVista(nombreVista) {
-  vistaActual = nombreVista;
-  const esPresupuesto = nombreVista === 'presupuesto';
-  viewPresupuesto.classList.toggle('active', esPresupuesto);
-  viewProvision.classList.toggle('active', !esPresupuesto);
-  actualizarMenuActivo();
-  cerrarMenu();
-}
-
-function irAMiPresupuesto() {
-  mostrarVista('presupuesto');
-  const ultimoKey = obtenerUltimoPresupuestoGuardado();
-  if (ultimoKey && presupuestos[ultimoKey]) {
-    presupuestoActualKey = ultimoKey;
-    localStorage.setItem('presupuestoActualKey', presupuestoActualKey);
-    const [anioGuardado, mesGuardado] = ultimoKey.split('-');
-    mesSelect.value = mesGuardado;
-    anioInput.value = anioGuardado;
-    abrirPresupuestoExistente(ultimoKey);
-  } else {
-    cargarInicial();
-  }
-}
-
-function irAProvisionGasto() {
-  mostrarVista('provision');
-  renderProvisionGasto();
-}
-
-    function ocultarMensajesAcceso() {
-      loginError.style.display = 'none';
-      loginError.textContent = '';
-      resetRequestMessage.style.display = 'none';
-      resetRequestMessage.textContent = '';
-      recoveryError.style.display = 'none';
-      recoveryError.textContent = '';
-      recoverySuccess.style.display = 'none';
-      recoverySuccess.textContent = '';
-    }
-
-    function obtenerRecoveryRedirectUrl() {
-      const url = new URL(`${window.location.origin}${window.location.pathname}`);
-      url.searchParams.set('recovery', '1');
-      return url.toString();
-    }
-
-    function limpiarUrlRecuperacion() {
-      const cleanUrl = `${window.location.origin}${window.location.pathname}`;
-      window.history.replaceState({}, document.title, cleanUrl);
-    }
-
-    function obtenerHashParams() {
-      const hash = (window.location.hash || '').replace(/^#/, '');
-      return new URLSearchParams(hash);
-    }
-
-    function obtenerSearchParams() {
-      return new URLSearchParams(window.location.search || '');
-    }
-
-    function urlIndicaRecuperacion() {
-      const hashParams = obtenerHashParams();
-      const searchParams = obtenerSearchParams();
-      const tipoHash = hashParams.get('type');
-      const tipoSearch = searchParams.get('type');
-
-      return (
-        tipoHash === 'recovery' ||
-        tipoHash === 'invite' ||
-        tipoSearch === 'recovery' ||
-        tipoSearch === 'invite' ||
-        searchParams.get('recovery') === '1' ||
-        searchParams.has('code') ||
-        hashParams.has('access_token')
-      );
-    }
-
-    async function procesarRecuperacionDesdeUrl() {
-      const searchParams = obtenerSearchParams();
-      const hashParams = obtenerHashParams();
-
-      const code = searchParams.get('code');
-      const tipoHash = hashParams.get('type');
-      const tipoSearch = searchParams.get('type');
-
-      const esInvite = tipoHash === 'invite' || tipoSearch === 'invite';
-      const esRecovery =
-        searchParams.get('recovery') === '1' ||
-        tipoHash === 'recovery' ||
-        tipoSearch === 'recovery';
-      const tieneToken = hashParams.has('access_token');
-      const esFlujoPassword = esInvite || esRecovery || tieneToken;
-
-      if (code && esFlujoPassword) {
-        const { error } = await supabaseClient.auth.exchangeCodeForSession(code);
-        if (error) {
-          console.error('Error intercambiando código:', error.message);
-          loginError.textContent = 'El enlace no es válido o ya expiró. Solicita uno nuevo.';
-          loginError.style.display = 'block';
-          mostrarFormularioAcceso();
-          return false;
-        }
-      }
-
-      if (esFlujoPassword) {
-        mostrarFormularioRecuperacion(esInvite);
-        return true;
-      }
-
-      return false;
-    }
-
-    function mostrarFormularioAcceso() {
-      recoveryModeActivo = false;
-      forcePasswordChangeMode = false;
-      loginAccessForm.style.display = 'block';
-      passwordRecoveryPanel.style.display = 'none';
-      recoveryPassword.value = '';
-      recoveryPasswordConfirm.value = '';
-    }
-
-    function mostrarFormularioRecuperacion(forzarCambio = false) {
-      recoveryModeActivo = true;
-      forcePasswordChangeMode = forzarCambio;
-      ocultarMensajesAcceso();
-      loginAccessForm.style.display = 'none';
-      passwordRecoveryPanel.style.display = 'block';
-      loginScreen.style.display = 'block';
-      appShell.style.display = 'none';
-      recoveryCancelBtn.style.display = forzarCambio ? 'none' : 'block';
-
-      const subtitulo = passwordRecoveryPanel.querySelector('.login-subtitle');
-      if (subtitulo) {
-        subtitulo.textContent = forzarCambio
-          ? 'Crea tu contraseña para activar tu acceso.'
-          : 'Escribe tu nueva contraseña para terminar la recuperación.';
-      }
-
-      setTimeout(() => recoveryPassword.focus(), 50);
-    }
-
-    async function solicitarRestablecimientoClave() {
-      ocultarMensajesAcceso();
-
-      const email = loginEmail.value.trim();
-
-      if (!email) {
-        loginError.textContent = 'Escribe tu correo para enviarte el enlace de recuperación.';
-        loginError.style.display = 'block';
-        return;
-      }
-
-      const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
-        redirectTo: obtenerRecoveryRedirectUrl()
-      });
-
-      if (error) {
-        loginError.textContent = 'No pudimos enviar el correo de recuperación. Intenta de nuevo.';
-        loginError.style.display = 'block';
-        return;
-      }
-
-      resetRequestMessage.textContent = 'Si el correo existe, te enviamos un enlace para cambiar la contraseña.';
-      resetRequestMessage.style.display = 'block';
-    }
-
-    async function guardarNuevaClave() {
-      ocultarMensajesAcceso();
-
-      const nueva = recoveryPassword.value.trim();
-      const confirmacion = recoveryPasswordConfirm.value.trim();
-
-      if (!nueva || !confirmacion) {
-        recoveryError.textContent = 'Completa los dos campos de contraseña.';
-        recoveryError.style.display = 'block';
-        return;
-      }
-
-      if (nueva.length < 6) {
-        recoveryError.textContent = 'La contraseña debe tener al menos 6 caracteres.';
-        recoveryError.style.display = 'block';
-        return;
-      }
-
-      if (nueva !== confirmacion) {
-        recoveryError.textContent = 'Las contraseñas no coinciden.';
-        recoveryError.style.display = 'block';
-        return;
-      }
-
-      recoverySaveBtn.disabled = true;
-      recoverySaveBtn.textContent = 'Guardando...';
-
-      try {
-        const { error: passwordError } = await supabaseClient.auth.updateUser({
-          password: nueva
-        });
-
-        if (passwordError) {
-          console.error('Error updateUser:', passwordError.message);
-          recoveryError.textContent = passwordError.message || 'No pudimos actualizar la contraseña.';
-          recoveryError.style.display = 'block';
-          return;
-        }
-
-        const user = await obtenerUsuarioActual();
-        if (user) {
-          const { error: profileError } = await supabaseClient
-            .from('profiles')
-            .upsert({
-              id: user.id,
-              email: user.email,
-              must_change_password: false
-            });
-
-          if (profileError) {
-            console.error('Error guardando perfil:', profileError.message);
-            recoveryError.textContent = 'La contraseña cambió, pero hubo un problema actualizando el perfil.';
-            recoveryError.style.display = 'block';
-            return;
-          }
-        }
-
-        recoverySuccess.textContent = 'Contraseña actualizada con éxito. Ahora inicia sesión.';
-        recoverySuccess.style.display = 'block';
-
-        recoveryPassword.value = '';
-        recoveryPasswordConfirm.value = '';
-        recoveryModeActivo = false;
-        forcePasswordChangeMode = false;
-
-        setTimeout(async () => {
-          await supabaseClient.auth.signOut();
-          limpiarUrlRecuperacion();
-          mostrarFormularioAcceso();
-          mostrarLogin();
-          loginPassword.value = '';
-          recoverySuccess.style.display = 'none';
-        }, 1500);
-      } catch (e) {
-        console.error('Error guardando nueva contraseña:', e);
-        recoveryError.textContent = 'Ocurrió un error al guardar la contraseña.';
-        recoveryError.style.display = 'block';
-      } finally {
-        recoverySaveBtn.disabled = false;
-        recoverySaveBtn.textContent = 'Guardar nueva contraseña';
-      }
-    }
-
-    async function cancelarRecuperacion() {
-      if (forcePasswordChangeMode) return;
-
-      limpiarUrlRecuperacion();
-      recoveryPassword.value = '';
-      recoveryPasswordConfirm.value = '';
-      mostrarFormularioAcceso();
-      await supabaseClient.auth.signOut();
-      mostrarLogin();
-    }
-
-    function nombreMes(valorMes) {
-      const meses = {
-        '01': 'Enero',
-        '02': 'Febrero',
-        '03': 'Marzo',
-        '04': 'Abril',
-        '05': 'Mayo',
-        '06': 'Junio',
-        '07': 'Julio',
-        '08': 'Agosto',
-        '09': 'Septiembre',
-        '10': 'Octubre',
-        '11': 'Noviembre',
-        '12': 'Diciembre'
-      };
-      return meses[valorMes] || '';
-    }
-
-    function obtenerKeyMesAnterior(mes, anio) {
-      let mesNum = Number(mes);
-      let anioNum = Number(anio);
-
-      mesNum -= 1;
-
-      if (mesNum === 0) {
-        mesNum = 12;
-        anioNum -= 1;
-      }
-
-      return `${anioNum}-${String(mesNum).padStart(2, '0')}`;
-    }
-
-    function obtenerKeyMismoMesAnioAnterior(mes, anio) {
-      return `${Number(anio) - 1}-${mes}`;
-    }
-
-    function itemTieneContenido(item) {
-      return (
-        String(item.descripcion || '').trim() !== '' ||
-        String(item.valor || '').trim() !== ''
-      );
-    }
-
-    function obtenerItemsArrastrados(tipo, mes, anio, estadoField) {
-      const arrastrados = [];
-      const keyMesAnterior = obtenerKeyMesAnterior(mes, anio);
-      const keyAnioAnterior = obtenerKeyMismoMesAnioAnterior(mes, anio);
-
-      const presupuestoMesAnterior = presupuestos[keyMesAnterior];
-      if (presupuestoMesAnterior && Array.isArray(presupuestoMesAnterior[tipo])) {
-        presupuestoMesAnterior[tipo]
-          .filter((item) => item.periodicidad === 'MENSUAL' && itemTieneContenido(item))
-          .forEach((item) => {
-            arrastrados.push({
-              descripcion: item.descripcion,
-              valor: item.valor,
-              periodicidad: item.periodicidad,
-              [estadoField]: false
-            });
-          });
-      }
-
-      const presupuestoAnioAnterior = presupuestos[keyAnioAnterior];
-      if (presupuestoAnioAnterior && Array.isArray(presupuestoAnioAnterior[tipo])) {
-        presupuestoAnioAnterior[tipo]
-          .filter((item) => item.periodicidad === 'ANUAL' && itemTieneContenido(item))
-          .forEach((item) => {
-            arrastrados.push({
-              descripcion: item.descripcion,
-              valor: item.valor,
-              periodicidad: item.periodicidad,
-              [estadoField]: false
-            });
-          });
-      }
-
-      return arrastrados;
-    }
-
-    function obtenerIngresosIniciales(mes, anio) {
-      return obtenerItemsArrastrados('ingresos', mes, anio, 'recibido');
-    }
-
-    function obtenerGastosIniciales(mes, anio) {
-      return obtenerItemsArrastrados('gastos', mes, anio, 'pagado');
-    }
-
-    function obtenerAhorrosIniciales(mes, anio) {
-      return obtenerItemsArrastrados('ahorros', mes, anio, 'pagado');
-    }
-
-    function obtenerPendientesMesAnterior(tipo, mes, anio, estadoField) {
-      const keyMesAnterior = obtenerKeyMesAnterior(mes, anio);
-      const presupuestoMesAnterior = presupuestos[keyMesAnterior];
-      if (!presupuestoMesAnterior || !Array.isArray(presupuestoMesAnterior[tipo])) return [];
-
-      return presupuestoMesAnterior[tipo]
-        .filter((item) => itemTieneContenido(item) && !item[estadoField])
-        .map((item) => ({
-          descripcion: item.descripcion || '',
-          valor: item.valor || '',
-          [estadoField]: false
-        }));
-    }
-
-    function obtenerCxcIniciales(mes, anio) {
-      return obtenerPendientesMesAnterior('cuentasPorCobrar', mes, anio, 'cobrado');
-    }
-
-    function obtenerCxpIniciales(mes, anio) {
-      return obtenerPendientesMesAnterior('cuentasPorPagar', mes, anio, 'pagado');
-    }
-
-    function guardarTodoLocal() {
-      localStorage.setItem(storageKey, JSON.stringify(presupuestos));
-      localStorage.setItem('presupuestoActualKey', presupuestoActualKey);
-    }
-
-    function guardarOwnerLocal(userId) {
-      if (userId) {
-        localStorage.setItem(storageOwnerKey, userId);
-      }
-    }
-
-
-async function cargarProvisionDesdeSupabase() {
-  const user = await obtenerUsuarioActual();
-  if (!user) return false;
-
-  const { data, error } = await supabaseClient
-    .from('provision_gasto')
-    .select('data')
-    .eq('user_id', user.id)
-    .maybeSingle();
-
-  if (error) {
-    console.error('Error cargando provisión desde Supabase:', error.message);
-    return false;
-  }
-
-  provisionGastoData = normalizarProvisionData(data?.data || { items: [] });
-  provisionInicialSincronizada = true;
-  guardarProvisionOwnerLocal(user.id);
-  guardarProvisionLocal();
-  return true;
-}
-
-async function guardarProvisionEnSupabase() {
-  const user = await obtenerUsuarioActual();
-  if (!user) return;
-  if (!provisionInicialSincronizada && (!Array.isArray(provisionGastoData.items) || provisionGastoData.items.length === 0)) return;
-
-  const payload = {
-    user_id: user.id,
-    data: normalizarProvisionData(provisionGastoData)
-  };
-
-  const { error } = await supabaseClient
-    .from('provision_gasto')
-    .upsert(payload, { onConflict: 'user_id' });
-
-  if (error) {
-    console.error('Error guardando provisión en Supabase:', error.message);
-  }
-}
-
-function programarGuardadoProvision() {
-  guardarProvisionLocal();
-
-  if (guardadoProvisionTimeout) {
-    clearTimeout(guardadoProvisionTimeout);
-  }
-
-  guardadoProvisionTimeout = setTimeout(async () => {
-    await guardarProvisionEnSupabase();
-  }, 500);
-}
-
-async function sincronizarProvisionInicial() {
-  const provisionLocal = leerProvisionLocal();
-  const ownerLocal = localStorage.getItem(provisionStorageOwnerKey) || '';
-  const user = await obtenerUsuarioActual();
-  const cargoRemoto = await cargarProvisionDesdeSupabase();
-
-  if (!cargoRemoto) {
-    provisionGastoData = provisionLocal;
-    provisionInicialSincronizada = true;
-    if (user) guardarProvisionOwnerLocal(user.id);
-    guardarProvisionLocal();
-    return;
-  }
-
-  const hayRemoto = Array.isArray(provisionGastoData.items) && provisionGastoData.items.length > 0;
-  const hayLocal = Array.isArray(provisionLocal.items) && provisionLocal.items.length > 0;
-  const localPerteneceAlUsuario = !ownerLocal || (user && ownerLocal === user.id);
-
-  if (!hayRemoto && hayLocal && localPerteneceAlUsuario) {
-    provisionGastoData = provisionLocal;
-    provisionInicialSincronizada = true;
-    if (user) guardarProvisionOwnerLocal(user.id);
-    guardarProvisionLocal();
-    await guardarProvisionEnSupabase();
-    await cargarProvisionDesdeSupabase();
-  }
-}
-
-    async function obtenerUsuarioActual() {
-      const { data, error } = await supabaseClient.auth.getUser();
-
-      if (error) {
-        console.error('Error obteniendo usuario actual:', error.message);
-        return null;
-      }
-
-      return data?.user || null;
-    }
-
-
-    async function asegurarPerfilUsuario() {
-      const user = await obtenerUsuarioActual();
-      if (!user) return null;
-
-      const { data: perfilExistente, error: errorConsulta } = await supabaseClient
-        .from('profiles')
-        .select('id, email, must_change_password')
-        .eq('id', user.id)
-        .maybeSingle();
-
-      if (errorConsulta) {
-        console.error('Error consultando perfil:', errorConsulta.message);
-        return null;
-      }
-
-      if (perfilExistente) return perfilExistente;
-
-      const nuevoPerfil = {
-        id: user.id,
-        email: user.email,
-        must_change_password: true
-      };
-
-      const { data: perfilCreado, error: errorCreacion } = await supabaseClient
-        .from('profiles')
-        .insert(nuevoPerfil)
-        .select('id, email, must_change_password')
-        .single();
-
-      if (errorCreacion) {
-        console.error('Error creando perfil:', errorCreacion.message);
-        return null;
-      }
-
-      return perfilCreado;
-    }
-
-    async function obtenerPerfilActual() {
-      return await asegurarPerfilUsuario();
-    }
-
-
-    function construirDataPresupuesto(presupuesto) {
-      return {
-        ingresos: Array.isArray(presupuesto.ingresos) ? presupuesto.ingresos : [],
-        gastos: Array.isArray(presupuesto.gastos) ? presupuesto.gastos : [],
-        ahorros: Array.isArray(presupuesto.ahorros) ? presupuesto.ahorros : [],
-        cuentasPorCobrar: Array.isArray(presupuesto.cuentasPorCobrar) ? presupuesto.cuentasPorCobrar : [],
-        cuentasPorPagar: Array.isArray(presupuesto.cuentasPorPagar) ? presupuesto.cuentasPorPagar : [],
-        disponibleActual: presupuesto.disponibleActual || {
-          valorManual: '',
-          usarManual: false
-        }
-      };
-    }
-
-    function normalizarPresupuestoDesdeFila(row) {
-      const data = row.data || {};
-
-      return {
-        mes: String(row.mes).padStart(2, '0'),
-        anio: String(row.anio),
-        ingresos: Array.isArray(data.ingresos) ? data.ingresos : [],
-        gastos: Array.isArray(data.gastos) ? data.gastos : [],
-        ahorros: Array.isArray(data.ahorros) ? data.ahorros : [],
-        cuentasPorCobrar: Array.isArray(data.cuentasPorCobrar) ? data.cuentasPorCobrar : [],
-        cuentasPorPagar: Array.isArray(data.cuentasPorPagar) ? data.cuentasPorPagar : [],
-        disponibleActual: data.disponibleActual || {
-          valorManual: '',
-          usarManual: false
-        }
-      };
-    }
-
-    async function cargarPresupuestosDesdeSupabase() {
-      const user = await obtenerUsuarioActual();
-      if (!user) return false;
-
-      const { data, error } = await supabaseClient
-        .from('presupuestos')
-        .select('user_id, presupuesto_key, mes, anio, data')
-        .eq('user_id', user.id)
-        .order('anio', { ascending: true })
-        .order('mes', { ascending: true });
-
-      if (error) {
-        console.error('Error cargando presupuestos desde Supabase:', error.message);
-        return false;
-      }
-
-      const presupuestosRemotos = {};
-
-      (data || []).forEach((row) => {
-        const key = row.presupuesto_key || `${row.anio}-${String(row.mes).padStart(2, '0')}`;
-        presupuestosRemotos[key] = normalizarPresupuestoDesdeFila(row);
-      });
-
-      presupuestos = presupuestosRemotos;
-      Object.keys(presupuestos).forEach(asegurarEstructuraPresupuesto);
-      guardarOwnerLocal(user.id);
-
-      if (presupuestoActualKey && !presupuestos[presupuestoActualKey]) {
-        presupuestoActualKey = '';
-      }
-
-      guardarTodoLocal();
-      return true;
-    }
-
-    async function guardarPresupuestoEnSupabase(key) {
-      if (!key || !presupuestos[key]) return;
-
-      const user = await obtenerUsuarioActual();
-      if (!user) return;
-
-      asegurarEstructuraPresupuesto(key);
-      const presupuesto = presupuestos[key];
-
-      const payload = {
-        user_id: user.id,
-        presupuesto_key: key,
-        mes: presupuesto.mes,
-        anio: Number(presupuesto.anio),
-        data: construirDataPresupuesto(presupuesto)
-      };
-
-      const { error } = await supabaseClient
-        .from('presupuestos')
-        .upsert(payload, { onConflict: 'user_id,presupuesto_key' });
-
-      if (error) {
-        console.error(`Error guardando presupuesto ${key} en Supabase:`, error.message);
-      }
-    }
-
-
-    async function eliminarPresupuestoDeSupabase(key) {
-      if (!key) return false;
-
-      const user = await obtenerUsuarioActual();
-      if (!user) return false;
-
-      const { error } = await supabaseClient
-        .from('presupuestos')
-        .delete()
-        .eq('user_id', user.id)
-        .eq('presupuesto_key', key);
-
-      if (error) {
-        console.error(`Error eliminando presupuesto ${key} en Supabase:`, error.message);
-        return false;
-      }
-
-      return true;
-    }
-
-    async function guardarTodosLosPresupuestosEnSupabase() {
-      const keys = Object.keys(presupuestos);
-      if (!keys.length) return;
-
-      const user = await obtenerUsuarioActual();
-      if (!user) return;
-
-      const payload = keys.map((key) => {
-        asegurarEstructuraPresupuesto(key);
-        const presupuesto = presupuestos[key];
-
-        return {
-          user_id: user.id,
-          presupuesto_key: key,
-          mes: presupuesto.mes,
-          anio: Number(presupuesto.anio),
-          data: construirDataPresupuesto(presupuesto)
-        };
-      });
-
-      const { error } = await supabaseClient
-        .from('presupuestos')
-        .upsert(payload, { onConflict: 'user_id,presupuesto_key' });
-
-      if (error) {
-        console.error('Error migrando presupuestos a Supabase:', error.message);
-      }
-    }
-
-    function programarGuardadoSupabase(key) {
-      if (!key || !presupuestos[key]) return;
-
-      presupuestosPendientesSync.add(key);
-
-      if (guardadoSupabaseTimeout) {
-        clearTimeout(guardadoSupabaseTimeout);
-      }
-
-      guardadoSupabaseTimeout = setTimeout(async () => {
-        const keysPendientes = Array.from(presupuestosPendientesSync);
-        presupuestosPendientesSync.clear();
-
-        for (const keyPendiente of keysPendientes) {
-          await guardarPresupuestoEnSupabase(keyPendiente);
-        }
-      }, 500);
-    }
-
-    async function sincronizarPresupuestosIniciales() {
-      const presupuestosLocales = leerPresupuestosLocales();
-      const ownerLocal = localStorage.getItem(storageOwnerKey) || '';
-      const user = await obtenerUsuarioActual();
-      const cargoRemotos = await cargarPresupuestosDesdeSupabase();
-
-      if (!cargoRemotos) {
-        presupuestos = presupuestosLocales;
-        Object.keys(presupuestos).forEach(asegurarEstructuraPresupuesto);
-        if (user) guardarOwnerLocal(user.id);
-        guardarTodoLocal();
-        return;
-      }
-
-      const hayRemotos = Object.keys(presupuestos).length > 0;
-      const hayLocales = Object.keys(presupuestosLocales).length > 0;
-      const localPerteneceAlUsuario = !ownerLocal || (user && ownerLocal === user.id);
-
-      if (!hayRemotos && hayLocales && localPerteneceAlUsuario) {
-        presupuestos = presupuestosLocales;
-        Object.keys(presupuestos).forEach(asegurarEstructuraPresupuesto);
-        if (user) guardarOwnerLocal(user.id);
-        guardarTodoLocal();
-        await guardarTodosLosPresupuestosEnSupabase();
-        await cargarPresupuestosDesdeSupabase();
-      }
-    }
-
-    function guardarTodo() {
-      guardarTodoLocal();
-      programarGuardadoSupabase(presupuestoActualKey);
-    }
-
-    function crearIngresoVacio() {
-      return {
-        descripcion: '',
-        valor: '',
-        periodicidad: 'MENSUAL',
-        recibido: false
-      };
-    }
-
-    function crearGastoVacio() {
-      return {
-        descripcion: '',
-        valor: '',
-        periodicidad: 'MENSUAL',
-        pagado: false
-      };
-    }
-
-    function crearAhorroVacio() {
-      return {
-        descripcion: '',
-        valor: '',
-        periodicidad: 'MENSUAL',
-        pagado: false
-      };
-    }
-
-    function crearCxcVacia() {
-      return {
-        descripcion: '',
-        valor: '',
-        cobrado: false
-      };
-    }
-
-    function crearCxpVacia() {
-      return {
-        descripcion: '',
-        valor: '',
-        pagado: false
-      };
-    }
-
-    function asegurarEstructuraPresupuesto(key) {
-      if (!presupuestos[key]) return;
-
-      if (!Array.isArray(presupuestos[key].ingresos)) {
-        presupuestos[key].ingresos = [];
-      }
-
-      presupuestos[key].ingresos = presupuestos[key].ingresos.map((ingreso) => ({
-        descripcion: ingreso.descripcion || '',
-        valor: ingreso.valor || '',
-        periodicidad: ingreso.periodicidad || 'MENSUAL',
-        recibido: Boolean(ingreso.recibido)
-      }));
-
-      if (!Array.isArray(presupuestos[key].gastos)) {
-        presupuestos[key].gastos = [];
-      }
-
-      presupuestos[key].gastos = presupuestos[key].gastos.map((gasto) => ({
-        descripcion: gasto.descripcion || '',
-        valor: gasto.valor || '',
-        periodicidad: gasto.periodicidad || 'MENSUAL',
-        pagado: Boolean(gasto.pagado)
-      }));
-
-      if (!Array.isArray(presupuestos[key].ahorros)) {
-        presupuestos[key].ahorros = [];
-      }
-
-      presupuestos[key].ahorros = presupuestos[key].ahorros.map((ahorro) => ({
-        descripcion: ahorro.descripcion || '',
-        valor: ahorro.valor || '',
-        periodicidad: ahorro.periodicidad || 'MENSUAL',
-        pagado: Boolean(ahorro.pagado)
-      }));
-
-      if (!Array.isArray(presupuestos[key].cuentasPorCobrar)) {
-        presupuestos[key].cuentasPorCobrar = [];
-      }
-
-      presupuestos[key].cuentasPorCobrar = presupuestos[key].cuentasPorCobrar.map((item) => ({
-        descripcion: item.descripcion || '',
-        valor: item.valor || '',
-        cobrado: Boolean(item.cobrado)
-      }));
-
-      if (!Array.isArray(presupuestos[key].cuentasPorPagar)) {
-        presupuestos[key].cuentasPorPagar = [];
-      }
-
-      presupuestos[key].cuentasPorPagar = presupuestos[key].cuentasPorPagar.map((item) => ({
-        descripcion: item.descripcion || '',
-        valor: item.valor || '',
-        pagado: Boolean(item.pagado)
-      }));
-
-      const disponibleAnterior = presupuestos[key].disponibleActual || {};
-      const sumaAnterior =
-        Number(disponibleAnterior.cuentasBancarias || 0) +
-        Number(disponibleAnterior.efectivo || 0);
-
-      presupuestos[key].disponibleActual = {
-        valorManual: String(disponibleAnterior.valorManual ?? (sumaAnterior || '')),
-        usarManual: false
-      };
-    }
-
-    function mostrarSoloEncabezado() {
-      modulosPresupuesto.style.display = 'none';
-      crearPresupuestoWrap.style.display = 'flex';
-      presupuestoActivo.style.display = 'none';
-      presupuestoActivoTexto.textContent = '';
-    }
-
-    function mostrarPresupuestoActivo() {
-      modulosPresupuesto.style.display = 'block';
-      crearPresupuestoWrap.style.display = 'none';
-      actualizarEtiquetaPresupuestoActivo();
-      presupuestoActivo.style.display = 'flex';
-    }
-
-    function obtenerKeySeleccionActual() {
-      const mes = mesSelect.value;
-      const anio = anioInput.value.trim();
-
-      if (!/^\d{4}$/.test(anio)) return '';
-      return `${anio}-${mes}`;
-    }
-
-    function calcularDisponibleAutomatico(presupuesto) {
-      const ingresosRecibidos = presupuesto.ingresos
-        .filter((item) => item.recibido)
-        .reduce((acc, item) => acc + (Number(item.valor) || 0), 0);
-
-      const gastosPagados = presupuesto.gastos
-        .filter((item) => item.pagado)
-        .reduce((acc, item) => acc + (Number(item.valor) || 0), 0);
-
-      const ahorrosPagados = presupuesto.ahorros
-        .filter((item) => item.pagado)
-        .reduce((acc, item) => acc + (Number(item.valor) || 0), 0);
-
-      return ingresosRecibidos - gastosPagados - ahorrosPagados;
-    }
-
-    function calcularPendiente(presupuesto) {
-      const gastosPendientes = presupuesto.gastos
-        .filter((item) => !item.pagado)
-        .reduce((acc, item) => acc + (Number(item.valor) || 0), 0);
-
-      const ahorrosPendientes = presupuesto.ahorros
-        .filter((item) => !item.pagado)
-        .reduce((acc, item) => acc + (Number(item.valor) || 0), 0);
-
-      return gastosPendientes + ahorrosPendientes;
-    }
-
-    function obtenerDisponibleBase(presupuesto) {
-      return calcularDisponibleAutomatico(presupuesto);
-    }
-
-    function abrirPresupuestoExistente(key) {
-      if (!presupuestos[key]) return;
-
-      presupuestoActualKey = key;
-      asegurarEstructuraPresupuesto(key);
-
-      guardarTodo();
-      renderIngresos();
-      renderGastos();
-      renderAhorros();
-      renderCxc();
-      renderCxp();
-      actualizarDisponibleActual();
-      mostrarPresupuestoActivo();
-    }
-
-    function evaluarVistaSegunSeleccion() {
-      const key = obtenerKeySeleccionActual();
-
-      if (!key) {
-        mostrarSoloEncabezado();
-        return;
-      }
-
-      if (presupuestos[key]) {
-        abrirPresupuestoExistente(key);
-        return;
-      }
-
-      mostrarSoloEncabezado();
-    }
-
-    function actualizarResumenIngresos() {
-      if (!presupuestoActualKey || !presupuestos[presupuestoActualKey]) {
-        totalIngresos.textContent = formatoMoneda(0);
-        return;
-      }
-
-      const ingresos = presupuestos[presupuestoActualKey].ingresos;
-      const total = ingresos.reduce((acc, fila) => acc + (Number(fila.valor) || 0), 0);
-      totalIngresos.textContent = formatoMoneda(total);
-    }
-
-    function actualizarResumenGastos() {
-      if (!presupuestoActualKey || !presupuestos[presupuestoActualKey]) {
-        totalGastos.textContent = formatoMoneda(0);
-        return;
-      }
-
-      const gastos = presupuestos[presupuestoActualKey].gastos;
-      const total = gastos.reduce((acc, fila) => acc + (Number(fila.valor) || 0), 0);
-      totalGastos.textContent = formatoMoneda(total);
-    }
-
-    function actualizarResumenAhorros() {
-      if (!presupuestoActualKey || !presupuestos[presupuestoActualKey]) {
-        totalAhorros.textContent = formatoMoneda(0);
-        totalAhorrosAcumulados.textContent = formatoMoneda(0);
-        return;
-      }
-
-      const ahorros = presupuestos[presupuestoActualKey].ahorros;
-      const total = ahorros.reduce((acc, fila) => acc + (Number(fila.valor) || 0), 0);
-      totalAhorros.textContent = formatoMoneda(total);
-      
-      const totalAcumulado = Object.entries(presupuestos).reduce((acc, [key, presupuesto]) => {
-        if (key > presupuestoActualKey) return acc;
-        const subtotal = (presupuesto.ahorros || []).reduce((suma, fila) => suma + (Number(fila.valor) || 0), 0);
-        return acc + subtotal;
-      }, 0);
-      totalAhorrosAcumulados.textContent = formatoMoneda(totalAcumulado);
-    }
-
-    function pintarValorResumen(elemento, caja, valor, clasePositiva) {
-      if (!elemento || !caja) return;
-
-      caja.classList.remove('value-warning', 'value-success', 'value-danger');
-
-      if (valor < 0) {
-        caja.classList.add('value-danger');
-        elemento.textContent = `⚠️ ${formatoMoneda(valor)}`;
-        return;
-      }
-
-      caja.classList.add(clasePositiva);
-      elemento.textContent = formatoMoneda(valor);
-    }
-
-    function actualizarDisponibleActual() {
-      if (!presupuestoActualKey || !presupuestos[presupuestoActualKey]) {
-        pendientePorPagar.textContent = formatoMoneda(0);
-        disponibleBase.textContent = formatoMoneda(0);
-        disponibleReal.textContent = formatoMoneda(0);
-
-        if (disponibleBaseBox) {
-          disponibleBaseBox.classList.remove('value-danger', 'value-success');
-          disponibleBaseBox.classList.add('value-warning');
-        }
-
-        const disponibleRealBoxVacio = disponibleReal.closest('.summary-box');
-        if (disponibleRealBoxVacio) {
-          disponibleRealBoxVacio.classList.remove('value-danger');
-          disponibleRealBoxVacio.classList.add('value-success');
-        }
-
-        if (disponibleManualToggle) disponibleManualToggle.checked = false;
-        return;
-      }
-
-      asegurarEstructuraPresupuesto(presupuestoActualKey);
-
-      const presupuesto = presupuestos[presupuestoActualKey];
-      const disponibleAntesPendientes = obtenerDisponibleBase(presupuesto);
-      const pendiente = calcularPendiente(presupuesto);
-      const disponible = disponibleAntesPendientes - pendiente;
-
-      pendientePorPagar.textContent = formatoMoneda(pendiente);
-
-      pintarValorResumen(disponibleBase, disponibleBaseBox, disponibleAntesPendientes, 'value-warning');
-
-      const disponibleRealBox = disponibleReal.closest('.summary-box');
-      pintarValorResumen(disponibleReal, disponibleRealBox, disponible, 'value-success');
-
-      if (disponibleManualToggle) disponibleManualToggle.checked = false;
-    }
-
-
-function actualizarResumenProvision() {
-  const totalAnual = provisionGastoData.items.reduce((acc, item) => acc + (Number(item.valor) || 0), 0);
-  const mensual = totalAnual / 12;
-
-  totalProvisionAnual.textContent = formatoMoneda(totalAnual);
-  totalProvisionMensual.textContent = formatoMoneda(mensual);
-}
-
-function renderProvisionGasto() {
-  tablaProvision.innerHTML = '';
-
-  if (!Array.isArray(provisionGastoData.items) || provisionGastoData.items.length === 0) {
-    const tr = document.createElement('tr');
-    tr.innerHTML = '<td colspan="3" class="empty-row">Aún no has agregado gastos anuales para provisionar.</td>';
-    tablaProvision.appendChild(tr);
-  }
-
-  provisionGastoData.items.forEach((fila, index) => {
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td class="col-concepto">
-        <input type="text" value="${fila.descripcion || ''}" placeholder="Ej. SOAT, impuestos, matrícula" data-index="${index}" data-field="descripcion" />
-      </td>
-      <td class="col-valor">
-        <input type="text" inputmode="numeric" value="${formatoNumeroInput(fila.valor)}" placeholder="0" data-index="${index}" data-field="valor" />
-      </td>
-      <td class="col-eliminar">
-        <button type="button" class="delete-mini" data-index="${index}" data-action="eliminar" title="Eliminar gasto anual">×</button>
-      </td>
-    `;
-    tablaProvision.appendChild(tr);
-  });
-
-  actualizarResumenProvision();
-  activarEventosFilasProvision();
-}
-
-function activarEventosFilasProvision() {
-  const campos = tablaProvision.querySelectorAll('input');
-  campos.forEach((campo) => {
-    campo.addEventListener('input', manejarCambioProvision);
-    campo.addEventListener('change', manejarCambioProvision);
-  });
-}
-
-function manejarCambioProvision(e) {
-  const index = Number(e.target.dataset.index);
-  const field = e.target.dataset.field;
-
-  if (Number.isNaN(index) || !provisionGastoData.items[index]) return;
-
-  let value = e.target.value;
-  if (field === 'valor') {
-    value = value.replace(/\D/g, '');
-    provisionGastoData.items[index][field] = value;
-    e.target.value = formatoNumeroInput(value);
-  } else {
-    provisionGastoData.items[index][field] = value;
-  }
-
-  programarGuardadoProvision();
-  actualizarResumenProvision();
-}
-
-function manejarAccionesTablaProvision(e) {
-  const action = e.target.dataset.action;
-  const index = Number(e.target.dataset.index);
-
-  if (action !== 'eliminar' || Number.isNaN(index)) return;
-
-  provisionGastoData.items.splice(index, 1);
-  programarGuardadoProvision();
-  renderProvisionGasto();
-}
-
-function agregarProvision() {
-  provisionGastoData.items.push(crearProvisionVacia());
-  programarGuardadoProvision();
-  renderProvisionGasto();
-
-  const nuevoIndex = provisionGastoData.items.length - 1;
-  const nuevoCampo = tablaProvision.querySelector(`[data-index="${nuevoIndex}"][data-field="descripcion"]`);
-  if (nuevoCampo) nuevoCampo.focus();
-}
-
-    function renderIngresos() {
-      tablaIngresos.innerHTML = '';
-
-      if (!presupuestoActualKey || !presupuestos[presupuestoActualKey]) {
-        totalIngresos.textContent = formatoMoneda(0);
-        return;
-      }
-
-      asegurarEstructuraPresupuesto(presupuestoActualKey);
-      const ingresos = presupuestos[presupuestoActualKey].ingresos;
-
-      if (ingresos.length === 0) {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `<td colspan="5" class="empty-row">Aún no has agregado ingresos para este mes.</td>`;
-        tablaIngresos.appendChild(tr);
-      }
-
-      ingresos.forEach((fila, index) => {
-        const clasePendiente = fila.recibido ? '' : 'fila-ingreso-pendiente';
-
-        const tr = document.createElement('tr');
-        tr.className = clasePendiente;
-        tr.innerHTML = `
-          <td class="col-concepto">
-            <input type="text" value="${fila.descripcion || ''}" placeholder="Ej. Nómina" data-index="${index}" data-field="descripcion" />
-          </td>
-          <td class="col-valor">
-            <input type="text" inputmode="numeric" value="${formatoNumeroInput(fila.valor)}" placeholder="0" data-index="${index}" data-field="valor" />
-          </td>
-          <td class="col-freq">
-            <select data-index="${index}" data-field="periodicidad">
-              <option value="MENSUAL" ${fila.periodicidad === 'MENSUAL' ? 'selected' : ''}>M</option>
-              <option value="ANUAL" ${fila.periodicidad === 'ANUAL' ? 'selected' : ''}>A</option>
-              <option value="OCASIONAL" ${fila.periodicidad === 'OCASIONAL' ? 'selected' : ''}>O</option>
-            </select>
-          </td>
-          <td class="col-pagado">
-            <div class="check-wrap">
-              <input type="checkbox" class="paid-check" ${fila.recibido ? 'checked' : ''} data-index="${index}" data-field="recibido" title="Marcar como recibido" />
-            </div>
-          </td>
-          <td class="col-eliminar">
-            <button type="button" class="delete-mini" data-index="${index}" data-action="eliminar" title="Eliminar ingreso">×</button>
-          </td>
-        `;
-        tablaIngresos.appendChild(tr);
-      });
-
-      actualizarResumenIngresos();
-      activarEventosFilasIngresos();
-    }
-
-    function renderGastos() {
-      tablaGastos.innerHTML = '';
-
-      if (!presupuestoActualKey || !presupuestos[presupuestoActualKey]) {
-        totalGastos.textContent = formatoMoneda(0);
-        return;
-      }
-
-      asegurarEstructuraPresupuesto(presupuestoActualKey);
-      const gastos = presupuestos[presupuestoActualKey].gastos;
-
-      if (gastos.length === 0) {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `<td colspan="5" class="empty-row">Aún no has agregado gastos para este mes.</td>`;
-        tablaGastos.appendChild(tr);
-      }
-
-      gastos.forEach((fila, index) => {
-        const clasePendiente = fila.pagado ? '' : 'fila-gasto-pendiente';
-
-        const tr = document.createElement('tr');
-        tr.className = clasePendiente;
-        tr.innerHTML = `
-          <td class="col-concepto">
-            <input type="text" value="${fila.descripcion || ''}" placeholder="Ej. Arriendo" data-index="${index}" data-field="descripcion" />
-          </td>
-          <td class="col-valor">
-            <input type="text" inputmode="numeric" value="${formatoNumeroInput(fila.valor)}" placeholder="0" data-index="${index}" data-field="valor" />
-          </td>
-          <td class="col-freq">
-            <select data-index="${index}" data-field="periodicidad">
-              <option value="MENSUAL" ${fila.periodicidad === 'MENSUAL' ? 'selected' : ''}>M</option>
-              <option value="ANUAL" ${fila.periodicidad === 'ANUAL' ? 'selected' : ''}>A</option>
-              <option value="OCASIONAL" ${fila.periodicidad === 'OCASIONAL' ? 'selected' : ''}>O</option>
-            </select>
-          </td>
-          <td class="col-pagado">
-            <div class="check-wrap">
-              <input type="checkbox" class="paid-check" ${fila.pagado ? 'checked' : ''} data-index="${index}" data-field="pagado" title="Marcar como pagado" />
-            </div>
-          </td>
-          <td class="col-eliminar">
-            <button type="button" class="delete-mini" data-index="${index}" data-action="eliminar" title="Eliminar gasto">×</button>
-          </td>
-        `;
-        tablaGastos.appendChild(tr);
-      });
-
-      actualizarResumenGastos();
-      activarEventosFilasGastos();
-    }
-
-    function renderAhorros() {
-      tablaAhorros.innerHTML = '';
-
-      if (!presupuestoActualKey || !presupuestos[presupuestoActualKey]) {
-        totalAhorros.textContent = formatoMoneda(0);
-                totalAhorrosAcumulados.textContent = formatoMoneda(0);
-        return;
-      }
-
-      asegurarEstructuraPresupuesto(presupuestoActualKey);
-      const ahorros = presupuestos[presupuestoActualKey].ahorros;
-
-      if (ahorros.length === 0) {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `<td colspan="5" class="empty-row">Aún no has agregado ahorros para este mes.</td>`;
-        tablaAhorros.appendChild(tr);
-      }
-
-      ahorros.forEach((fila, index) => {
-        const clasePendiente = fila.pagado ? '' : 'fila-ahorro-pendiente';
-
-        const tr = document.createElement('tr');
-        tr.className = clasePendiente;
-        tr.innerHTML = `
-          <td class="col-concepto">
-            <input type="text" value="${fila.descripcion || ''}" placeholder="Ej. Fondo viaje" data-index="${index}" data-field="descripcion" />
-          </td>
-          <td class="col-valor">
-            <input type="text" inputmode="numeric" value="${formatoNumeroInputConSigno(fila.valor)}" placeholder="0" data-index="${index}" data-field="valor" />          </td>
-          <td class="col-freq">
-            <select data-index="${index}" data-field="periodicidad">
-              <option value="MENSUAL" ${fila.periodicidad === 'MENSUAL' ? 'selected' : ''}>M</option>
-              <option value="ANUAL" ${fila.periodicidad === 'ANUAL' ? 'selected' : ''}>A</option>
-              <option value="OCASIONAL" ${fila.periodicidad === 'OCASIONAL' ? 'selected' : ''}>O</option>
-            </select>
-          </td>
-          <td class="col-pagado">
-            <div class="check-wrap">
-              <input type="checkbox" class="paid-check" ${fila.pagado ? 'checked' : ''} data-index="${index}" data-field="pagado" title="Marcar como realizado" />
-            </div>
-          </td>
-          <td class="col-eliminar">
-            <button type="button" class="delete-mini" data-index="${index}" data-action="eliminar" title="Eliminar ahorro">×</button>
-          </td>
-        `;
-        tablaAhorros.appendChild(tr);
-      });
-
-      actualizarResumenAhorros();
-      activarEventosFilasAhorros();
-    }
-
-
-    function actualizarResumenCxc() {
-      if (!presupuestoActualKey || !presupuestos[presupuestoActualKey]) {
-        totalCxc.textContent = formatoMoneda(0);
-        return;
-      }
-
-      const items = presupuestos[presupuestoActualKey].cuentasPorCobrar || [];
-      const total = items
-        .filter((item) => !item.cobrado)
-        .reduce((acc, fila) => acc + (Number(fila.valor) || 0), 0);
-      totalCxc.textContent = formatoMoneda(total);
-    }
-
-    function actualizarResumenCxp() {
-      if (!presupuestoActualKey || !presupuestos[presupuestoActualKey]) {
-        totalCxp.textContent = formatoMoneda(0);
-        return;
-      }
-
-      const items = presupuestos[presupuestoActualKey].cuentasPorPagar || [];
-      const total = items
-        .filter((item) => !item.pagado)
-        .reduce((acc, fila) => acc + (Number(fila.valor) || 0), 0);
-      totalCxp.textContent = formatoMoneda(total);
-    }
-
-    function renderCxc() {
-      tablaCxc.innerHTML = '';
-
-      if (!presupuestoActualKey || !presupuestos[presupuestoActualKey]) {
-        totalCxc.textContent = formatoMoneda(0);
-        return;
-      }
-
-      asegurarEstructuraPresupuesto(presupuestoActualKey);
-      const items = presupuestos[presupuestoActualKey].cuentasPorCobrar;
-
-      if (items.length === 0) {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `<td colspan="4" class="empty-row">Aún no has agregado cuentas por cobrar para este mes.</td>`;
-        tablaCxc.appendChild(tr);
-      }
-
-      items.forEach((fila, index) => {
-        const clasePendiente = fila.cobrado ? '' : 'fila-cxc-pendiente';
-        const tr = document.createElement('tr');
-        tr.className = clasePendiente;
-        tr.innerHTML = `
-          <td class="col-concepto">
-            <input type="text" value="${fila.descripcion || ''}" placeholder="Ej. Préstamo a Juan" data-index="${index}" data-field="descripcion" />
-          </td>
-          <td class="col-valor">
-            <input type="text" inputmode="numeric" value="${formatoNumeroInput(fila.valor)}" placeholder="0" data-index="${index}" data-field="valor" />
-          </td>
-          <td class="col-pagado">
-            <div class="check-wrap">
-              <input type="checkbox" class="paid-check" ${fila.cobrado ? 'checked' : ''} data-index="${index}" data-field="cobrado" title="Marcar como cobrado" />
-            </div>
-          </td>
-          <td class="col-eliminar">
-            <button type="button" class="delete-mini" data-index="${index}" data-action="eliminar" title="Eliminar cuenta">×</button>
-          </td>
-        `;
-        tablaCxc.appendChild(tr);
-      });
-
-      actualizarResumenCxc();
-      activarEventosFilasCxc();
-    }
-
-    function renderCxp() {
-      tablaCxp.innerHTML = '';
-
-      if (!presupuestoActualKey || !presupuestos[presupuestoActualKey]) {
-        totalCxp.textContent = formatoMoneda(0);
-        return;
-      }
-
-      asegurarEstructuraPresupuesto(presupuestoActualKey);
-      const items = presupuestos[presupuestoActualKey].cuentasPorPagar;
-
-      if (items.length === 0) {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `<td colspan="4" class="empty-row">Aún no has agregado cuentas por pagar para este mes.</td>`;
-        tablaCxp.appendChild(tr);
-      }
-
-      items.forEach((fila, index) => {
-        const clasePendiente = fila.pagado ? '' : 'fila-cxp-pendiente';
-        const tr = document.createElement('tr');
-        tr.className = clasePendiente;
-        tr.innerHTML = `
-          <td class="col-concepto">
-            <input type="text" value="${fila.descripcion || ''}" placeholder="Ej. Cuota pendiente" data-index="${index}" data-field="descripcion" />
-          </td>
-          <td class="col-valor">
-            <input type="text" inputmode="numeric" value="${formatoNumeroInput(fila.valor)}" placeholder="0" data-index="${index}" data-field="valor" />
-          </td>
-          <td class="col-pagado">
-            <div class="check-wrap">
-              <input type="checkbox" class="paid-check" ${fila.pagado ? 'checked' : ''} data-index="${index}" data-field="pagado" title="Marcar como pagado" />
-            </div>
-          </td>
-          <td class="col-eliminar">
-            <button type="button" class="delete-mini" data-index="${index}" data-action="eliminar" title="Eliminar cuenta">×</button>
-          </td>
-        `;
-        tablaCxp.appendChild(tr);
-      });
-
-      actualizarResumenCxp();
-      activarEventosFilasCxp();
-    }
-
-    function activarEventosFilasCxc() {
-      const campos = tablaCxc.querySelectorAll('input');
-      campos.forEach((campo) => {
-        if (campo.type === 'checkbox') {
-          campo.addEventListener('change', manejarCambioCxc);
-        } else {
-          campo.addEventListener('input', manejarCambioCxc);
-          campo.addEventListener('change', manejarCambioCxc);
-        }
-      });
-    }
-
-    function activarEventosFilasCxp() {
-      const campos = tablaCxp.querySelectorAll('input');
-      campos.forEach((campo) => {
-        if (campo.type === 'checkbox') {
-          campo.addEventListener('change', manejarCambioCxp);
-        } else {
-          campo.addEventListener('input', manejarCambioCxp);
-          campo.addEventListener('change', manejarCambioCxp);
-        }
-      });
-    }
-
-    function manejarCambioCxc(e) {
-      const index = Number(e.target.dataset.index);
-      const field = e.target.dataset.field;
-
-      if (!presupuestoActualKey || !presupuestos[presupuestoActualKey] || Number.isNaN(index)) return;
-
-      if (field === 'cobrado') {
-        presupuestos[presupuestoActualKey].cuentasPorCobrar[index][field] = e.target.checked;
-        guardarTodo();
-        renderCxc();
-        return;
-      }
-
-      let value = e.target.value;
-      if (field === 'valor') {
-        value = value.replace(/\D/g, '');
-        presupuestos[presupuestoActualKey].cuentasPorCobrar[index][field] = value;
-        e.target.value = formatoNumeroInput(value);
-      } else {
-        presupuestos[presupuestoActualKey].cuentasPorCobrar[index][field] = value;
-      }
-
-      guardarTodo();
-      actualizarResumenCxc();
-    }
-
-    function manejarCambioCxp(e) {
-      const index = Number(e.target.dataset.index);
-      const field = e.target.dataset.field;
-
-      if (!presupuestoActualKey || !presupuestos[presupuestoActualKey] || Number.isNaN(index)) return;
-
-      if (field === 'pagado') {
-        presupuestos[presupuestoActualKey].cuentasPorPagar[index][field] = e.target.checked;
-        guardarTodo();
-        renderCxp();
-        return;
-      }
-
-      let value = e.target.value;
-      if (field === 'valor') {
-        value = value.replace(/\D/g, '');
-        presupuestos[presupuestoActualKey].cuentasPorPagar[index][field] = value;
-        e.target.value = formatoNumeroInput(value);
-      } else {
-        presupuestos[presupuestoActualKey].cuentasPorPagar[index][field] = value;
-      }
-
-      guardarTodo();
-      actualizarResumenCxp();
-    }
-
-    function manejarAccionesTablaCxc(e) {
-      const action = e.target.dataset.action;
-      const index = Number(e.target.dataset.index);
-
-      if (action !== 'eliminar' || !presupuestoActualKey || !presupuestos[presupuestoActualKey] || Number.isNaN(index)) return;
-
-      presupuestos[presupuestoActualKey].cuentasPorCobrar.splice(index, 1);
-      guardarTodo();
-      renderCxc();
-    }
-
-    function manejarAccionesTablaCxp(e) {
-      const action = e.target.dataset.action;
-      const index = Number(e.target.dataset.index);
-
-      if (action !== 'eliminar' || !presupuestoActualKey || !presupuestos[presupuestoActualKey] || Number.isNaN(index)) return;
-
-      presupuestos[presupuestoActualKey].cuentasPorPagar.splice(index, 1);
-      guardarTodo();
-      renderCxp();
-    }
-
-    function agregarCxc() {
-      if (!presupuestoActualKey || !presupuestos[presupuestoActualKey]) {
-        alert('Primero crea o abre un presupuesto.');
-        return;
-      }
-
-      asegurarEstructuraPresupuesto(presupuestoActualKey);
-      presupuestos[presupuestoActualKey].cuentasPorCobrar.push(crearCxcVacia());
-      guardarTodo();
-      renderCxc();
-
-      const nuevoIndex = presupuestos[presupuestoActualKey].cuentasPorCobrar.length - 1;
-      const nuevoCampo = tablaCxc.querySelector(`[data-index="${nuevoIndex}"][data-field="descripcion"]`);
-      if (nuevoCampo) nuevoCampo.focus();
-    }
-
-    function agregarCxp() {
-      if (!presupuestoActualKey || !presupuestos[presupuestoActualKey]) {
-        alert('Primero crea o abre un presupuesto.');
-        return;
-      }
-
-      asegurarEstructuraPresupuesto(presupuestoActualKey);
-      presupuestos[presupuestoActualKey].cuentasPorPagar.push(crearCxpVacia());
-      guardarTodo();
-      renderCxp();
-
-      const nuevoIndex = presupuestos[presupuestoActualKey].cuentasPorPagar.length - 1;
-      const nuevoCampo = tablaCxp.querySelector(`[data-index="${nuevoIndex}"][data-field="descripcion"]`);
-      if (nuevoCampo) nuevoCampo.focus();
-    }
-
-    function activarEventosFilasIngresos() {
-      const campos = tablaIngresos.querySelectorAll('input, select');
-
-      campos.forEach((campo) => {
-        if (campo.type === 'checkbox') {
-          campo.addEventListener('change', manejarCambioIngreso);
-        } else {
-          campo.addEventListener('input', manejarCambioIngreso);
-          campo.addEventListener('change', manejarCambioIngreso);
-        }
-      });
-    }
-
-    function activarEventosFilasGastos() {
-      const campos = tablaGastos.querySelectorAll('input, select');
-      campos.forEach((campo) => {
-        if (campo.type === 'checkbox') {
-          campo.addEventListener('change', manejarCambioGasto);
-        } else {
-          campo.addEventListener('input', manejarCambioGasto);
-          campo.addEventListener('change', manejarCambioGasto);
-        }
-      });
-    }
-
-    function activarEventosFilasAhorros() {
-      const campos = tablaAhorros.querySelectorAll('input, select');
-      campos.forEach((campo) => {
-        if (campo.type === 'checkbox') {
-          campo.addEventListener('change', manejarCambioAhorro);
-        } else {
-          campo.addEventListener('input', manejarCambioAhorro);
-          campo.addEventListener('change', manejarCambioAhorro);
-        }
-      });
-    }
-
-    function manejarCambioIngreso(e) {
-      const index = Number(e.target.dataset.index);
-      const field = e.target.dataset.field;
-
-      if (!presupuestoActualKey || !presupuestos[presupuestoActualKey] || Number.isNaN(index)) return;
-
-      if (field === 'recibido') {
-        presupuestos[presupuestoActualKey].ingresos[index][field] = e.target.checked;
-        guardarTodo();
-        actualizarResumenIngresos();
-        actualizarDisponibleActual();
-        renderIngresos();
-        return;
-      }
-
-      let value = e.target.value;
-      if (field === 'valor') {
-        value = value.replace(/\D/g, '');
-        presupuestos[presupuestoActualKey].ingresos[index][field] = value;
-        e.target.value = formatoNumeroInput(value);
-      } else {
-        presupuestos[presupuestoActualKey].ingresos[index][field] = value;
-      }
-
-      guardarTodo();
-      actualizarResumenIngresos();
-      actualizarDisponibleActual();
-    }
-
-    function manejarCambioGasto(e) {
-      const index = Number(e.target.dataset.index);
-      const field = e.target.dataset.field;
-
-      if (!presupuestoActualKey || !presupuestos[presupuestoActualKey] || Number.isNaN(index)) return;
-
-      if (field === 'pagado') {
-        presupuestos[presupuestoActualKey].gastos[index][field] = e.target.checked;
-        guardarTodo();
-        actualizarResumenGastos();
-        actualizarDisponibleActual();
-        renderGastos();
-        return;
-      }
-
-      let value = e.target.value;
-      if (field === 'valor') {
-        value = value.replace(/\D/g, '');
-        presupuestos[presupuestoActualKey].gastos[index][field] = value;
-        e.target.value = formatoNumeroInput(value);
-      } else {
-        presupuestos[presupuestoActualKey].gastos[index][field] = value;
-      }
-
-      guardarTodo();
-      actualizarResumenGastos();
-      actualizarDisponibleActual();
-    }
-
-    function manejarCambioAhorro(e) {
-      const index = Number(e.target.dataset.index);
-      const field = e.target.dataset.field;
-
-      if (!presupuestoActualKey || !presupuestos[presupuestoActualKey] || Number.isNaN(index)) return;
-
-      if (field === 'pagado') {
-        presupuestos[presupuestoActualKey].ahorros[index][field] = e.target.checked;
-        guardarTodo();
-        actualizarResumenAhorros();
-        actualizarDisponibleActual();
-        renderAhorros();
-        return;
-      }
-
-      let value = e.target.value;
-      if (field === 'valor') {
-        value = normalizarNumeroConSigno(value);
-        presupuestos[presupuestoActualKey].ahorros[index][field] = value;
- e.target.value = formatoNumeroInputConSigno(value);
-      } else {
-        presupuestos[presupuestoActualKey].ahorros[index][field] = value;
-      }
-
-      guardarTodo();
-      actualizarResumenAhorros();
-      actualizarDisponibleActual();
-    }
-
-    function manejarCambioDisponibleBase() {
-      actualizarDisponibleActual();
-    }
-
-    function manejarCambioModoManual() {
-      actualizarDisponibleActual();
-    }
-
-    function manejarAccionesTablaIngresos(e) {
-      const action = e.target.dataset.action;
-      const index = Number(e.target.dataset.index);
-
-      if (action !== 'eliminar' || !presupuestoActualKey || !presupuestos[presupuestoActualKey] || Number.isNaN(index)) return;
-
-      presupuestos[presupuestoActualKey].ingresos.splice(index, 1);
-      guardarTodo();
-      renderIngresos();
-      actualizarDisponibleActual();
-    }
-
-    function manejarAccionesTablaGastos(e) {
-      const action = e.target.dataset.action;
-      const index = Number(e.target.dataset.index);
-
-      if (action !== 'eliminar' || !presupuestoActualKey || !presupuestos[presupuestoActualKey] || Number.isNaN(index)) return;
-
-      presupuestos[presupuestoActualKey].gastos.splice(index, 1);
-      guardarTodo();
-      renderGastos();
-      actualizarDisponibleActual();
-    }
-
-    function manejarAccionesTablaAhorros(e) {
-      const action = e.target.dataset.action;
-      const index = Number(e.target.dataset.index);
-
-      if (action !== 'eliminar' || !presupuestoActualKey || !presupuestos[presupuestoActualKey] || Number.isNaN(index)) return;
-
-      presupuestos[presupuestoActualKey].ahorros.splice(index, 1);
-      guardarTodo();
-      renderAhorros();
-      actualizarDisponibleActual();
-    }
-
-    function agregarIngreso() {
-      if (!presupuestoActualKey || !presupuestos[presupuestoActualKey]) {
-        alert('Primero crea o abre un presupuesto.');
-        return;
-      }
-
-      asegurarEstructuraPresupuesto(presupuestoActualKey);
-      presupuestos[presupuestoActualKey].ingresos.push(crearIngresoVacio());
-      guardarTodo();
-      renderIngresos();
-
-      const nuevoIndex = presupuestos[presupuestoActualKey].ingresos.length - 1;
-      const nuevoCampo = tablaIngresos.querySelector(`[data-index="${nuevoIndex}"][data-field="descripcion"]`);
-      if (nuevoCampo) nuevoCampo.focus();
-    }
-
-    function agregarGasto() {
-      if (!presupuestoActualKey || !presupuestos[presupuestoActualKey]) {
-        alert('Primero crea o abre un presupuesto.');
-        return;
-      }
-
-      asegurarEstructuraPresupuesto(presupuestoActualKey);
-      presupuestos[presupuestoActualKey].gastos.push(crearGastoVacio());
-      guardarTodo();
-      renderGastos();
-      actualizarDisponibleActual();
-
-      const nuevoIndex = presupuestos[presupuestoActualKey].gastos.length - 1;
-      const nuevoCampo = tablaGastos.querySelector(`[data-index="${nuevoIndex}"][data-field="descripcion"]`);
-      if (nuevoCampo) nuevoCampo.focus();
-    }
-
-    function agregarAhorro() {
-      if (!presupuestoActualKey || !presupuestos[presupuestoActualKey]) {
-        alert('Primero crea o abre un presupuesto.');
-        return;
-      }
-
-      asegurarEstructuraPresupuesto(presupuestoActualKey);
-      presupuestos[presupuestoActualKey].ahorros.push(crearAhorroVacio());
-      guardarTodo();
-      renderAhorros();
-      actualizarDisponibleActual();
-
-      const nuevoIndex = presupuestos[presupuestoActualKey].ahorros.length - 1;
-      const nuevoCampo = tablaAhorros.querySelector(`[data-index="${nuevoIndex}"][data-field="descripcion"]`);
-      if (nuevoCampo) nuevoCampo.focus();
-    }
-
-    function actualizarSeleccionPresupuesto(mes, anio) {
-      mesSelect.value = mes;
-      anioInput.value = anio;
-      evaluarVistaSegunSeleccion();
-    }
-
-    function navegarPresupuesto(direccion) {
-      guardarTodo();
-
-      const mesActual = Number(mesSelect.value || '1');
-      const anioActual = Number(anioInput.value || new Date().getFullYear());
-
-      let nuevoMes = mesActual + direccion;
-      let nuevoAnio = anioActual;
-
-      if (nuevoMes < 1) {
-        nuevoMes = 12;
-        nuevoAnio -= 1;
-      }
-
-      if (nuevoMes > 12) {
-        nuevoMes = 1;
-        nuevoAnio += 1;
-      }
-
-      actualizarSeleccionPresupuesto(String(nuevoMes).padStart(2, '0'), String(nuevoAnio));
-    }
-
-    function crearOAbrirPresupuesto() {
-      const mes = mesSelect.value;
-      const anio = anioInput.value.trim();
-
-      if (!anio) {
-        alert('Escribe el año para crear el presupuesto.');
-        return;
-      }
-
-      const key = `${anio}-${mes}`;
-      const ingresosArrastrados = obtenerIngresosIniciales(mes, anio);
-      const gastosArrastrados = obtenerGastosIniciales(mes, anio);
-      const ahorrosArrastrados = obtenerAhorrosIniciales(mes, anio);
-      const cxcArrastradas = obtenerCxcIniciales(mes, anio);
-      const cxpArrastradas = obtenerCxpIniciales(mes, anio);
-
-      if (!presupuestos[key]) {
-        presupuestos[key] = {
-          mes,
-          anio,
-          ingresos: ingresosArrastrados,
-          gastos: gastosArrastrados,
-          ahorros: ahorrosArrastrados,
-          cuentasPorCobrar: cxcArrastradas,
-          cuentasPorPagar: cxpArrastradas,
-          disponibleActual: {
-            valorManual: '',
-            usarManual: false
-          }
-        };
-      } else {
-        asegurarEstructuraPresupuesto(key);
-
-        const ingresosVacios = presupuestos[key].ingresos.length === 0;
-        const gastosVacios = presupuestos[key].gastos.length === 0;
-        const ahorrosVacios = presupuestos[key].ahorros.length === 0;
-        const cxcVacias = presupuestos[key].cuentasPorCobrar.length === 0;
-        const cxpVacias = presupuestos[key].cuentasPorPagar.length === 0;
-
-        if (ingresosVacios && ingresosArrastrados.length > 0) {
-          presupuestos[key].ingresos = ingresosArrastrados;
-        }
-
-        if (gastosVacios && gastosArrastrados.length > 0) {
-          presupuestos[key].gastos = gastosArrastrados;
-        }
-
-        if (ahorrosVacios && ahorrosArrastrados.length > 0) {
-          presupuestos[key].ahorros = ahorrosArrastrados;
-        }
-
-        if (cxcVacias && cxcArrastradas.length > 0) {
-          presupuestos[key].cuentasPorCobrar = cxcArrastradas;
-        }
-
-        if (cxpVacias && cxpArrastradas.length > 0) {
-          presupuestos[key].cuentasPorPagar = cxpArrastradas;
-        }
-      }
-
-      abrirPresupuestoExistente(key);
-    }
-
-
-    async function eliminarPresupuestoActual() {
-      if (!presupuestoActualKey || !presupuestos[presupuestoActualKey]) {
-        alert('No hay un presupuesto activo para eliminar.');
-        return;
-      }
-
-      const keyAEliminar = presupuestoActualKey;
-      const presupuestoRespaldo = JSON.parse(JSON.stringify(presupuestos[keyAEliminar]));
-      const etiqueta = `${obtenerNombreMes(presupuestoRespaldo.mes)} ${presupuestoRespaldo.anio}`;
-      const confirmado = confirm(`¿Seguro que quieres eliminar el presupuesto de ${etiqueta}? Esta acción no se puede deshacer.`);
-
-      if (!confirmado) return;
-
-      delete presupuestos[keyAEliminar];
-      presupuestosPendientesSync.delete(keyAEliminar);
-      presupuestoActualKey = '';
-      guardarTodoLocal();
-      mostrarSoloEncabezado();
-      evaluarVistaSegunSeleccion();
-
-      const eliminado = await eliminarPresupuestoDeSupabase(keyAEliminar);
-
-      if (!eliminado) {
-        presupuestos[keyAEliminar] = presupuestoRespaldo;
-        presupuestoActualKey = keyAEliminar;
-        guardarTodoLocal();
-        abrirPresupuestoExistente(keyAEliminar);
-        alert('No se pudo eliminar el presupuesto en la base de datos. Inténtalo otra vez.');
-        return;
-      }
-    }
-
-    function intentarAbrirPresupuestoAutomatico() {
-      evaluarVistaSegunSeleccion();
-    }
-
-    function obtenerUltimoPresupuestoGuardado() {
-      const keys = Object.keys(presupuestos);
-      if (!keys.length) return '';
-
-      return keys.sort((a, b) => {
-        const [anioA, mesA] = a.split('-').map(Number);
-        const [anioB, mesB] = b.split('-').map(Number);
-
-        if (anioA !== anioB) return anioB - anioA;
-        return mesB - mesA;
-      })[0];
-    }
-
-    function cargarInicial() {
-      const hoy = new Date();
-      const mesActual = String(hoy.getMonth() + 1).padStart(2, '0');
-      const anioActual = hoy.getFullYear();
-
-      mesSelect.value = mesActual;
-      anioInput.value = anioActual;
-
-      if (presupuestoActualKey && presupuestos[presupuestoActualKey]) {
-        const [anioGuardado, mesGuardado] = presupuestoActualKey.split('-');
-        mesSelect.value = mesGuardado;
-        anioInput.value = anioGuardado;
-        abrirPresupuestoExistente(presupuestoActualKey);
-        return;
-      }
-
-      const ultimoKey = obtenerUltimoPresupuestoGuardado();
-
-      if (ultimoKey && presupuestos[ultimoKey]) {
-        presupuestoActualKey = ultimoKey;
-        localStorage.setItem('presupuestoActualKey', presupuestoActualKey);
-
-        const [anioGuardado, mesGuardado] = ultimoKey.split('-');
-        mesSelect.value = mesGuardado;
-        anioInput.value = anioGuardado;
-        abrirPresupuestoExistente(ultimoKey);
-        return;
-      }
-      totalIngresos.textContent = formatoMoneda(0);
-      totalGastos.textContent = formatoMoneda(0);
-      totalAhorros.textContent = formatoMoneda(0);
-      totalCxc.textContent = formatoMoneda(0);
-      totalCxp.textContent = formatoMoneda(0);
-        totalAhorrosAcumulados.textContent = formatoMoneda(0);
-      pendientePorPagar.textContent = formatoMoneda(0);
-      disponibleReal.textContent = formatoMoneda(0);
-      mostrarSoloEncabezado();
-    }
-
-
-    async function iniciarSesion() {
-      ocultarMensajesAcceso();
-
-      const email = loginEmail.value.trim();
-      const password = loginPassword.value;
-
-      if (!email || !password) {
-        loginError.textContent = 'Completa correo y contraseña.';
-        loginError.style.display = 'block';
-        return;
-      }
-
-      loginBtn.disabled = true;
-      loginBtn.textContent = 'Ingresando...';
-
-      try {
-        const { error } = await supabaseClient.auth.signInWithPassword({
-          email,
-          password
-        });
-
-        if (error) {
-          loginError.textContent = 'No pudimos iniciar sesión. Revisa correo y contraseña.';
-          loginError.style.display = 'block';
-          return;
-        }
-
-        loginPassword.value = '';
-
-        let perfil = null;
-        try {
-          perfil = await obtenerPerfilActual();
-        } catch (e) {
-          console.error('Error obteniendo perfil:', e);
-        }
-
-        if (perfil?.must_change_password) {
-          mostrarFormularioRecuperacion(true);
-          return;
-        }
-
-        mostrarApp();
-
-        try {
-          await sincronizarPresupuestosIniciales();
-        } catch (e) {
-          console.error('Error sincronizando presupuestos:', e);
-        }
-
-        try {
-          await sincronizarProvisionInicial();
-        } catch (e) {
-          console.error('Error sincronizando provisión:', e);
-        }
-
-        try {
-          cargarInicial();
-          renderProvisionGasto();
-        } catch (e) {
-          console.error('Error cargando app:', e);
-        }
-      } catch (e) {
-        console.error('Error general en iniciarSesion:', e);
-        loginError.textContent = 'Ocurrió un error al iniciar sesión.';
-        loginError.style.display = 'block';
-      } finally {
-        loginBtn.disabled = false;
-        loginBtn.textContent = 'Ingresar';
-      }
-    }
-
-    function mostrarLogin() {
-      loginScreen.style.display = 'block';
-      appShell.style.display = 'none';
-      mostrarFormularioAcceso();
-    }
-
-    function mostrarApp() {
-      loginScreen.style.display = 'none';
-      appShell.style.display = 'block';
-    }
-
-    async function verificarSesionInicial() {
-      try {
-        const hashParams = obtenerHashParams();
-        const searchParams = obtenerSearchParams();
-
-        const esInvite =
-          hashParams.get('type') === 'invite' ||
-          searchParams.get('type') === 'invite';
-
-        if (await procesarRecuperacionDesdeUrl()) {
-          if (esInvite) {
-            forcePasswordChangeMode = true;
-          }
-          return;
-        }
-
-        const { data, error } = await supabaseClient.auth.getSession();
-
-        if (error) {
-          console.error('Error obteniendo sesión:', error.message);
-          mostrarLogin();
-          return;
-        }
-
-        if (data.session) {
-          if (urlIndicaRecuperacion()) {
-            mostrarFormularioRecuperacion(esInvite);
-            return;
-          }
-
-          const perfil = await obtenerPerfilActual();
-
-          if (perfil?.must_change_password) {
-            mostrarFormularioRecuperacion(true);
-            return;
-          }
-
-          mostrarApp();
-          await sincronizarPresupuestosIniciales();
-          await sincronizarProvisionInicial();
-          cargarInicial();
-          renderProvisionGasto();
-        } else {
-          limpiarUrlRecuperacion();
-          mostrarLogin();
-        }
-      } catch (err) {
-        console.error(err);
-        limpiarUrlRecuperacion();
-        mostrarLogin();
-      }
-    }
-
-    async function cerrarSesion() {
-      if (guardadoSupabaseTimeout) {
-        clearTimeout(guardadoSupabaseTimeout);
-        guardadoSupabaseTimeout = null;
-      }
-
-      try {
-        await guardarTodosLosPresupuestosEnSupabase();
-        await guardarProvisionEnSupabase();
-      } catch (error) {
-        console.error('Error guardando antes de cerrar sesión:', error);
-      }
-
-      try {
-        await supabaseClient.auth.signOut();
-      } catch (error) {
-        console.error('Error cerrando sesión:', error);
-      } finally {
-        recoveryModeActivo = false;
-        forcePasswordChangeMode = false;
-        presupuestoActualKey = '';
-        localStorage.removeItem('presupuestoActualKey');
-        limpiarUrlRecuperacion();
-        mostrarLogin();
-      }
-    }
-
-    supabaseClient.auth.onAuthStateChange(async (event, session) => {
-      const hashParams = obtenerHashParams();
-      const searchParams = obtenerSearchParams();
-
-      const esInvite =
-        hashParams.get('type') === 'invite' ||
-        searchParams.get('type') === 'invite';
-
-      if (event === 'SIGNED_OUT') {
-        recoveryModeActivo = false;
-        forcePasswordChangeMode = false;
-        presupuestoActualKey = '';
-        localStorage.removeItem('presupuestoActualKey');
-        limpiarUrlRecuperacion();
-        mostrarLogin();
-        return;
-      }
-
-      if (event === 'PASSWORD_RECOVERY') {
-        mostrarFormularioRecuperacion(false);
-        return;
-      }
-
-      if (!session) {
-        if (urlIndicaRecuperacion()) {
-          mostrarFormularioRecuperacion(esInvite);
-          return;
-        }
-
-        limpiarUrlRecuperacion();
-        mostrarLogin();
-        return;
-      }
-    });
-
-    presupuestoAnteriorBtn.addEventListener('click', () => navegarPresupuesto(-1));
-    presupuestoSiguienteBtn.addEventListener('click', () => navegarPresupuesto(1));
-
-    agregarIngresoBtn.addEventListener('click', agregarIngreso);
-    agregarGastoBtn.addEventListener('click', agregarGasto);
-    agregarAhorroBtn.addEventListener('click', agregarAhorro);
-    agregarCxcBtn.addEventListener('click', agregarCxc);
-    agregarCxpBtn.addEventListener('click', agregarCxp);
-    crearPresupuestoBtn.addEventListener('click', crearOAbrirPresupuesto);
-    eliminarPresupuestoBtn.addEventListener('click', eliminarPresupuestoActual);
-
-    tablaIngresos.addEventListener('click', manejarAccionesTablaIngresos);
-    tablaGastos.addEventListener('click', manejarAccionesTablaGastos);
-    tablaAhorros.addEventListener('click', manejarAccionesTablaAhorros);
-    tablaCxc.addEventListener('click', manejarAccionesTablaCxc);
-    tablaCxp.addEventListener('click', manejarAccionesTablaCxp);
-    tablaProvision.addEventListener('click', manejarAccionesTablaProvision);
-
-    agregarProvisionBtn.addEventListener('click', agregarProvision);
-    menuToggleBtn.addEventListener('click', abrirMenu);
-    drawerCloseBtn.addEventListener('click', cerrarMenu);
-    drawerOverlay.addEventListener('click', cerrarMenu);
-    menuPresupuestoBtn.addEventListener('click', irAMiPresupuesto);
-    menuProvisionBtn.addEventListener('click', irAProvisionGasto);
-if (disponibleManualToggle) {
-      disponibleManualToggle.addEventListener('change', manejarCambioModoManual);
-    }
-
-    mesSelect.addEventListener('change', intentarAbrirPresupuestoAutomatico);
-    anioInput.addEventListener('change', intentarAbrirPresupuestoAutomatico);
-    anioInput.addEventListener('blur', intentarAbrirPresupuestoAutomatico);
-
-    loginBtn.addEventListener('click', iniciarSesion);
-    forgotPasswordBtn.addEventListener('click', solicitarRestablecimientoClave);
-    recoverySaveBtn.addEventListener('click', guardarNuevaClave);
-    recoveryCancelBtn.addEventListener('click', cancelarRecuperacion);
-
-    loginPassword.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
-        iniciarSesion();
-      }
-    });
-
-    recoveryPassword.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
-        guardarNuevaClave();
-      }
-    });
-
-    recoveryPasswordConfirm.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
-        guardarNuevaClave();
-      }
-    });
-
-    logoutBtn.addEventListener('click', cerrarSesion);
-
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') {
-        cerrarMenu();
-      }
-    });
-
-    window.addEventListener('beforeunload', () => {
-      guardarTodoLocal();
-      guardarProvisionLocal();
-    });
-
-    verificarSesionInicial();
-  </script>
-</body>
-</html>
+ (cd "$(git rev-parse --show-toplevel)" && git apply --3way <<'EOF' 
+diff --git a/index.html b/index.html
+index 2bc707eadd15c60754b13e8f6d24ceacb9eb75f9..32d07049b53e1ec4a803cd1a2a4fe67afa31e7da 100644
+--- a/index.html
++++ b/index.html
+@@ -1181,50 +1181,54 @@
+             <table>
+               <thead>
+                 <tr>
+                   <th class="col-concepto">Concepto</th>
+                   <th class="col-valor">Valor</th>
+                   <th class="col-freq">Freq.</th>
+                   <th class="col-pagado">✓</th>
+                   <th class="col-eliminar">X</th>
+                 </tr>
+               </thead>
+               <tbody id="tablaAhorros"></tbody>
+             </table>
+           </div>
+ 
+           <div class="mini-legend">M = Mensual · A = Anual · O = Ocasional</div>
+ 
+           <div class="actions-row">
+             <button id="agregarAhorroBtn" type="button">+ Agregar ahorro</button>
+           </div>
+ 
+           <div class="summary">
+             <div class="summary-box">
+               <div class="label">Total ahorros registrados</div>
+               <div class="value" id="totalAhorros">$0</div>
+             </div>
++            <div class="summary-box">
++              <div class="label">Ahorro total acumulado</div>
++              <div class="value" id="totalAhorrosAcumulados">$0</div>
++            </div>
+           </div>
+         </div>
+ 
+         <div class="card card-disponible">
+           <h2>RESUMEN</h2>
+           <div class="summary" style="margin-top: 0;">
+             <div class="summary-box value-warning" id="disponibleBaseBox">
+               <div class="label">Disponible antes de pagos pendientes</div>
+               <div class="value" id="disponibleBase">$0</div>
+               <input id="disponibleManualToggle" type="checkbox" style="display:none;" aria-hidden="true" tabindex="-1" />
+             </div>
+ 
+             <div class="summary-box value-danger">
+               <div class="label">Pendiente por pagar / apartar</div>
+               <div class="value" id="pendientePorPagar">$0</div>
+             </div>
+ 
+             <div class="summary-box value-success">
+               <div class="label">Disponible real</div>
+               <div class="value" id="disponibleReal">$0</div>
+             </div>
+           </div>
+         </div>
+ 
+         <div class="card card-informativo-banner">
+@@ -1393,50 +1397,51 @@
+     const pageTitle = document.getElementById('pageTitle');
+     const viewPresupuesto = document.getElementById('viewPresupuesto');
+     const viewProvision = document.getElementById('viewProvision');
+ 
+     const mesSelect = document.getElementById('mes');
+     const anioInput = document.getElementById('anio');
+     const presupuestoAnteriorBtn = document.getElementById('presupuestoAnteriorBtn');
+     const presupuestoSiguienteBtn = document.getElementById('presupuestoSiguienteBtn');
+     const presupuestoActivo = document.getElementById('presupuestoActivo');
+     const presupuestoActivoTexto = document.getElementById('presupuestoActivoTexto');
+     const eliminarPresupuestoBtn = document.getElementById('eliminarPresupuestoBtn');
+     const crearPresupuestoWrap = document.getElementById('crearPresupuestoWrap');
+     const crearPresupuestoBtn = document.getElementById('crearPresupuestoBtn');
+     const modulosPresupuesto = document.getElementById('modulosPresupuesto');
+ 
+     const tablaIngresos = document.getElementById('tablaIngresos');
+     const totalIngresos = document.getElementById('totalIngresos');
+     const agregarIngresoBtn = document.getElementById('agregarIngresoBtn');
+ 
+     const tablaGastos = document.getElementById('tablaGastos');
+     const totalGastos = document.getElementById('totalGastos');
+     const agregarGastoBtn = document.getElementById('agregarGastoBtn');
+ 
+     const tablaAhorros = document.getElementById('tablaAhorros');
+     const totalAhorros = document.getElementById('totalAhorros');
++    const totalAhorrosAcumulados = document.getElementById('totalAhorrosAcumulados');
+     const agregarAhorroBtn = document.getElementById('agregarAhorroBtn');
+ 
+     const tablaProvision = document.getElementById('tablaProvision');
+     const totalProvisionAnual = document.getElementById('totalProvisionAnual');
+     const totalProvisionMensual = document.getElementById('totalProvisionMensual');
+     const agregarProvisionBtn = document.getElementById('agregarProvisionBtn');
+ 
+     const disponibleBase = document.getElementById('disponibleBase');
+     const disponibleManualToggle = document.getElementById('disponibleManualToggle');
+     const pendientePorPagar = document.getElementById('pendientePorPagar');
+     const disponibleReal = document.getElementById('disponibleReal');
+ 
+     const tablaCxc = document.getElementById('tablaCxc');
+     const totalCxc = document.getElementById('totalCxc');
+     const agregarCxcBtn = document.getElementById('agregarCxcBtn');
+ 
+     const tablaCxp = document.getElementById('tablaCxp');
+     const totalCxp = document.getElementById('totalCxp');
+     const agregarCxpBtn = document.getElementById('agregarCxpBtn');
+ 
+     const storageKey = 'presupuestosMensualesApp';
+     const storageOwnerKey = 'presupuestosMensualesAppOwner';
+     const provisionStorageKey = 'provisionGastoApp';
+     const provisionStorageOwnerKey = 'provisionGastoAppOwner';
+ 
+@@ -1482,50 +1487,77 @@ let provisionInicialSincronizada = false;
+ 
+ 
+     function obtenerNombreMes(mes) {
+       const option = mesSelect.querySelector(`option[value="${String(mes).padStart(2, '0')}"]`);
+       return option ? option.textContent : String(mes);
+     }
+ 
+     function actualizarEtiquetaPresupuestoActivo() {
+       if (!presupuestoActualKey || !presupuestos[presupuestoActualKey]) {
+         presupuestoActivoTexto.textContent = '';
+         return;
+       }
+ 
+       const presupuesto = presupuestos[presupuestoActualKey];
+       presupuestoActivoTexto.textContent = `Presupuesto activo: ${obtenerNombreMes(presupuesto.mes)} ${presupuesto.anio}`;
+     }
+ 
+     function formatoNumeroInput(valor) {
+       const limpio = String(valor || '').replace(/\D/g, '');
+       if (!limpio) return '';
+       return new Intl.NumberFormat('es-CO', {
+         maximumFractionDigits: 0
+       }).format(Number(limpio));
+     }
+ 
++    function normalizarNumeroConSigno(valor) {
++      if (valor === null || valor === undefined) return '';
++      let texto = String(valor).trim();
++      if (!texto) return '';
++      if (texto === '-') return '-';
++
++      const esNegativo = texto.startsWith('-');
++      texto = texto.replace(/\D/g, '');
++      if (!texto) return '';
++      return esNegativo ? `-${texto}` : texto;
++    }
++
++    function formatoNumeroInputConSigno(valor) {
++      const normalizado = normalizarNumeroConSigno(valor);
++      if (!normalizado) return '';
++      if (normalizado === '-') return '-';
++
++      const numero = Number(normalizado);
++      if (!Number.isFinite(numero)) return '';
++
++      const absolutoFormateado = new Intl.NumberFormat('es-CO', {
++        maximumFractionDigits: 0
++      }).format(Math.abs(numero));
++
++      return numero < 0 ? `-${absolutoFormateado}` : absolutoFormateado;
++    }
++
+ 
+ function crearProvisionVacia() {
+   return {
+     descripcion: '',
+     valor: ''
+   };
+ }
+ 
+ function normalizarProvisionData(data) {
+   return {
+     items: Array.isArray(data?.items)
+       ? data.items.map((item) => ({
+           descripcion: item?.descripcion || '',
+           valor: item?.valor || ''
+         }))
+       : []
+   };
+ }
+ 
+ function guardarProvisionLocal() {
+   localStorage.setItem(provisionStorageKey, JSON.stringify(provisionGastoData));
+ }
+ 
+ function guardarProvisionOwnerLocal(userId) {
+   if (userId) {
+@@ -2465,56 +2497,64 @@ async function sincronizarProvisionInicial() {
+     function actualizarResumenIngresos() {
+       if (!presupuestoActualKey || !presupuestos[presupuestoActualKey]) {
+         totalIngresos.textContent = formatoMoneda(0);
+         return;
+       }
+ 
+       const ingresos = presupuestos[presupuestoActualKey].ingresos;
+       const total = ingresos.reduce((acc, fila) => acc + (Number(fila.valor) || 0), 0);
+       totalIngresos.textContent = formatoMoneda(total);
+     }
+ 
+     function actualizarResumenGastos() {
+       if (!presupuestoActualKey || !presupuestos[presupuestoActualKey]) {
+         totalGastos.textContent = formatoMoneda(0);
+         return;
+       }
+ 
+       const gastos = presupuestos[presupuestoActualKey].gastos;
+       const total = gastos.reduce((acc, fila) => acc + (Number(fila.valor) || 0), 0);
+       totalGastos.textContent = formatoMoneda(total);
+     }
+ 
+     function actualizarResumenAhorros() {
+       if (!presupuestoActualKey || !presupuestos[presupuestoActualKey]) {
+         totalAhorros.textContent = formatoMoneda(0);
++        totalAhorrosAcumulados.textContent = formatoMoneda(0);
+         return;
+       }
+ 
+       const ahorros = presupuestos[presupuestoActualKey].ahorros;
+       const total = ahorros.reduce((acc, fila) => acc + (Number(fila.valor) || 0), 0);
+       totalAhorros.textContent = formatoMoneda(total);
++
++      const totalAcumulado = Object.entries(presupuestos).reduce((acc, [key, presupuesto]) => {
++        if (key > presupuestoActualKey) return acc;
++        const subtotal = (presupuesto.ahorros || []).reduce((suma, fila) => suma + (Number(fila.valor) || 0), 0);
++        return acc + subtotal;
++      }, 0);
++      totalAhorrosAcumulados.textContent = formatoMoneda(totalAcumulado);
+     }
+ 
+     function pintarValorResumen(elemento, caja, valor, clasePositiva) {
+       if (!elemento || !caja) return;
+ 
+       caja.classList.remove('value-warning', 'value-success', 'value-danger');
+ 
+       if (valor < 0) {
+         caja.classList.add('value-danger');
+         elemento.textContent = `⚠️ ${formatoMoneda(valor)}`;
+         return;
+       }
+ 
+       caja.classList.add(clasePositiva);
+       elemento.textContent = formatoMoneda(valor);
+     }
+ 
+     function actualizarDisponibleActual() {
+       if (!presupuestoActualKey || !presupuestos[presupuestoActualKey]) {
+         pendientePorPagar.textContent = formatoMoneda(0);
+         disponibleBase.textContent = formatoMoneda(0);
+         disponibleReal.textContent = formatoMoneda(0);
+ 
+         if (disponibleBaseBox) {
+           disponibleBaseBox.classList.remove('value-danger', 'value-success');
+@@ -2721,73 +2761,74 @@ function agregarProvision() {
+               <option value="ANUAL" ${fila.periodicidad === 'ANUAL' ? 'selected' : ''}>A</option>
+               <option value="OCASIONAL" ${fila.periodicidad === 'OCASIONAL' ? 'selected' : ''}>O</option>
+             </select>
+           </td>
+           <td class="col-pagado">
+             <div class="check-wrap">
+               <input type="checkbox" class="paid-check" ${fila.pagado ? 'checked' : ''} data-index="${index}" data-field="pagado" title="Marcar como pagado" />
+             </div>
+           </td>
+           <td class="col-eliminar">
+             <button type="button" class="delete-mini" data-index="${index}" data-action="eliminar" title="Eliminar gasto">×</button>
+           </td>
+         `;
+         tablaGastos.appendChild(tr);
+       });
+ 
+       actualizarResumenGastos();
+       activarEventosFilasGastos();
+     }
+ 
+     function renderAhorros() {
+       tablaAhorros.innerHTML = '';
+ 
+       if (!presupuestoActualKey || !presupuestos[presupuestoActualKey]) {
+         totalAhorros.textContent = formatoMoneda(0);
++        totalAhorrosAcumulados.textContent = formatoMoneda(0);
+         return;
+       }
+ 
+       asegurarEstructuraPresupuesto(presupuestoActualKey);
+       const ahorros = presupuestos[presupuestoActualKey].ahorros;
+ 
+       if (ahorros.length === 0) {
+         const tr = document.createElement('tr');
+         tr.innerHTML = `<td colspan="5" class="empty-row">Aún no has agregado ahorros para este mes.</td>`;
+         tablaAhorros.appendChild(tr);
+       }
+ 
+       ahorros.forEach((fila, index) => {
+         const clasePendiente = fila.pagado ? '' : 'fila-ahorro-pendiente';
+ 
+         const tr = document.createElement('tr');
+         tr.className = clasePendiente;
+         tr.innerHTML = `
+           <td class="col-concepto">
+             <input type="text" value="${fila.descripcion || ''}" placeholder="Ej. Fondo viaje" data-index="${index}" data-field="descripcion" />
+           </td>
+           <td class="col-valor">
+-            <input type="text" inputmode="numeric" value="${formatoNumeroInput(fila.valor)}" placeholder="0" data-index="${index}" data-field="valor" />
++            <input type="text" inputmode="text" value="${formatoNumeroInputConSigno(fila.valor)}" placeholder="0" data-index="${index}" data-field="valor" />
+           </td>
+           <td class="col-freq">
+             <select data-index="${index}" data-field="periodicidad">
+               <option value="MENSUAL" ${fila.periodicidad === 'MENSUAL' ? 'selected' : ''}>M</option>
+               <option value="ANUAL" ${fila.periodicidad === 'ANUAL' ? 'selected' : ''}>A</option>
+               <option value="OCASIONAL" ${fila.periodicidad === 'OCASIONAL' ? 'selected' : ''}>O</option>
+             </select>
+           </td>
+           <td class="col-pagado">
+             <div class="check-wrap">
+               <input type="checkbox" class="paid-check" ${fila.pagado ? 'checked' : ''} data-index="${index}" data-field="pagado" title="Marcar como realizado" />
+             </div>
+           </td>
+           <td class="col-eliminar">
+             <button type="button" class="delete-mini" data-index="${index}" data-action="eliminar" title="Eliminar ahorro">×</button>
+           </td>
+         `;
+         tablaAhorros.appendChild(tr);
+       });
+ 
+       actualizarResumenAhorros();
+       activarEventosFilasAhorros();
+     }
+ 
+ 
+@@ -3125,53 +3166,53 @@ function agregarProvision() {
+         presupuestos[presupuestoActualKey].gastos[index][field] = value;
+       }
+ 
+       guardarTodo();
+       actualizarResumenGastos();
+       actualizarDisponibleActual();
+     }
+ 
+     function manejarCambioAhorro(e) {
+       const index = Number(e.target.dataset.index);
+       const field = e.target.dataset.field;
+ 
+       if (!presupuestoActualKey || !presupuestos[presupuestoActualKey] || Number.isNaN(index)) return;
+ 
+       if (field === 'pagado') {
+         presupuestos[presupuestoActualKey].ahorros[index][field] = e.target.checked;
+         guardarTodo();
+         actualizarResumenAhorros();
+         actualizarDisponibleActual();
+         renderAhorros();
+         return;
+       }
+ 
+       let value = e.target.value;
+       if (field === 'valor') {
+-        value = value.replace(/\D/g, '');
++        value = normalizarNumeroConSigno(value);
+         presupuestos[presupuestoActualKey].ahorros[index][field] = value;
+-        e.target.value = formatoNumeroInput(value);
++        e.target.value = formatoNumeroInputConSigno(value);
+       } else {
+         presupuestos[presupuestoActualKey].ahorros[index][field] = value;
+       }
+ 
+       guardarTodo();
+       actualizarResumenAhorros();
+       actualizarDisponibleActual();
+     }
+ 
+     function manejarCambioDisponibleBase() {
+       actualizarDisponibleActual();
+     }
+ 
+     function manejarCambioModoManual() {
+       actualizarDisponibleActual();
+     }
+ 
+     function manejarAccionesTablaIngresos(e) {
+       const action = e.target.dataset.action;
+       const index = Number(e.target.dataset.index);
+ 
+       if (action !== 'eliminar' || !presupuestoActualKey || !presupuestos[presupuestoActualKey] || Number.isNaN(index)) return;
+ 
+       presupuestos[presupuestoActualKey].ingresos.splice(index, 1);
+       guardarTodo();
+@@ -3404,50 +3445,51 @@ function agregarProvision() {
+ 
+       if (presupuestoActualKey && presupuestos[presupuestoActualKey]) {
+         const [anioGuardado, mesGuardado] = presupuestoActualKey.split('-');
+         mesSelect.value = mesGuardado;
+         anioInput.value = anioGuardado;
+         abrirPresupuestoExistente(presupuestoActualKey);
+         return;
+       }
+ 
+       const ultimoKey = obtenerUltimoPresupuestoGuardado();
+ 
+       if (ultimoKey && presupuestos[ultimoKey]) {
+         presupuestoActualKey = ultimoKey;
+         localStorage.setItem('presupuestoActualKey', presupuestoActualKey);
+ 
+         const [anioGuardado, mesGuardado] = ultimoKey.split('-');
+         mesSelect.value = mesGuardado;
+         anioInput.value = anioGuardado;
+         abrirPresupuestoExistente(ultimoKey);
+         return;
+       }
+ 
+       totalIngresos.textContent = formatoMoneda(0);
+       totalGastos.textContent = formatoMoneda(0);
+       totalAhorros.textContent = formatoMoneda(0);
++      totalAhorrosAcumulados.textContent = formatoMoneda(0);
+       totalCxc.textContent = formatoMoneda(0);
+       totalCxp.textContent = formatoMoneda(0);
+       pendientePorPagar.textContent = formatoMoneda(0);
+       disponibleReal.textContent = formatoMoneda(0);
+       mostrarSoloEncabezado();
+     }
+ 
+ 
+     async function iniciarSesion() {
+       ocultarMensajesAcceso();
+ 
+       const email = loginEmail.value.trim();
+       const password = loginPassword.value;
+ 
+       if (!email || !password) {
+         loginError.textContent = 'Completa correo y contraseña.';
+         loginError.style.display = 'block';
+         return;
+       }
+ 
+       loginBtn.disabled = true;
+       loginBtn.textContent = 'Ingresando...';
+ 
+       try {
+         const { error } = await supabaseClient.auth.signInWithPassword({
+ 
+EOF
+)
