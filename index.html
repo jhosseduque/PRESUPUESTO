@@ -2617,6 +2617,7 @@ tr.innerHTML = `
     <input type="text" inputmode="text" value="${formatoNumeroInputConSigno(fila.valor)}" placeholder="0" data-index="${index}" data-field="valor" />
   </td>
   <td class="col-freq">
+
     <select data-index="${index}" data-field="periodicidad">
       <option value="MENSUAL" ${fila.periodicidad === 'MENSUAL' ? 'selected' : ''}>M</option>
       <option value="ANUAL" ${fila.periodicidad === 'ANUAL' ? 'selected' : ''}>A</option>
@@ -2819,10 +2820,12 @@ function agregarProvision() {
             <input type="text" value="${fila.descripcion || ''}" placeholder="Ej. Fondo viaje" data-index="${index}" data-field="descripcion" />
           </td>
           <td class="col-valor">
-            <input type="text" inputmode="text" value="${formatoNumeroInputConSigno(fila.valor)}" placeholder="0" data-index="${index}" data-field="valor" />          <td class="col-freq">
+            <input type="text" inputmode="text" value="${formatoNumeroInputConSigno(fila.valor)}" placeholder="0" data-index="${index}" data-field="valor" />
                       </td>
+
           <td class="col-freq">          
             <select data-index="${index}" data-field="periodicidad">
+
               <option value="MENSUAL" ${fila.periodicidad === 'MENSUAL' ? 'selected' : ''}>M</option>
               <option value="ANUAL" ${fila.periodicidad === 'ANUAL' ? 'selected' : ''}>A</option>
               <option value="OCASIONAL" ${fila.periodicidad === 'OCASIONAL' ? 'selected' : ''}>O</option>
